@@ -335,7 +335,7 @@ class Auditor33GroupA:
                         65,
                         "WARN",
                         f'对话标签过于单一: "{dominant_tag[0]}"'
-                        f'占比{dominant_tag[1] / len(tags):.0%}',
+                        f"占比{dominant_tag[1] / len(tags):.0%}",
                         '丰富对话标签,用动作/神情代替"XX道"',
                         True,
                     )

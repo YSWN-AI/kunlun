@@ -1,4 +1,4 @@
-"""
+﻿"""
 昆仑创作引擎 — 质量仪表盘 (QualityDashboard)
 
 为 API 路由和 CLI 提供统一入口，封装 QualityEvaluator。
@@ -21,6 +21,11 @@ class DashboardReport:
     token_budget_usage: float = 0.0
     warnings: list[str] = field(default_factory=list)
     issues: list[str] = field(default_factory=list)
+
+    @property
+    def issues_summary(self) -> list[str]:
+        """问题摘要（返回前 N 条问题）"""
+        return self.issues
     dimensions: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:

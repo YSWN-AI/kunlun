@@ -99,9 +99,9 @@ class ContinuityChecker:
                             entity_type="character",
                             entity_id=char_id,
                             description=(
-                            f"角色情绪剧烈变化: {prev_emotion} → {curr_emotion} "
-                            f"(跨{emotion_distance}级)"
-                        ),
+                                f"角色情绪剧烈变化: {prev_emotion} → {curr_emotion} "
+                                f"(跨{emotion_distance}级)"
+                            ),
                             previous_value=prev_emotion,
                             current_value=curr_emotion,
                             suggestion="建议添加情绪过渡描写",
@@ -203,9 +203,8 @@ class ContinuityChecker:
                     entity_type="timeline",
                     entity_id="main",
                     description=(
-                            f"时间跳跃过大: {prev_day}天 → {curr_day}天 "
-                            f"(跨{curr_day - prev_day}天)"
-                        ),
+                        f"时间跳跃过大: {prev_day}天 → {curr_day}天 (跨{curr_day - prev_day}天)"
+                    ),
                     previous_value=prev_day,
                     current_value=curr_day,
                     suggestion="建议添加时间跳跃说明 (如'三个月后')",
@@ -472,9 +471,9 @@ class ContinuityChecker:
                             entity_type="value",
                             entity_id=value_key,
                             description=(
-                            f"数值暴增: {value_key}: {prev_val} → {curr_val} "
-                            f"(x{curr_val / max(prev_val, 1):.1f})"
-                        ),
+                                f"数值暴增: {value_key}: {prev_val} → {curr_val} "
+                                f"(x{curr_val / max(prev_val, 1):.1f})"
+                            ),
                             previous_value=prev_val,
                             current_value=curr_val,
                             suggestion="建议添加合理的升级描写",

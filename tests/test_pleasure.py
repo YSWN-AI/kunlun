@@ -1,6 +1,7 @@
 """
 测试 — 爽点系统 (pleasure/)
 """
+
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -44,10 +45,18 @@ class TestPleasureTypeConfigs:
     def test_grade_s_types(self):
         """S级爽点（最强爽点）"""
         from kunlun.pleasure.engine import PLEASURE_TYPE_CONFIGS
-        s_configs = [PLEASURE_TYPE_CONFIGS[p] for p in [
-            PleasureType.FACE_SLAP, PleasureType.LEVEL_UP, PleasureType.SHOW_OFF,
-            PleasureType.AWAKENING, PleasureType.SYSTEM_REWARD, PleasureType.REVENGE,
-        ]]
+
+        s_configs = [
+            PLEASURE_TYPE_CONFIGS[p]
+            for p in [
+                PleasureType.FACE_SLAP,
+                PleasureType.LEVEL_UP,
+                PleasureType.SHOW_OFF,
+                PleasureType.AWAKENING,
+                PleasureType.SYSTEM_REWARD,
+                PleasureType.REVENGE,
+            ]
+        ]
         for cfg in s_configs:
             assert cfg.grade == "S", f"{cfg.name_cn} should be grade S"
 
@@ -63,6 +72,7 @@ class TestPleasureTypeConfigs:
     def test_default_config_fallback(self):
         """未配置的类型返回默认值"""
         from kunlun.pleasure.engine import PLEASURE_TYPE_CONFIGS
+
         fake_type = PleasureType.FACE_SLAP
         config = PLEASURE_TYPE_CONFIGS.get(fake_type)
         assert config is not None
@@ -75,10 +85,26 @@ class TestPleasureFatigueDetector:
     def test_no_fatigue_on_fresh(self):
         detector = PleasureFatigueDetector()
         from kunlun.pleasure.engine import PleasureEvent
+
         events = [
-            PleasureEvent(event_type=PleasureType.FACE_SLAP, position=0, intensity=0.9, keywords_matched=["打脸"]),
-            PleasureEvent(event_type=PleasureType.LEVEL_UP, position=1000, intensity=0.8, keywords_matched=["升级"]),
-            PleasureEvent(event_type=PleasureType.REVEAL, position=2000, intensity=0.7, keywords_matched=["揭秘"]),
+            PleasureEvent(
+                event_type=PleasureType.FACE_SLAP,
+                position=0,
+                intensity=0.9,
+                keywords_matched=["打脸"],
+            ),
+            PleasureEvent(
+                event_type=PleasureType.LEVEL_UP,
+                position=1000,
+                intensity=0.8,
+                keywords_matched=["升级"],
+            ),
+            PleasureEvent(
+                event_type=PleasureType.REVEAL,
+                position=2000,
+                intensity=0.7,
+                keywords_matched=["揭秘"],
+            ),
         ]
         report = detector.feed(events)
         assert report["fatigue_detected"] is False
@@ -86,8 +112,14 @@ class TestPleasureFatigueDetector:
     def test_detect_consecutive_same(self):
         detector = PleasureFatigueDetector()
         from kunlun.pleasure.engine import PleasureEvent
+
         events = [
-            PleasureEvent(event_type=PleasureType.FACE_SLAP, position=0, intensity=0.9, keywords_matched=["打脸"]),
+            PleasureEvent(
+                event_type=PleasureType.FACE_SLAP,
+                position=0,
+                intensity=0.9,
+                keywords_matched=["打脸"],
+            ),
         ]
         detector.feed(events)
         detector.feed(events)
@@ -99,10 +131,23 @@ class TestPleasureFatigueDetector:
     def test_detect_fixed_pattern(self):
         detector = PleasureFatigueDetector()
         from kunlun.pleasure.engine import PleasureEvent
+
         pattern = [
-            PleasureEvent(event_type=PleasureType.FACE_SLAP, position=0, intensity=0.9, keywords_matched=["a"]),
-            PleasureEvent(event_type=PleasureType.LEVEL_UP, position=100, intensity=0.8, keywords_matched=["b"]),
-            PleasureEvent(event_type=PleasureType.OVERWHELM, position=200, intensity=0.7, keywords_matched=["c"]),
+            PleasureEvent(
+                event_type=PleasureType.FACE_SLAP, position=0, intensity=0.9, keywords_matched=["a"]
+            ),
+            PleasureEvent(
+                event_type=PleasureType.LEVEL_UP,
+                position=100,
+                intensity=0.8,
+                keywords_matched=["b"],
+            ),
+            PleasureEvent(
+                event_type=PleasureType.OVERWHELM,
+                position=200,
+                intensity=0.7,
+                keywords_matched=["c"],
+            ),
         ]
         for _ in range(4):
             for e in pattern:
@@ -113,22 +158,53 @@ class TestPleasureFatigueDetector:
     def test_variety_suggestions(self):
         detector = PleasureFatigueDetector()
         from kunlun.pleasure.engine import PleasureEvent
+
         for _ in range(5):
-            detector.feed([
-                PleasureEvent(event_type=PleasureType.FACE_SLAP, position=0, intensity=0.9, keywords_matched=["a"]),
-            ])
+            detector.feed(
+                [
+                    PleasureEvent(
+                        event_type=PleasureType.FACE_SLAP,
+                        position=0,
+                        intensity=0.9,
+                        keywords_matched=["a"],
+                    ),
+                ]
+            )
         suggestions = detector.get_variety_suggestions("玄幻")
         assert len(suggestions) > 0
 
     def test_reset(self):
         detector = PleasureFatigueDetector()
         from kunlun.pleasure.engine import PleasureEvent
-        detector.feed([
-            PleasureEvent(event_type=PleasureType.FACE_SLAP, position=0, intensity=0.9, keywords_matched=["a"]),
-            PleasureEvent(event_type=PleasureType.FACE_SLAP, position=100, intensity=0.9, keywords_matched=["b"]),
-            PleasureEvent(event_type=PleasureType.FACE_SLAP, position=200, intensity=0.9, keywords_matched=["c"]),
-            PleasureEvent(event_type=PleasureType.FACE_SLAP, position=300, intensity=0.9, keywords_matched=["d"]),
-        ])
+
+        detector.feed(
+            [
+                PleasureEvent(
+                    event_type=PleasureType.FACE_SLAP,
+                    position=0,
+                    intensity=0.9,
+                    keywords_matched=["a"],
+                ),
+                PleasureEvent(
+                    event_type=PleasureType.FACE_SLAP,
+                    position=100,
+                    intensity=0.9,
+                    keywords_matched=["b"],
+                ),
+                PleasureEvent(
+                    event_type=PleasureType.FACE_SLAP,
+                    position=200,
+                    intensity=0.9,
+                    keywords_matched=["c"],
+                ),
+                PleasureEvent(
+                    event_type=PleasureType.FACE_SLAP,
+                    position=300,
+                    intensity=0.9,
+                    keywords_matched=["d"],
+                ),
+            ]
+        )
         detector.reset()
         report = detector.feed([])
         assert report["fatigue_detected"] is False
@@ -153,9 +229,7 @@ class TestPleasureArcPlanner:
 
     def test_genre_specific_arc(self):
         plan = PleasureArcPlanner.plan_for_genre("test_book", 100, "系统流")
-        assert any(
-            PleasureType.SYSTEM_REWARD in p.primary_types for p in plan.phases
-        )
+        assert any(PleasureType.SYSTEM_REWARD in p.primary_types for p in plan.phases)
 
     def test_genre_suspense_arc(self):
         plan = PleasureArcPlanner.plan_for_genre("test_book", 100, "悬疑推理")
@@ -261,8 +335,12 @@ class TestPleasureEngine:
 
 def test_arc_plan_data_class():
     plan = PleasureArcPlan(book_id="t", total_chapters=50, chapters_per_act=10)
-    plan.phases.append(ArcPhase(
-        name="test", chapter_range=(1, 10), target_density=2.0,
-        primary_types=[PleasureType.FACE_SLAP],
-    ))
+    plan.phases.append(
+        ArcPhase(
+            name="test",
+            chapter_range=(1, 10),
+            target_density=2.0,
+            primary_types=[PleasureType.FACE_SLAP],
+        )
+    )
     assert plan.phases[0].name == "test"

@@ -174,8 +174,7 @@ class RippleDetector:
             f"| {imp.severity} | {imp.entity_name} ({imp.entity_uid}) | "
             f"{imp.entity_type} | {imp.impact_description} | {imp.suggestion} |"
             for imp in sorted(
-                report.impacts,
-                key=lambda x: ["FATAL", "HIGH", "MEDIUM", "LOW"].index(x.severity)
+                report.impacts, key=lambda x: ["FATAL", "HIGH", "MEDIUM", "LOW"].index(x.severity)
             )
         )
 

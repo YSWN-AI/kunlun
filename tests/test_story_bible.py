@@ -1,6 +1,7 @@
 """
 测试Story Bible统一管理模块
 """
+
 import tempfile
 from pathlib import Path
 
@@ -41,8 +42,10 @@ class TestWorkflowStage:
 class TestBibleEntry:
     def test_defaults(self):
         entry = BibleEntry(
-            key="char_zhangsan", section=BibleSection.STORY_BIBLE,
-            entry_type="character", raw_line="[char_zhangsan]: 主角",
+            key="char_zhangsan",
+            section=BibleSection.STORY_BIBLE,
+            entry_type="character",
+            raw_line="[char_zhangsan]: 主角",
         )
         assert entry.key == "char_zhangsan"
         assert entry.parsed_fields == {}
@@ -51,10 +54,13 @@ class TestBibleEntry:
 
     def test_with_fields(self):
         entry = BibleEntry(
-            key="rule_001", section=BibleSection.BOOK_RULES,
-            entry_type="rule", raw_line="- 必须包含爽点",
+            key="rule_001",
+            section=BibleSection.BOOK_RULES,
+            entry_type="rule",
+            raw_line="- 必须包含爽点",
             parsed_fields={"header": "核心规则", "content": "必须包含爽点"},
-            tags=["core"], created_at=12345678.0,
+            tags=["core"],
+            created_at=12345678.0,
         )
         assert entry.parsed_fields["content"] == "必须包含爽点"
         assert "core" in entry.tags
@@ -107,6 +113,7 @@ class TestStoryBible:
     def test_init(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -121,6 +128,7 @@ class TestStoryBible:
     def test_parse_all_empty(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -136,6 +144,7 @@ class TestStoryBible:
     def test_get_overview_empty(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -151,6 +160,7 @@ class TestStoryBible:
     def test_codex_query(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -165,6 +175,7 @@ class TestStoryBible:
     def test_get_chapter_context(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -180,13 +191,16 @@ class TestStoryBible:
     def test_create_workflow_plan(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
             try:
                 bible = StoryBible("test_wf")
                 plan = bible.create_workflow_plan(
-                    "一个少年踏上修炼之路", genre="东方玄幻", target_chapters=200,
+                    "一个少年踏上修炼之路",
+                    genre="东方玄幻",
+                    target_chapters=200,
                 )
                 assert isinstance(plan, WorkflowPlan)
                 assert plan.stage == WorkflowStage.IDEA
@@ -199,6 +213,7 @@ class TestStoryBible:
     def test_save_and_load_workflow_plan(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -220,6 +235,7 @@ class TestStoryBible:
     def test_load_workflow_plan_nonexistent(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -232,6 +248,7 @@ class TestStoryBible:
     def test_advance_workflow_stage(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -249,6 +266,7 @@ class TestStoryBible:
     def test_initialize_bible_from_template(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -270,6 +288,7 @@ class TestStoryBible:
     def test_export_codex_json(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -285,6 +304,7 @@ class TestStoryBible:
     def test_export_for_context_injection(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -321,7 +341,8 @@ class TestCodexQueryResult:
 class TestChapterBibleChange:
     def test_defaults(self):
         change = ChapterBibleChange(
-            chapter=1, section=BibleSection.STORY_BIBLE,
+            chapter=1,
+            section=BibleSection.STORY_BIBLE,
         )
         assert change.added == []
         assert change.modified == []
@@ -333,6 +354,7 @@ class TestSingleton:
     def test_get_story_bible(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -343,5 +365,6 @@ class TestSingleton:
             finally:
                 cfg.settings.DATA_DIR = original
                 import kunlun.story_bible.engine as sbe_mod
+
                 if "singleton_book" in sbe_mod._bibles:
                     del sbe_mod._bibles["singleton_book"]

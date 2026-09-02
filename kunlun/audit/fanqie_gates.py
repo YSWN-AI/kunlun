@@ -498,8 +498,7 @@ class FanqieTrafficOptimizer:
             advice = {
                 "stage": "首秀期/稳定期",
                 "stage_desc": (
-                    "保持高频率更新，每3章一个小爽点，"
-                    "每10章一个大爽点。20万字后可做书测。"
+                    "保持高频率更新，每3章一个小爽点，每10章一个大爽点。20万字后可做书测。"
                 ),
                 "daily_goal": "6000字以上/天",
                 "chapters_per_day": 3,

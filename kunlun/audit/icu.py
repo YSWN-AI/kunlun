@@ -1,4 +1,4 @@
-"""
+﻿"""
 连载ICU — 七维质量保障与自动修复
 
 7个维度:
@@ -452,7 +452,7 @@ class ICUSystem:
     # ─── 主接口 ───
 
     async def run_full_check(
-        self, text: str, chapter: int, _chapter_type: str = "normal", auto_fix: bool = True
+        self, text: str, chapter: int, chapter_type: str = "normal", auto_fix: bool = True
     ) -> tuple[ICUReport, str]:
         """运行完整7维检查，可选自动修复"""
         report = ICUReport(

@@ -44,9 +44,15 @@ class TestGachaScoring:
         engine = GachaEngine()
         text = "测试文本。" * 10
         for method_name in [
-            "_score_diversity", "_score_coherence", "_score_info_density",
-            "_score_emotion", "_score_rhythm", "_score_novelty",
-            "_score_fluency", "_score_completeness", "_score_humanness",
+            "_score_diversity",
+            "_score_coherence",
+            "_score_info_density",
+            "_score_emotion",
+            "_score_rhythm",
+            "_score_novelty",
+            "_score_fluency",
+            "_score_completeness",
+            "_score_humanness",
         ]:
             score = getattr(engine, method_name)(text)
             assert isinstance(score, float)

@@ -1,4 +1,4 @@
-"""
+﻿"""
 昆仑创作引擎 — Makefile 调度员
 
 负责整个章节创作流程的编排：
@@ -609,7 +609,7 @@ class Makefile(BaseAgent):
             pipeline_intervention.advance_node(
                 ctx.pipeline_id,
                 f"{ctx.pipeline_id}_publish",
-                NodeStatus.COMPLETED if ctx.result.get("success") else NodeStatus.FAILED,
+                NodeStatus.SUCCESS if ctx.result.get("success") else NodeStatus.FAILED,
                 {"result": ctx.result},
             )
         except Exception as e_pi:

@@ -1,4 +1,4 @@
-﻿"""
+"""
 昆仑创作引擎 — 流式生成 + 扩展路由
 /stream/generate, /api/orchestrate, /api/agents, /api/truth-status, /api/auto-fix
 """

@@ -17,6 +17,7 @@ def pytest_configure(config):
     """测试启动前：禁用速率限制，避免 TestClient 触发 slowapi 异常"""
     os.environ.setdefault("KUNLUN_RATE_LIMIT_PER_MINUTE", "0")
     from kunlun.config import settings
+
     settings.rate_limit_per_minute = 0
     settings.rate_limit_generate_per_minute = 999
     settings.rate_limit_export_per_minute = 999
@@ -96,6 +97,7 @@ def reset_singletons():
             ce_mod._conflict_managers.clear()
         # 清理冲突持久化目录，避免测试间数据污染
         from kunlun.config import settings
+
         conflict_dir = settings.DATA_DIR / "conflict"
         if conflict_dir.exists():
             for item in conflict_dir.iterdir():
@@ -154,6 +156,7 @@ def reset_singletons():
     # 重置 LayerRuleEngine 单例
     try:
         from kunlun.rules.layers import reset_layer_engine
+
         reset_layer_engine()
     except Exception:
         pass

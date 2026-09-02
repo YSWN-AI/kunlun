@@ -1,6 +1,7 @@
 """
 水印引擎测试 — 零宽字符嵌入/提取、同义词替换、水印强度
 """
+
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -27,6 +28,7 @@ class TestWatermarkPayload:
 
     def test_to_string_is_valid_json(self):
         import json
+
         payload = WatermarkPayload(user_id="u1", timestamp="t1", document_id="d1", nonce="n1")
         s = payload.to_string()
         data = json.loads(s)
@@ -71,7 +73,10 @@ class TestZeroWidthWatermark:
         # 编码后文本应比原文长（插入了零宽字符）
         assert len(result) > len(text)
         # 零宽字符肉眼不可见但存在
-        assert ZeroWidthWatermark.ZERO_WIDTH_SPACE in result or ZeroWidthWatermark.ZERO_WIDTH_NON_JOINER in result
+        assert (
+            ZeroWidthWatermark.ZERO_WIDTH_SPACE in result
+            or ZeroWidthWatermark.ZERO_WIDTH_NON_JOINER in result
+        )
 
     def test_encode_decode_roundtrip_ascii(self):
         text = "这是一个测试文本。用于验证水印的编码和解码功能。"

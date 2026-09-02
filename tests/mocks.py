@@ -27,6 +27,7 @@ def temp_dir():
     tmp = tempfile.mkdtemp()
     yield Path(tmp)
     import shutil
+
     shutil.rmtree(tmp, ignore_errors=True)
 
 
@@ -45,6 +46,7 @@ def mock_settings(monkeypatch):
 
     def _set(attr: str, value: Any) -> None:
         from kunlun.config import settings
+
         monkeypatch.setattr(settings, attr, value)
 
     return _set
@@ -65,7 +67,9 @@ def mock_kg_client():
     """
     with patch("kunlun.ripple.detector.kg_client", autospec=True) as mock_kg:
         mock_kg.query_cypher = MagicMock(return_value=[])
-        mock_kg.health_check = MagicMock(return_value={"neo4j": True, "qdrant": True, "sqlite": True})
+        mock_kg.health_check = MagicMock(
+            return_value={"neo4j": True, "qdrant": True, "sqlite": True}
+        )
         mock_kg.get_entity = MagicMock(return_value=None)
         mock_kg.upsert_entity = MagicMock(return_value=True)
         yield mock_kg
@@ -132,7 +136,9 @@ def async_side_effect(values: list[Any]) -> AsyncMock:
 # ─── HTTP 响应 Mock ──────────────────────────────────
 
 
-def make_httpx_response(status_code: int = 200, json_data: dict | None = None, text: str = "") -> MagicMock:
+def make_httpx_response(
+    status_code: int = 200, json_data: dict | None = None, text: str = ""
+) -> MagicMock:
     """创建模拟的 httpx Response 对象"""
     resp = MagicMock()
     resp.status_code = status_code

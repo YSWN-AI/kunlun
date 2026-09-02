@@ -312,8 +312,7 @@ class R6StateConsistency(PreCheckRule):
                                 level=CheckLevel.WARN,
                                 passed=True,
                                 message=(
-                                    f"章节跳跃过大: 当前最大章节 "
-                                    f"{max_chapter}, 请求章节 {chapter}"
+                                    f"章节跳跃过大: 当前最大章节 {max_chapter}, 请求章节 {chapter}"
                                 ),
                             )
             except Exception as e:

@@ -727,15 +727,13 @@ class SociologistAgent(BaseAgent):
         return await self.deduce_all(
             {
                 "clan_baseline": (
-                    f"{name}的宗族背景：南方大族，族人2000+，族田3000亩，"
-                    f"三代出过两个进士。"
+                    f"{name}的宗族背景：南方大族，族人2000+，族田3000亩，三代出过两个进士。"
                 ),
                 "admin_baseline": (
                     f"{name}生前负责督运江南漕粮进京，手下有漕帮人脉。{position_info}{crime_info}"
                 ),
                 "underworld_baseline": (
-                    f"{name}生前暗中保护了一条从沿海到内地的私盐通道。"
-                    f"{crime_info}"
+                    f"{name}生前暗中保护了一条从沿海到内地的私盐通道。{crime_info}"
                 ),
             },
             dimensions=["clan", "admin", "underworld"],
@@ -755,8 +753,7 @@ class SociologistAgent(BaseAgent):
         return await self.deduce_all(
             {
                 "economy_baseline": (
-                    f"{scenario} 灾前粮价：米每石1两，"
-                    f"灾后飙升至3两。借贷利率：月息3分。"
+                    f"{scenario} 灾前粮价：米每石1两，灾后飙升至3两。借贷利率：月息3分。"
                 ),
                 "clan_baseline": "该县有王姓大族，掌握义仓和族田，但救济只给本族中人。",
                 "mobility_baseline": (
@@ -785,8 +782,7 @@ class SociologistAgent(BaseAgent):
                 "propaganda_baseline": f"需要抹黑{name}的舆论武器：童谣、揭帖、戏曲影射。",
                 "astronomy_baseline": "最近天象：彗星过境，钦天监可政治化解读。",
                 "language_baseline": (
-                    f"文字狱切入方向：{name}曾出版诗集一部，"
-                    f"师从某位有争议的大儒。"
+                    f"文字狱切入方向：{name}曾出版诗集一部，师从某位有争议的大儒。"
                 ),
             },
             dimensions=["admin", "propaganda", "astronomy", "language"],

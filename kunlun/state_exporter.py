@@ -47,13 +47,7 @@ def _state_dir(book_id: str) -> Path:
 def _header(title: str) -> str:
     """生成带时间戳的文件头。"""
     ts = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
-    return (
-        f"# {'=' * 60}\n"
-        f"# {title}\n"
-        f"# 生成时间: {ts}\n"
-        f"# 昆仑创作引擎 — 状态导出\n"
-        f"# {'=' * 60}\n"
-    )
+    return f"# {'=' * 60}\n# {title}\n# 生成时间: {ts}\n# 昆仑创作引擎 — 状态导出\n# {'=' * 60}\n"
 
 
 def _section(title: str) -> str:
@@ -694,8 +688,7 @@ def _export_foreshadowing(_book_id: str, kg_data: dict | None, truth: dict) -> s
             lines.append(_section("已埋设伏笔"))
             if all_hooks:
                 lines.extend(
-                    f"  ◈ {h.get('name', h.get('description', '?'))}"
-                    f"  (第{h.get('chapter', '?')}章)"
+                    f"  ◈ {h.get('name', h.get('description', '?'))}  (第{h.get('chapter', '?')}章)"
                     for h in all_hooks[:50]
                 )
             else:

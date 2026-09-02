@@ -1,4 +1,4 @@
-﻿"""
+"""
 昆仑创作引擎 — 章节路由 (v2)
 /books/{book_id}/chapters/batch-generate: 批量生成
 /books/{book_id}/chapters/{chapter}/generate: 单章生成

@@ -213,7 +213,11 @@ class TestMarketplaceEngine:
 
     def test_publish_template(self, engine):
         tpl = engine.publish_template(
-            "测试模板", "outline", "测试描述", "{}", author_id="dev_001",
+            "测试模板",
+            "outline",
+            "测试描述",
+            "{}",
+            author_id="dev_001",
         )
         assert tpl is not None
         assert tpl.name == "测试模板"
@@ -338,7 +342,10 @@ class TestPluginStoreEngine:
         from kunlun.plugin_store import PluginCategory
 
         plg = engine.publish_plugin(
-            "测试插件", PluginCategory.UTILITY, "测试描述", author="dev_001",
+            "测试插件",
+            PluginCategory.UTILITY,
+            "测试描述",
+            author="dev_001",
         )
         assert plg is not None
         assert plg.name == "测试插件"
@@ -375,7 +382,11 @@ class TestPluginStoreEngine:
         engine.approve_plugin(plg.plugin_id)
 
         review = engine.review(
-            plg.plugin_id, "user_001", 4.0, "好评", "非常好用",
+            plg.plugin_id,
+            "user_001",
+            4.0,
+            "好评",
+            "非常好用",
         )
         assert review is not None
         assert review.rating == 4.0
@@ -488,7 +499,9 @@ class TestFineTuneEngine:
 
     def test_build_dataset_all(self, engine):
         dataset = engine.build_dataset(
-            style_focus=True, genre_focus=True, dialogue_focus=True,
+            style_focus=True,
+            genre_focus=True,
+            dialogue_focus=True,
         )
         assert len(dataset) == 3
 

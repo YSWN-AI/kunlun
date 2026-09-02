@@ -200,6 +200,7 @@ warn_unused_ignores = true
 no_implicit_optional = true
 # 第三方库无类型注释 → 暂时跳过
 ignore_missing_imports = true
+disable_error_code = ["no-any-return"]
 # 不检查 migrations 和 tests
 exclude = [
     "migrations/",

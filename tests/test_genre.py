@@ -1,6 +1,7 @@
 """
 测试 — 题材模板库 (genre/)
 """
+
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -24,8 +25,16 @@ class TestTop10Templates:
 
     def test_template_ids(self):
         expected_ids = [
-            "dushi_xiuzhen", "xuanhuan", "xitong", "chongsheng", "chuanyue",
-            "mori", "xuanyi", "youxi", "kehuan", "yanqing",
+            "dushi_xiuzhen",
+            "xuanhuan",
+            "xitong",
+            "chongsheng",
+            "chuanyue",
+            "mori",
+            "xuanyi",
+            "youxi",
+            "kehuan",
+            "yanqing",
         ]
         for tid in expected_ids:
             assert tid in TOP10_TEMPLATES, f"Missing template: {tid}"
@@ -53,38 +62,44 @@ class TestTop10Templates:
 
     def test_match_score_exact(self):
         t = TOP10_TEMPLATES["xuanhuan"]
-        score = t.match_score({
-            "genre": "玄幻",
-            "pace": "medium",
-            "target_words": 3000000,
-            "platform": "qidian",
-            "preferred_pleasures": ["升级", "热血"],
-            "audience": "general",
-        })
+        score = t.match_score(
+            {
+                "genre": "玄幻",
+                "pace": "medium",
+                "target_words": 3000000,
+                "platform": "qidian",
+                "preferred_pleasures": ["升级", "热血"],
+                "audience": "general",
+            }
+        )
         assert score >= 70  # 高匹配
 
     def test_match_score_partial(self):
         t = TOP10_TEMPLATES["xitong"]
-        score = t.match_score({
-            "genre": "系统",
-            "pace": "fast",
-            "target_words": 2000000,
-            "platform": "fanqie",
-            "preferred_pleasures": ["打脸"],
-            "audience": "mass",
-        })
+        score = t.match_score(
+            {
+                "genre": "系统",
+                "pace": "fast",
+                "target_words": 2000000,
+                "platform": "fanqie",
+                "preferred_pleasures": ["打脸"],
+                "audience": "mass",
+            }
+        )
         assert score >= 60
 
     def test_match_score_low(self):
         t = TOP10_TEMPLATES["yanqing"]
-        score = t.match_score({
-            "genre": "科幻",
-            "pace": "fast",
-            "target_words": 5000000,
-            "platform": "feilu",
-            "preferred_pleasures": ["打脸", "碾压"],
-            "audience": "mass",
-        })
+        score = t.match_score(
+            {
+                "genre": "科幻",
+                "pace": "fast",
+                "target_words": 5000000,
+                "platform": "feilu",
+                "preferred_pleasures": ["打脸", "碾压"],
+                "audience": "mass",
+            }
+        )
         assert score < 50  # 低匹配
 
 
@@ -126,8 +141,11 @@ class TestGenreRuleEngine:
 
     def test_recommend_basic(self):
         results = GenreRuleEngine.recommend(
-            genre="都市", pace="fast", target_words=2000000,
-            platform="fanqie", preferred_pleasures=["打脸", "装逼"],
+            genre="都市",
+            pace="fast",
+            target_words=2000000,
+            platform="fanqie",
+            preferred_pleasures=["打脸", "装逼"],
             top_n=3,
         )
         assert len(results) <= 3
@@ -143,11 +161,15 @@ class TestGenreRuleEngine:
     def test_recommend_genre_xuanhuan(self):
         results = GenreRuleEngine.recommend(genre="玄幻", preferred_pleasures=["升级", "热血"])
         assert results  # 应该能匹配到
-        assert any("玄幻" in r["name"] for r in results) or any(r["template_id"] == "xuanhuan" for r in results)
+        assert any("玄幻" in r["name"] for r in results) or any(
+            r["template_id"] == "xuanhuan" for r in results
+        )
 
     def test_recommend_platform_specific(self):
         results = GenreRuleEngine.recommend(platform="jjwxc", top_n=2)
-        assert any(r.get("template_id") == "yanqing" or "言情" in r.get("name", "") for r in results)
+        assert any(
+            r.get("template_id") == "yanqing" or "言情" in r.get("name", "") for r in results
+        )
 
     def test_merge_configs(self):
         merged = GenreRuleEngine.merge_configs(["xuanhuan_dongfang", "xitong_liu"])
@@ -184,6 +206,7 @@ class TestGenreRuleEngine:
 
 def test_genre_config_fields():
     from kunlun.genre.engine import AudienceLevel
+
     cfg = GenreConfig(
         genre_id="test",
         name="Test",
@@ -197,6 +220,7 @@ def test_genre_config_fields():
     )
     assert cfg.name == "Test"
     assert cfg.preferred_pleasures == ["打脸", "升级"]
+
 
 def test_factory():
     e1 = get_genre_engine()

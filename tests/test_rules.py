@@ -1,6 +1,7 @@
 """
 测试三层规则分离系统 (Three-Layer Rule Separation)
 """
+
 import tempfile
 from pathlib import Path
 
@@ -23,7 +24,9 @@ from kunlun.rules.engine import (
 class TestRule:
     def test_rule_creation(self):
         r = Rule(
-            id="TEST001", category=RuleCategory.STYLE, severity=RuleSeverity.HARD,
+            id="TEST001",
+            category=RuleCategory.STYLE,
+            severity=RuleSeverity.HARD,
             description="测试规则",
         )
         assert r.id == "TEST001"
@@ -34,17 +37,24 @@ class TestRule:
 
     def test_rule_with_params_and_tags(self):
         r = Rule(
-            id="TEST002", category=RuleCategory.STRUCTURE, severity=RuleSeverity.SOFT,
-            description="字数检查", check="word_count >= 500",
-            params={"min_words": 500}, tags=["structure"],
+            id="TEST002",
+            category=RuleCategory.STRUCTURE,
+            severity=RuleSeverity.SOFT,
+            description="字数检查",
+            check="word_count >= 500",
+            params={"min_words": 500},
+            tags=["structure"],
         )
         assert r.params["min_words"] == 500
         assert "structure" in r.tags
 
     def test_rule_disabled(self):
         r = Rule(
-            id="TEST003", category=RuleCategory.PLEASURE, severity=RuleSeverity.INFO,
-            description="测试", enabled=False,
+            id="TEST003",
+            category=RuleCategory.PLEASURE,
+            severity=RuleSeverity.INFO,
+            description="测试",
+            enabled=False,
         )
         assert r.enabled is False
 
@@ -87,7 +97,8 @@ class TestRuleEngine:
     def test_build_rule_stack_with_genre_and_book(self):
         engine = RuleEngine()
         stack = engine.build_rule_stack(
-            genre_id="xuanhuan_dongfang", book_id="test_book",
+            genre_id="xuanhuan_dongfang",
+            book_id="test_book",
         )
         assert isinstance(stack, RuleStack)
         assert stack.book_id == "test_book"
@@ -138,15 +149,22 @@ class TestRuleEngine:
         engine = RuleEngine()
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
             try:
-                r1 = Rule(id="B001", category=RuleCategory.STYLE,
-                          severity=RuleSeverity.HARD, description="自定义规则1")
+                r1 = Rule(
+                    id="B001",
+                    category=RuleCategory.STYLE,
+                    severity=RuleSeverity.HARD,
+                    description="自定义规则1",
+                )
                 layer = RuleLayer(
-                    name="测试书籍", layer_type="book",
-                    description="测试", rules={"B001": r1},
+                    name="测试书籍",
+                    layer_type="book",
+                    description="测试",
+                    rules={"B001": r1},
                 )
                 engine.save_book_rules("my_book", layer)
                 loaded = engine.get_book_rules("my_book")
@@ -184,11 +202,16 @@ class TestRuleLayer:
         assert layer.metadata == {}
 
     def test_layer_with_rules(self):
-        r1 = Rule(id="R1", category=RuleCategory.CONTENT,
-                  severity=RuleSeverity.HARD, description="规则1")
-        layer = RuleLayer(name="测试", layer_type="book",
-                          description="测试", rules={"R1": r1},
-                          metadata={"version": "1"})
+        r1 = Rule(
+            id="R1", category=RuleCategory.CONTENT, severity=RuleSeverity.HARD, description="规则1"
+        )
+        layer = RuleLayer(
+            name="测试",
+            layer_type="book",
+            description="测试",
+            rules={"R1": r1},
+            metadata={"version": "1"},
+        )
         assert len(layer.rules) == 1
         assert layer.metadata["version"] == "1"
 

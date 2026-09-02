@@ -1146,8 +1146,7 @@ class GenreRuleEngine:
             "genre": config.name,
             "description": config.description,
             "target_words_per_chapter": (
-                f"{config.suggested_words_per_chapter[0]}-"
-                f"{config.suggested_words_per_chapter[1]}"
+                f"{config.suggested_words_per_chapter[0]}-{config.suggested_words_per_chapter[1]}"
             ),
             "total_words": (
                 f"{config.suggested_total_words[0] / 10000:.0f}万-"

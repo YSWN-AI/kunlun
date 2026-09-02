@@ -1,6 +1,7 @@
 """
 测试Writer上下文动态压缩 (Writer Context ReIO)
 """
+
 import tempfile
 from pathlib import Path
 
@@ -46,11 +47,17 @@ class TestChapterMemory:
 
     def test_with_data(self):
         mem = ChapterMemory(
-            chapter=5, full_text="测试章节内容", word_count=2000,
-            key_snippets=["片段1", "片段2"], entities_mentioned=["主角", "张三"],
-            plot_threads=["主线"], foreshadowing_planted=["伏笔1"],
-            retention=RetentionPriority.HIGH, surprise_score=0.8,
-            emotion_peak=True, chapter_title="高潮",
+            chapter=5,
+            full_text="测试章节内容",
+            word_count=2000,
+            key_snippets=["片段1", "片段2"],
+            entities_mentioned=["主角", "张三"],
+            plot_threads=["主线"],
+            foreshadowing_planted=["伏笔1"],
+            retention=RetentionPriority.HIGH,
+            surprise_score=0.8,
+            emotion_peak=True,
+            chapter_title="高潮",
         )
         assert mem.word_count == 2000
         assert len(mem.key_snippets) == 2
@@ -80,7 +87,11 @@ class TestSnippetExtractor:
         ) * 3
         mem = SnippetExtractor.extract(text, 3)
         assert mem.key_snippets  # 应提取到冲突相关片段
-        assert mem.retention in [RetentionPriority.MEDIUM, RetentionPriority.HIGH, RetentionPriority.CRITICAL]
+        assert mem.retention in [
+            RetentionPriority.MEDIUM,
+            RetentionPriority.HIGH,
+            RetentionPriority.CRITICAL,
+        ]
 
     def test_extract_pleasure_text(self):
         text = (
@@ -90,7 +101,11 @@ class TestSnippetExtractor:
         ) * 3
         mem = SnippetExtractor.extract(text, 5)
         assert mem.key_snippets  # 应提取到爽点相关片段
-        assert mem.retention in [RetentionPriority.MEDIUM, RetentionPriority.HIGH, RetentionPriority.CRITICAL]
+        assert mem.retention in [
+            RetentionPriority.MEDIUM,
+            RetentionPriority.HIGH,
+            RetentionPriority.CRITICAL,
+        ]
 
     def test_extract_emotion_peak(self):
         text = "主角仰天长啸，欣喜若狂地发现自己获得了无上机缘。"
@@ -115,12 +130,14 @@ class TestChapterRanker:
 
     def test_rank_basic(self):
         mem1 = ChapterMemory(
-            chapter=1, word_count=500,
+            chapter=1,
+            word_count=500,
             entities_mentioned=["主角", "张三"],
             retention=RetentionPriority.MEDIUM,
         )
         mem2 = ChapterMemory(
-            chapter=4, word_count=600,
+            chapter=4,
+            word_count=600,
             entities_mentioned=["主角"],
             retention=RetentionPriority.HIGH,
             emotion_peak=True,
@@ -132,7 +149,8 @@ class TestChapterRanker:
 
     def test_rank_with_plot_threads(self):
         mem = ChapterMemory(
-            chapter=2, word_count=400,
+            chapter=2,
+            word_count=400,
             plot_threads=["主线", "支线1"],
             retention=RetentionPriority.MEDIUM,
         )
@@ -161,17 +179,24 @@ class TestContextAssembler:
     def test_assemble_with_memories(self):
         text_para = "这是一段足够长的测试文本。" * 50
         mem1 = ChapterMemory(
-            chapter=1, full_text=text_para,
-            key_snippets=["关键片段A"], retention=RetentionPriority.CRITICAL,
-            emotion_peak=True, foreshadowing_planted=["伏笔1"],
+            chapter=1,
+            full_text=text_para,
+            key_snippets=["关键片段A"],
+            retention=RetentionPriority.CRITICAL,
+            emotion_peak=True,
+            foreshadowing_planted=["伏笔1"],
         )
         mem2 = ChapterMemory(
-            chapter=2, full_text=text_para,
-            key_snippets=["片段B"], retention=RetentionPriority.HIGH,
+            chapter=2,
+            full_text=text_para,
+            key_snippets=["片段B"],
+            retention=RetentionPriority.HIGH,
         )
         mem3 = ChapterMemory(
-            chapter=3, full_text=text_para,
-            key_snippets=["片段C"], retention=RetentionPriority.LOW,
+            chapter=3,
+            full_text=text_para,
+            key_snippets=["片段C"],
+            retention=RetentionPriority.LOW,
         )
         memories = {1: mem1, 2: mem2, 3: mem3}
         assembler = ContextAssembler(max_chars=10000)
@@ -182,12 +207,17 @@ class TestContextAssembler:
 
     def test_assemble_for_budget(self):
         mem = ChapterMemory(
-            chapter=1, full_text="测试文本" * 20,
-            key_snippets=["片段"], retention=RetentionPriority.HIGH,
+            chapter=1,
+            full_text="测试文本" * 20,
+            key_snippets=["片段"],
+            retention=RetentionPriority.HIGH,
         )
         assembler = ContextAssembler()
         result = assembler.assemble_for_budget(
-            2, {1: mem}, _budget_type=ContextBudgetType.CHARACTERS, budget_value=1000,
+            2,
+            {1: mem},
+            _budget_type=ContextBudgetType.CHARACTERS,
+            budget_value=1000,
         )
         assert isinstance(result, ContextAssembly)
 
@@ -203,6 +233,7 @@ class TestWriterContextManager:
     def test_init_with_temp_dir(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -216,6 +247,7 @@ class TestWriterContextManager:
     def test_register_chapter(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -232,6 +264,7 @@ class TestWriterContextManager:
     def test_build_context(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -249,6 +282,7 @@ class TestWriterContextManager:
     def test_mark_chapters_expired(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -264,6 +298,7 @@ class TestWriterContextManager:
     def test_get_memory_nonexistent(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -276,6 +311,7 @@ class TestWriterContextManager:
     def test_get_statistics_empty(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -289,6 +325,7 @@ class TestWriterContextManager:
     def test_get_statistics_with_data(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -306,6 +343,7 @@ class TestWriterContextManager:
     def test_persistence(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -321,6 +359,7 @@ class TestWriterContextManager:
             finally:
                 cfg.settings.DATA_DIR = original
                 import kunlun.writer_context.__init__ as wc_mod
+
                 wc_mod._managers.clear()
 
 
@@ -328,6 +367,7 @@ class TestSingleton:
     def test_get_writer_context_manager(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             import kunlun.config as cfg
+
             original = cfg.settings.DATA_DIR
             cfg.settings.DATA_DIR = Path(tmpdir)
 
@@ -341,6 +381,7 @@ class TestSingleton:
             finally:
                 cfg.settings.DATA_DIR = original
                 import kunlun.writer_context.__init__ as wc_mod
+
                 if "singleton_book" in wc_mod._managers:
                     del wc_mod._managers["singleton_book"]
                 if "other_book" in wc_mod._managers:

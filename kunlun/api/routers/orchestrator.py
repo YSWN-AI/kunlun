@@ -177,7 +177,7 @@ async def approve_subtask(request: ApprovalRequest):
     """
     logger.info(
         f"[Orchestrator] 审批: {request.task_id} - {request.subtask_id} - "
-            f"{'通过' if request.approved else '拒绝'}"
+        f"{'通过' if request.approved else '拒绝'}"
     )
 
     # 在实际实现中，这里需要与调度器集成

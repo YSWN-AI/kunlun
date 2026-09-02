@@ -120,13 +120,11 @@ class EditorInChief:
                 "## 目标读者\n\n## 创作理念\n"
             ),
             "current_focus.md": (
-                "# 当前焦点\n\n## 最近1-3章关注点\n\n"
-                "## 待推进的冲突\n\n## 需回收的伏笔\n"
+                "# 当前焦点\n\n## 最近1-3章关注点\n\n## 待推进的冲突\n\n## 需回收的伏笔\n"
             ),
             "book_rules.md": "# 作品规则\n\n## 硬约束\n- \n\n## 软指南\n- \n\n## 角色规则\n- \n",
             "story_bible.md": (
-                "# 故事设定\n\n## 世界观\n\n## 力量体系\n\n"
-                "## 主要势力\n\n## 关键地点\n"
+                "# 故事设定\n\n## 世界观\n\n## 力量体系\n\n## 主要势力\n\n## 关键地点\n"
             ),
         }
         for name, content in docs.items():

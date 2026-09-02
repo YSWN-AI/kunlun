@@ -40,12 +40,17 @@ class TestMarginalEfficiencyAnalyzer:
 
         # 高ROI核心模块
         metric = analyzer.register_module(
-            "test_core", ModuleTier.CORE,
-            code_lines=300, complexity_score=30,
-            maintenance_burden=10, runtime_overhead_ms=50,
+            "test_core",
+            ModuleTier.CORE,
+            code_lines=300,
+            complexity_score=30,
+            maintenance_burden=10,
+            runtime_overhead_ms=50,
             dependency_count=3,
-            usage_frequency=0.95, quality_contribution=90,
-            test_coverage=80, bug_surface_area=5,
+            usage_frequency=0.95,
+            quality_contribution=90,
+            test_coverage=80,
+            bug_surface_area=5,
         )
         assert metric.roi_score > 1.0, f"Core module should have high ROI, got {metric.roi_score}"
         assert not metric.is_low_efficiency_boundary
@@ -56,12 +61,17 @@ class TestMarginalEfficiencyAnalyzer:
 
         # 低效外围模块（高维护负担，低质量贡献）
         metric = analyzer.register_module(
-            "test_peripheral", ModuleTier.PERIPHERAL,
-            code_lines=20, complexity_score=5,
-            maintenance_burden=60, runtime_overhead_ms=2,
+            "test_peripheral",
+            ModuleTier.PERIPHERAL,
+            code_lines=20,
+            complexity_score=5,
+            maintenance_burden=60,
+            runtime_overhead_ms=2,
             dependency_count=1,
-            usage_frequency=0.05, quality_contribution=5,
-            test_coverage=10, bug_surface_area=2,
+            usage_frequency=0.05,
+            quality_contribution=5,
+            test_coverage=10,
+            bug_surface_area=2,
         )
         assert metric.roi_score < 1.0
 
@@ -71,12 +81,17 @@ class TestMarginalEfficiencyAnalyzer:
 
         # 正好在阈值边界
         metric = analyzer.register_module(
-            "test_boundary", ModuleTier.SUPPORT,
-            code_lines=500, complexity_score=70,
-            maintenance_burden=50, runtime_overhead_ms=300,
+            "test_boundary",
+            ModuleTier.SUPPORT,
+            code_lines=500,
+            complexity_score=70,
+            maintenance_burden=50,
+            runtime_overhead_ms=300,
             dependency_count=8,
-            usage_frequency=0.4, quality_contribution=40,
-            test_coverage=20, bug_surface_area=30,
+            usage_frequency=0.4,
+            quality_contribution=40,
+            test_coverage=20,
+            bug_surface_area=30,
         )
         # ROI应该在中等范围
         assert 0.1 <= metric.roi_score <= 5.0
@@ -86,12 +101,17 @@ class TestMarginalEfficiencyAnalyzer:
         analyzer = MarginalEfficiencyAnalyzer()
 
         analyzer.register_module(
-            "test_large_low_roi", ModuleTier.CORE,
-            code_lines=2000, complexity_score=85,
-            maintenance_burden=70, runtime_overhead_ms=1000,
+            "test_large_low_roi",
+            ModuleTier.CORE,
+            code_lines=2000,
+            complexity_score=85,
+            maintenance_burden=70,
+            runtime_overhead_ms=1000,
             dependency_count=15,
-            usage_frequency=0.9, quality_contribution=30,
-            test_coverage=5, bug_surface_area=60,
+            usage_frequency=0.9,
+            quality_contribution=30,
+            test_coverage=5,
+            bug_surface_area=60,
         )
         directives = analyzer.analyze()
         assert len(directives) > 0
@@ -102,12 +122,17 @@ class TestMarginalEfficiencyAnalyzer:
         analyzer = MarginalEfficiencyAnalyzer()
 
         analyzer.register_module(
-            "test_high_burden", ModuleTier.PERIPHERAL,
-            code_lines=200, complexity_score=40,
-            maintenance_burden=75, runtime_overhead_ms=100,
+            "test_high_burden",
+            ModuleTier.PERIPHERAL,
+            code_lines=200,
+            complexity_score=40,
+            maintenance_burden=75,
+            runtime_overhead_ms=100,
             dependency_count=3,
-            usage_frequency=0.1, quality_contribution=10,
-            test_coverage=0, bug_surface_area=40,
+            usage_frequency=0.1,
+            quality_contribution=10,
+            test_coverage=0,
+            bug_surface_area=40,
         )
         directives = analyzer.analyze()
         removal_directives = [d for d in directives if d.action == OptimizationAction.REMOVE]
@@ -119,21 +144,31 @@ class TestMarginalEfficiencyAnalyzer:
 
         # 低效模块
         analyzer.register_module(
-            "low_efficiency", ModuleTier.PERIPHERAL,
-            code_lines=500, complexity_score=50,
-            maintenance_burden=60, runtime_overhead_ms=200,
+            "low_efficiency",
+            ModuleTier.PERIPHERAL,
+            code_lines=500,
+            complexity_score=50,
+            maintenance_burden=60,
+            runtime_overhead_ms=200,
             dependency_count=4,
-            usage_frequency=0.2, quality_contribution=15,
-            test_coverage=0, bug_surface_area=30,
+            usage_frequency=0.2,
+            quality_contribution=15,
+            test_coverage=0,
+            bug_surface_area=30,
         )
         # 高ROI核心
         analyzer.register_module(
-            "high_roi_core", ModuleTier.CORE,
-            code_lines=300, complexity_score=30,
-            maintenance_burden=10, runtime_overhead_ms=50,
+            "high_roi_core",
+            ModuleTier.CORE,
+            code_lines=300,
+            complexity_score=30,
+            maintenance_burden=10,
+            runtime_overhead_ms=50,
             dependency_count=3,
-            usage_frequency=0.95, quality_contribution=90,
-            test_coverage=80, bug_surface_area=5,
+            usage_frequency=0.95,
+            quality_contribution=90,
+            test_coverage=80,
+            bug_surface_area=5,
         )
 
         reallocations = analyzer.generate_reallocation(["low_efficiency"])
@@ -162,17 +197,25 @@ class TestOptimizationMonitor:
         monitor = OptimizationMonitor()
 
         baseline = OptimizationMetrics(
-            total_lines=30000, dead_code_lines=500,
-            duplicate_lines=300, swallowed_exceptions=8,
-            todo_count=5, avg_roi=1.2, low_efficiency_ratio=0.15,
+            total_lines=30000,
+            dead_code_lines=500,
+            duplicate_lines=300,
+            swallowed_exceptions=8,
+            todo_count=5,
+            avg_roi=1.2,
+            low_efficiency_ratio=0.15,
         )
         monitor.set_baseline(baseline)
 
         # 优化后
         improved = OptimizationMetrics(
-            total_lines=29000, dead_code_lines=300,
-            duplicate_lines=200, swallowed_exceptions=2,
-            todo_count=3, avg_roi=1.5, low_efficiency_ratio=0.08,
+            total_lines=29000,
+            dead_code_lines=300,
+            duplicate_lines=200,
+            swallowed_exceptions=2,
+            todo_count=3,
+            avg_roi=1.5,
+            low_efficiency_ratio=0.08,
         )
         delta = monitor.record_snapshot(improved)
 
@@ -205,10 +248,14 @@ class TestOptimizationMonitor:
         """测试健康摘要"""
         monitor = OptimizationMonitor()
 
-        monitor.set_baseline(OptimizationMetrics(
-            total_lines=30000, dead_code_lines=500,
-            avg_roi=1.2, low_efficiency_ratio=0.15,
-        ))
+        monitor.set_baseline(
+            OptimizationMetrics(
+                total_lines=30000,
+                dead_code_lines=500,
+                avg_roi=1.2,
+                low_efficiency_ratio=0.15,
+            )
+        )
 
         health = monitor.get_health_summary()
         assert health["status"] in ("healthy", "needs_optimization")
@@ -221,9 +268,13 @@ class TestOptimizationMonitor:
             history_path = Path(tmpdir) / "test_history.json"
             monitor = OptimizationMonitor(history_path=history_path)
 
-            monitor.set_baseline(OptimizationMetrics(
-                total_lines=1000, avg_roi=1.0, low_efficiency_ratio=0.1,
-            ))
+            monitor.set_baseline(
+                OptimizationMetrics(
+                    total_lines=1000,
+                    avg_roi=1.0,
+                    low_efficiency_ratio=0.1,
+                )
+            )
             monitor.save()
 
             assert history_path.exists()

@@ -245,10 +245,10 @@ class StyleDriftDetector:
                         deviation=drift,
                         severity=severity,
                         suggestion=(
-                        f"词汇多样性从{baseline.ttr:.2f}变化到{current.ttr:.2f}"
-                        f"（{drift:.0%}），"
-                        f"{'词汇变得重复' if current.ttr < baseline.ttr else '词汇变得分散'}"
-                    ),
+                            f"词汇多样性从{baseline.ttr:.2f}变化到{current.ttr:.2f}"
+                            f"（{drift:.0%}），"
+                            f"{'词汇变得重复' if current.ttr < baseline.ttr else '词汇变得分散'}"
+                        ),
                     )
                 )
 
@@ -269,15 +269,15 @@ class StyleDriftDetector:
                         deviation=drift,
                         severity=severity,
                         suggestion=(
-                        f"对话比例从{baseline.dialogue_ratio:.0%}"
-                        f"变化到{current.dialogue_ratio:.0%}"
-                        f"（{drift:.0%}），"
-                        + (
-                            "对话过多可能拖慢节奏"
-                            if current.dialogue_ratio > baseline.dialogue_ratio
-                            else "叙述过多可能缺乏互动"
-                        )
-                    ),
+                            f"对话比例从{baseline.dialogue_ratio:.0%}"
+                            f"变化到{current.dialogue_ratio:.0%}"
+                            f"（{drift:.0%}），"
+                            + (
+                                "对话过多可能拖慢节奏"
+                                if current.dialogue_ratio > baseline.dialogue_ratio
+                                else "叙述过多可能缺乏互动"
+                            )
+                        ),
                     )
                 )
 

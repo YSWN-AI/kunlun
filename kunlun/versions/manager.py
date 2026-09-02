@@ -91,9 +91,7 @@ class VersionManager:
     """
 
     def __init__(self, repo_path: str | None = None):
-        self._repo_path = Path(
-            repo_path or getattr(settings, "project_root", Path.cwd())
-        ).resolve()
+        self._repo_path = Path(repo_path or getattr(settings, "project_root", Path.cwd())).resolve()
         self._initialized = False
         self._ensure_git_repo()
 

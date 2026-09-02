@@ -252,8 +252,7 @@ class SafetyFilter:
         suggestions = {
             ViolationCategory.POLITICAL: "涉及政治敏感内容，请删除或修改相关表述",
             ViolationCategory.VIOLENCE: (
-                f"暴力描写可能过线，建议弱化具体细节"
-                f"（检测到：{matched[:20]}...）"
+                f"暴力描写可能过线，建议弱化具体细节（检测到：{matched[:20]}...）"
             ),
             ViolationCategory.PORNOGRAPHY: "涉性内容请用含蓄表达替代直接描写",
             ViolationCategory.DISCRIMINATION: "请避免歧视性表述，使用中性语言",

@@ -235,7 +235,7 @@ class CostTracker:
         """获取当前预算状态"""
         now = time.time()
         day_start = now - (now % 86400)  # 当天0点
-        month_start = now - 30 * 86400   # 30天滚动窗口
+        month_start = now - 30 * 86400  # 30天滚动窗口
 
         # 从单一数据源按时间窗口筛选，避免数据不一致
         daily_used = sum(r.cost_usd for r in self._records if r.timestamp >= day_start)

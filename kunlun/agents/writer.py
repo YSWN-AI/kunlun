@@ -286,9 +286,9 @@ KG快照: {kg_snapshot_id}
             base += f"\n## 爽点排布 ({len(pleasure_points)}个)\n"
             for pp in pleasure_points:
                 base += (
-                f"- {pp.get('type', '')}: {pp.get('description', '')} "
-                f"(场景{pp.get('scene_at', 0) + 1})\n"
-            )
+                    f"- {pp.get('type', '')}: {pp.get('description', '')} "
+                    f"(场景{pp.get('scene_at', 0) + 1})\n"
+                )
 
         if foreshadowing:
             to_reveal = foreshadowing.get("to_reveal", [])

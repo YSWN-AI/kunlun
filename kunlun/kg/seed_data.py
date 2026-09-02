@@ -202,8 +202,7 @@ PLATFORM_RULES = [
         "uid": "rule_qidian_golden3",
         "name": "起点黄金三章",
         "description": (
-            "起点中文网签约核心标准: 前3章必须有清晰冲突、"
-            "金手指展现、世界观建立、章节钩子"
+            "起点中文网签约核心标准: 前3章必须有清晰冲突、金手指展现、世界观建立、章节钩子"
         ),
         "platform": "起点中文网",
         "requirements": [

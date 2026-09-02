@@ -1,6 +1,7 @@
 """
 LLM 语义缓存模块标准 pytest 测试
 """
+
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -12,6 +13,7 @@ class TestLLMCache:
     @pytest.fixture
     def cache(self):
         from kunlun.llm_cache import CacheMode, LLMCache
+
         c = LLMCache()
         c.configure(CacheMode.SEMANTIC)
         return c
@@ -53,6 +55,7 @@ class TestLLMCache:
 
     def test_disabled_mode(self, sample_messages):
         from kunlun.llm_cache import CacheMode, LLMCache
+
         c = LLMCache()
         c.configure(CacheMode.DISABLED)
         result = c.get(sample_messages)
@@ -62,7 +65,7 @@ class TestLLMCache:
         cache.set(sample_messages, "hello", model="deepseek-chat")
         stats = cache.get_stats()
         assert stats.total_requests >= 0
-        assert hasattr(stats, 'hit_rate')
+        assert hasattr(stats, "hit_rate")
         assert 0.0 <= stats.hit_rate <= 1.0
 
     def test_cache_clear(self, cache, sample_messages):

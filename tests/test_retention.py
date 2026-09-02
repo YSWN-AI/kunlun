@@ -1,6 +1,7 @@
 """
 测试 — 追读力系统 (retention/)
 """
+
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -83,7 +84,13 @@ class TestDropOffPredictor:
 
     def test_predict_hook_drop(self):
         predictor = DropOffPredictor()
-        predictor.predict(chapter_number=1, hook_score=0.9, pleasure_score=0.7, word_count=2500, active_debt_count=0)
+        predictor.predict(
+            chapter_number=1,
+            hook_score=0.9,
+            pleasure_score=0.7,
+            word_count=2500,
+            active_debt_count=0,
+        )
         result = predictor.predict(
             chapter_number=2,
             hook_score=0.3,
@@ -96,9 +103,27 @@ class TestDropOffPredictor:
 
     def test_get_trend(self):
         predictor = DropOffPredictor()
-        predictor.predict(chapter_number=1, hook_score=0.7, pleasure_score=0.6, word_count=2500, active_debt_count=0)
-        predictor.predict(chapter_number=2, hook_score=0.5, pleasure_score=0.5, word_count=2500, active_debt_count=0)
-        predictor.predict(chapter_number=3, hook_score=0.3, pleasure_score=0.4, word_count=2500, active_debt_count=0)
+        predictor.predict(
+            chapter_number=1,
+            hook_score=0.7,
+            pleasure_score=0.6,
+            word_count=2500,
+            active_debt_count=0,
+        )
+        predictor.predict(
+            chapter_number=2,
+            hook_score=0.5,
+            pleasure_score=0.5,
+            word_count=2500,
+            active_debt_count=0,
+        )
+        predictor.predict(
+            chapter_number=3,
+            hook_score=0.3,
+            pleasure_score=0.4,
+            word_count=2500,
+            active_debt_count=0,
+        )
         trend = predictor.get_trend()
         assert "trend" in trend
         assert "avg_dropoff" in trend
@@ -115,9 +140,15 @@ class TestHookStrengthScorer:
 
     def test_score_with_hooks(self):
         hooks = [
-            HookResult(hook_type=HookType.CLIFFHANGER, position="closing", paragraph_index=0, strength=0.9),
-            HookResult(hook_type=HookType.MYSTERY, position="opening", paragraph_index=0, strength=0.7),
-            HookResult(hook_type=HookType.EMOTIONAL, position="closing", paragraph_index=1, strength=0.8),
+            HookResult(
+                hook_type=HookType.CLIFFHANGER, position="closing", paragraph_index=0, strength=0.9
+            ),
+            HookResult(
+                hook_type=HookType.MYSTERY, position="opening", paragraph_index=0, strength=0.7
+            ),
+            HookResult(
+                hook_type=HookType.EMOTIONAL, position="closing", paragraph_index=1, strength=0.8
+            ),
         ]
         report = HookStrengthScorer.score(hooks)
         assert report.overall_score > 0.0
@@ -127,8 +158,15 @@ class TestHookStrengthScorer:
 
     def test_score_weak_closing(self):
         hooks = [
-            HookResult(hook_type=HookType.CLIFFHANGER, position="closing", paragraph_index=0, strength=0.2),
-            HookResult(hook_type=HookType.CONFRONTATION, position="opening", paragraph_index=0, strength=0.3),
+            HookResult(
+                hook_type=HookType.CLIFFHANGER, position="closing", paragraph_index=0, strength=0.2
+            ),
+            HookResult(
+                hook_type=HookType.CONFRONTATION,
+                position="opening",
+                paragraph_index=0,
+                strength=0.3,
+            ),
         ]
         report = HookStrengthScorer.score(hooks)
         assert report.closing_hook_score < 0.4
@@ -136,10 +174,18 @@ class TestHookStrengthScorer:
 
     def test_score_diverse(self):
         hooks = [
-            HookResult(hook_type=HookType.CLIFFHANGER, position="closing", paragraph_index=0, strength=0.9),
-            HookResult(hook_type=HookType.MYSTERY, position="opening", paragraph_index=0, strength=0.7),
-            HookResult(hook_type=HookType.REVERSAL, position="closing", paragraph_index=1, strength=0.8),
-            HookResult(hook_type=HookType.PROMISE, position="mid_chapter", paragraph_index=5, strength=0.6),
+            HookResult(
+                hook_type=HookType.CLIFFHANGER, position="closing", paragraph_index=0, strength=0.9
+            ),
+            HookResult(
+                hook_type=HookType.MYSTERY, position="opening", paragraph_index=0, strength=0.7
+            ),
+            HookResult(
+                hook_type=HookType.REVERSAL, position="closing", paragraph_index=1, strength=0.8
+            ),
+            HookResult(
+                hook_type=HookType.PROMISE, position="mid_chapter", paragraph_index=5, strength=0.6
+            ),
         ]
         report = HookStrengthScorer.score(hooks)
         assert "钩子类型丰富" in report.strengths
@@ -255,8 +301,14 @@ class TestRetentionPredictor:
     def test_analyze_with_debts(self):
         predictor = RetentionPredictor(book_id="test")
         debts = [
-            Debt(debt_type=DebtType.FORESHADOW, description="伏笔A", created_chapter=1,
-                 age_chapters=5, severity=RiskLevel.WATCH, should_resolve_by=10),
+            Debt(
+                debt_type=DebtType.FORESHADOW,
+                description="伏笔A",
+                created_chapter=1,
+                age_chapters=5,
+                severity=RiskLevel.WATCH,
+                should_resolve_by=10,
+            ),
         ]
         report = predictor.analyze(
             text=SAMPLE_TEXT * 5,
@@ -290,7 +342,10 @@ def test_pleasure_scorer():
 
 def test_platform_adapter():
     ps, _sug = PlatformAdapter.score_for_platform(
-        "fanqie", hook_score=0.8, pleasure_score=0.7,
-        payoff_score=0.6, debt_score=0.9,
+        "fanqie",
+        hook_score=0.8,
+        pleasure_score=0.7,
+        payoff_score=0.6,
+        debt_score=0.9,
     )
     assert 0.0 <= ps <= 1.0

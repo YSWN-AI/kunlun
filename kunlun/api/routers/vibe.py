@@ -62,8 +62,7 @@ async def vibe_express(
         return {
             "success": True,
             "message": (
-                f"理解了，你要写{parsed.emotion or '未知情感'}的"
-                f"{parsed.scene_type or '场景'}"
+                f"理解了，你要写{parsed.emotion or '未知情感'}的{parsed.scene_type or '场景'}"
             ),
             "parsed_intent": {
                 "scene_type": parsed.scene_type,

@@ -1,6 +1,7 @@
 """
 测试蝴蝶效应检测器 (Ripple Detector)
 """
+
 from unittest.mock import patch
 
 import pytest
@@ -48,7 +49,12 @@ class TestRippleDetector:
         mock_kg.query_cypher.side_effect = [
             [{"type": "Character", "name": "主角"}],
             [
-                {"uid": "org_001", "type": "Organization", "name": "青云宗", "relation": "MEMBER_OF"},
+                {
+                    "uid": "org_001",
+                    "type": "Organization",
+                    "name": "青云宗",
+                    "relation": "MEMBER_OF",
+                },
             ],
         ]
         detector = RippleDetector()
@@ -62,17 +68,22 @@ class TestRippleDetector:
 class TestRippleImpact:
     def test_ripple_impact_fields(self):
         impact = RippleImpact(
-            entity_uid="loc_001", entity_type="Location",
-            entity_name="青云山", impact_description="位置信息需要同步更新",
-            severity="LOW", suggestion="请检查青云山",
+            entity_uid="loc_001",
+            entity_type="Location",
+            entity_name="青云山",
+            impact_description="位置信息需要同步更新",
+            severity="LOW",
+            suggestion="请检查青云山",
         )
         assert impact.severity == "LOW"
         assert impact.entity_type == "Location"
 
     def test_ripple_impact_defaults(self):
         impact = RippleImpact(
-            entity_uid="e1", entity_type="Character",
-            entity_name="测试", impact_description="测试影响",
+            entity_uid="e1",
+            entity_type="Character",
+            entity_name="测试",
+            impact_description="测试影响",
             severity="MEDIUM",
         )
         assert impact.suggestion == ""
@@ -81,7 +92,8 @@ class TestRippleImpact:
 class TestRippleReport:
     def test_ripple_report_defaults(self):
         report = RippleReport(
-            changed_entity_uid="e1", changed_entity_type="Character",
+            changed_entity_uid="e1",
+            changed_entity_type="Character",
             change_description="测试变更",
         )
         assert report.impacts == []
@@ -89,13 +101,18 @@ class TestRippleReport:
 
     def test_ripple_report_with_impacts(self):
         impact = RippleImpact(
-            entity_uid="e2", entity_type="Location",
-            entity_name="测试地", impact_description="测试",
+            entity_uid="e2",
+            entity_type="Location",
+            entity_name="测试地",
+            impact_description="测试",
             severity="HIGH",
         )
         report = RippleReport(
-            changed_entity_uid="e1", changed_entity_type="Character",
-            change_description="变更", impacts=[impact], total_affected=1,
+            changed_entity_uid="e1",
+            changed_entity_type="Character",
+            change_description="变更",
+            impacts=[impact],
+            total_affected=1,
         )
         assert len(report.impacts) == 1
 

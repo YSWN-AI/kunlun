@@ -1,6 +1,7 @@
 """
 安全审核模块测试 — 6类违规检测 + 分级报告 + 平台规则
 """
+
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -57,8 +58,16 @@ class TestSafetyReport:
             book_id="test",
             chapter=1,
             violations=[
-                Violation(category=ViolationCategory.POLITICAL, level=ViolationLevel.HIGH, description="测试"),
-                Violation(category=ViolationCategory.VIOLENCE, level=ViolationLevel.MEDIUM, description="测试2"),
+                Violation(
+                    category=ViolationCategory.POLITICAL,
+                    level=ViolationLevel.HIGH,
+                    description="测试",
+                ),
+                Violation(
+                    category=ViolationCategory.VIOLENCE,
+                    level=ViolationLevel.MEDIUM,
+                    description="测试2",
+                ),
             ],
         )
         assert report.violation_count == 2
@@ -108,7 +117,9 @@ class TestSafetyFilterViolence:
         text = "残忍的画面，肢解后的尸体散落一地。"
         report = SafetyFilter.scan(text)
         assert not report.passed
-        violent_violations = [v for v in report.violations if v.category == ViolationCategory.VIOLENCE]
+        violent_violations = [
+            v for v in report.violations if v.category == ViolationCategory.VIOLENCE
+        ]
         assert len(violent_violations) > 0
         assert any(v.level == ViolationLevel.HIGH for v in violent_violations)
 
@@ -190,19 +201,25 @@ class TestSafetyFilterPlatformRules:
     def test_qidian_ai_ban(self):
         text = "使用AI生成的内容进行创作。"
         report = SafetyFilter.scan(text, platform="qidian")
-        platform = [v for v in report.violations if v.category == ViolationCategory.PLATFORM_SPECIFIC]
+        platform = [
+            v for v in report.violations if v.category == ViolationCategory.PLATFORM_SPECIFIC
+        ]
         assert len(platform) > 0
 
     def test_jjwxc_bl_content(self):
         text = "这是一本耽美小说。"
         report = SafetyFilter.scan(text, platform="jjwxc")
-        platform = [v for v in report.violations if v.category == ViolationCategory.PLATFORM_SPECIFIC]
+        platform = [
+            v for v in report.violations if v.category == ViolationCategory.PLATFORM_SPECIFIC
+        ]
         assert len(platform) > 0
 
     def test_no_platform_rules_without_specifying(self):
         text = "AI生成的内容"
         report = SafetyFilter.scan(text)  # 不指定平台
-        platform = [v for v in report.violations if v.category == ViolationCategory.PLATFORM_SPECIFIC]
+        platform = [
+            v for v in report.violations if v.category == ViolationCategory.PLATFORM_SPECIFIC
+        ]
         assert len(platform) == 0
 
 
@@ -221,7 +238,12 @@ class TestViolationLevelOrdering:
     """违规级别应有合理的排序"""
 
     def test_level_severity(self):
-        levels = [ViolationLevel.LOW, ViolationLevel.MEDIUM, ViolationLevel.HIGH, ViolationLevel.BLOCK]
+        levels = [
+            ViolationLevel.LOW,
+            ViolationLevel.MEDIUM,
+            ViolationLevel.HIGH,
+            ViolationLevel.BLOCK,
+        ]
         # BLOCK > HIGH > MEDIUM > LOW
         assert levels.index(ViolationLevel.BLOCK) > levels.index(ViolationLevel.HIGH)
         assert levels.index(ViolationLevel.HIGH) > levels.index(ViolationLevel.MEDIUM)

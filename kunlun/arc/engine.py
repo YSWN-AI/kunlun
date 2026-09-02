@@ -1,4 +1,4 @@
-﻿"""
+"""
 arc 引擎核心实现
 角色弧光追踪 + 情感线分析
 
@@ -16,9 +16,9 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-from kunlun.common.json_store import load_json, save_json
 from loguru import logger
 
+from kunlun.common.json_store import load_json, save_json
 from kunlun.config import settings
 
 # ══════════════════════════════════════════════════════
@@ -671,7 +671,6 @@ class ArcTracker:
     def _save(self):
         if not self._data_dir:
             return
-        import json
 
         data: dict[str, Any] = {}
         for name, arc in self.arcs.items():

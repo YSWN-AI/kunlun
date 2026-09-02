@@ -1,6 +1,7 @@
 """
 测试剧透过滤系统 (Spoiler Filter)
 """
+
 import pytest
 
 from kunlun.spoiler import (
@@ -150,8 +151,12 @@ class TestStageConfig:
         assert isinstance(config.chapter_range, tuple)
         assert isinstance(config.rag_lookahead, int)
         assert isinstance(config.use_future_rag, bool)
-        assert config.spoiler_level in [SpoilerLevel.STRICT, SpoilerLevel.MODERATE,
-                                        SpoilerLevel.MINIMAL, SpoilerLevel.NONE]
+        assert config.spoiler_level in [
+            SpoilerLevel.STRICT,
+            SpoilerLevel.MODERATE,
+            SpoilerLevel.MINIMAL,
+            SpoilerLevel.NONE,
+        ]
 
 
 class TestStageResult:

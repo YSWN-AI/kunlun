@@ -1,4 +1,4 @@
-"""
+﻿"""
 守护进程 + 通知推送 — 对应 inkos up 命令
 
 后台循环自动写章，非关键问题全自动运行，关键问题暂停等人工审核。
@@ -6,6 +6,7 @@
 """
 
 from __future__ import annotations
+from typing import Any
 
 import asyncio
 import contextlib
@@ -141,7 +142,7 @@ class DaemonEngine:
         self.chapters_written = 0
         self.chapters_failed = 0
         self.notifiers: list[NotificationChannel] = []
-        self._unified_notify_mgr: object | None = None  # 统一通知管理器 (延迟加载)
+        self._unified_notify_mgr: Any | None = None  # 统一通知管理器 (延迟加载)
         self.log_writer = LogWriter()
         self._pause_event = asyncio.Event()
         self._pause_event.set()  # 初始非暂停

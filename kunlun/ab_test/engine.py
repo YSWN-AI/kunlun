@@ -170,7 +170,7 @@ class MetricsCalculator:
             metric=MetricName.READABILITY,
             score=round(score, 1),
             detail=f"句长{avg_sentence_len:.0f}字, 段落{avg_para_len if paragraphs else 0:.0f}字, "
-              f"标点密度{punct_density:.1f}%",
+            f"标点密度{punct_density:.1f}%",
         )
 
     @staticmethod
@@ -208,7 +208,7 @@ class MetricsCalculator:
             metric=MetricName.PACING,
             score=round(min(100, score), 1),
             detail=f"短句{short_ratio:.0%}, 极短句{ultra_short_ratio:.0%}, "
-              f"长句{long_ratio:.0%}, 对话{dialogue_ratio:.0%}",
+            f"长句{long_ratio:.0%}, 对话{dialogue_ratio:.0%}",
         )
 
     @staticmethod
@@ -276,7 +276,7 @@ class MetricsCalculator:
             metric=MetricName.EMOTIONAL_IMPACT,
             score=round(min(100, score), 1),
             detail=f"高情感词{high_count}个, 中情感词{medium_count}个, "
-              f"感叹{exclamation_ratio:.1f}%",
+            f"感叹{exclamation_ratio:.1f}%",
         )
 
     @staticmethod

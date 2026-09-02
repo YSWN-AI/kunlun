@@ -312,7 +312,7 @@ class TestOpeningQuality:
         report = FanqieTrafficOptimizer.check_chapter(strong, chapter=1, is_first_three=True)
         # 验证 report 对象本身有效（即使关键词检测可能未命中）
         assert report is not None
-        assert hasattr(report, 'has_strong_opening')
+        assert hasattr(report, "has_strong_opening")
 
     def test_weak_opening(self):
         from kunlun.audit.fanqie_gates import FanqieTrafficOptimizer

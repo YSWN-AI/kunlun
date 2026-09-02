@@ -1,4 +1,4 @@
-"""
+﻿"""
 truth 真相文件引擎 — 写作"底牌"管理+角色关系矩阵+信息揭露计划
 
 核心能力:
@@ -130,6 +130,9 @@ class TruthFileManager(BaseExtensionModule):
         self._truths: dict[str, TruthEntry] = {}
         self._character_matrix: dict[str, CharacterMatrixEntry] = {}
         self._reveal_schedule: list[RevealStep] = []
+        self._chapter_summaries: dict[int, dict[str, Any]] = {}
+        self._emotional_arcs: dict[str, list[dict[str, Any]]] = {}
+        self._hooks: dict[str, dict[str, Any]] = {}
 
     # === 真相管理 ===
 
@@ -382,6 +385,100 @@ class TruthFileManager(BaseExtensionModule):
             }
             for s in steps
         ]
+
+    # === 章节摘要 ===
+
+    def add_chapter_summary(
+        self,
+        chapter: int,
+        summary: str,
+        scenes: list[Any] | None = None,
+        characters_involved: list[str] | None = None,
+        foreshadowing: list[Any] | None = None,
+    ) -> None:
+        """添加章节摘要"""
+        self._chapter_summaries[chapter] = {
+            "summary": summary,
+            "scenes": scenes or [],
+            "characters_involved": characters_involved or [],
+            "foreshadowing": foreshadowing or [],
+        }
+        logger.debug(f"章节摘要已添加: 第{chapter}章")
+
+    def get_chapter_summary(self, chapter: int) -> dict[str, Any] | None:
+        """获取章节摘要"""
+        return self._chapter_summaries.get(chapter)
+
+    # === 情感弧 ===
+
+    def update_emotional_arc(
+        self,
+        character: str,
+        chapter: int,
+        emotion: str,
+        intensity: float = 0.5,
+        scene_title: str = "",
+    ) -> None:
+        """更新角色情感弧"""
+        if character not in self._emotional_arcs:
+            self._emotional_arcs[character] = []
+        self._emotional_arcs[character].append({
+            "chapter": chapter,
+            "emotion": emotion,
+            "intensity": intensity,
+            "scene_title": scene_title,
+        })
+        logger.debug(f"情感弧已更新: {character} 第{chapter}章 {emotion}")
+
+    def get_emotional_arc(self, character: str) -> list[dict[str, Any]]:
+        """获取角色情感弧"""
+        return self._emotional_arcs.get(character, [])
+
+    # === 伏笔钩子 ===
+
+    def register_hook(
+        self,
+        hook: str,
+        start_chapter: int,
+        reveal_chapter: int,
+        priority: str = "medium",
+        description: str = "",
+    ) -> None:
+        """注册伏笔钩子"""
+        self._hooks[hook] = {
+            "hook": hook,
+            "start_chapter": start_chapter,
+            "reveal_chapter": reveal_chapter,
+            "priority": priority,
+            "description": description,
+            "revealed": False,
+            "revealed_at": None,
+        }
+        logger.debug(f"伏笔已注册: {hook} (第{start_chapter}章→第{reveal_chapter}章)")
+
+    def reveal_hook(self, hook: str, chapter: int) -> bool:
+        """标记伏笔已揭示"""
+        if hook in self._hooks:
+            self._hooks[hook]["revealed"] = True
+            self._hooks[hook]["revealed_at"] = chapter
+            logger.debug(f"伏笔已揭示: {hook} (第{chapter}章)")
+            return True
+        logger.warning(f"伏笔不存在: {hook}")
+        return False
+
+    def check_overdue_hooks(self, chapter: int) -> list[dict[str, Any]]:
+        """检查逾期未揭示的伏笔"""
+        overdue = []
+        for hook_data in self._hooks.values():
+            if (
+                not hook_data["revealed"]
+                and chapter > hook_data["reveal_chapter"]
+            ):
+                overdue.append(hook_data)
+        if overdue:
+            logger.debug(f"发现 {len(overdue)} 个逾期伏笔")
+        return overdue
+
 
 
 _managers: dict[str, TruthFileManager] = {}

@@ -1,6 +1,7 @@
 """
 测试短篇生成引擎 (Shortform Engine)
 """
+
 import pytest
 
 from kunlun.shortform import (
@@ -44,8 +45,11 @@ class TestShortformTemplates:
 class TestShortformResult:
     def test_result_success(self):
         result = ShortformResult(
-            success=True, text="测试正文内容", word_count=500,
-            mode="short_story", model_used="deepseek-chat",
+            success=True,
+            text="测试正文内容",
+            word_count=500,
+            mode="short_story",
+            model_used="deepseek-chat",
             generation_time=2.5,
         )
         assert result.success is True
@@ -55,8 +59,11 @@ class TestShortformResult:
 
     def test_result_failure(self):
         result = ShortformResult(
-            success=False, text="", word_count=0,
-            mode="short_story", model_used="",
+            success=False,
+            text="",
+            word_count=0,
+            mode="short_story",
+            model_used="",
             generation_time=0.0,
         )
         assert result.success is False

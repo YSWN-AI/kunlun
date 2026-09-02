@@ -2,6 +2,7 @@
 Humanize 模块标准 pytest 测试
 自用场景关键路径：AI文本检测、规则后处理、AntiAIDetector
 """
+
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -30,6 +31,7 @@ class TestTextFingerprint:
 
     def test_analyze_ai_text(self):
         from kunlun.humanize.fingerprint import TextFingerprint
+
         fp = TextFingerprint()
         result = fp.analyze(AI_TEXT)
         assert result.perplexity_score >= 0, "困惑度必须非负"
@@ -38,6 +40,7 @@ class TestTextFingerprint:
 
     def test_analyze_human_text(self):
         from kunlun.humanize.fingerprint import TextFingerprint
+
         fp = TextFingerprint()
         result = fp.analyze(HUMAN_TEXT)
         assert result.ai_likelihood <= 1.0
@@ -45,6 +48,7 @@ class TestTextFingerprint:
     def test_ai_vs_human_differentiation(self):
         """AI文本应该比人类文本得分更高"""
         from kunlun.humanize.fingerprint import TextFingerprint
+
         fp = TextFingerprint()
         ai_result = fp.analyze(AI_TEXT)
         human_result = fp.analyze(HUMAN_TEXT)
@@ -58,14 +62,16 @@ class TestAIModeDetector:
 
     def test_detect_ai_patterns(self):
         from kunlun.humanize.detector import AIModeDetector
+
         det = AIModeDetector()
         result = det.detect(AI_TEXT)
-        assert hasattr(result, 'total_markers')
-        assert hasattr(result, 'summary')
+        assert hasattr(result, "total_markers")
+        assert hasattr(result, "summary")
         assert result.total_markers >= 0
 
     def test_detect_human_patterns(self):
         from kunlun.humanize.detector import AIModeDetector
+
         det = AIModeDetector()
         result = det.detect(HUMAN_TEXT)
         assert result.total_markers >= 0
@@ -77,6 +83,7 @@ class TestRulePostProcessor:
     def test_process_reduces_ai_score(self):
         from kunlun.humanize.fingerprint import TextFingerprint
         from kunlun.humanize.rewriter import RulePostProcessor
+
         fp = TextFingerprint()
         processor = RulePostProcessor()
 
@@ -84,7 +91,7 @@ class TestRulePostProcessor:
         processed = processor.process(AI_TEXT)
         after = fp.analyze(processed)
 
-        assert hasattr(after, 'ai_likelihood')
+        assert hasattr(after, "ai_likelihood")
         # 处理后不应崩溃，结果应有意义
         assert 0.0 <= after.ai_likelihood <= 1.0
 
@@ -94,21 +101,24 @@ class TestAntiAIDetector:
 
     def test_detect_returns_strategy(self):
         from kunlun.humanize.engine import AntiAIDetector
+
         ad = AntiAIDetector()
         result = ad.detect(AI_TEXT)
         assert isinstance(result, dict)
-        assert 'recommended_strategy' in result
-        assert 'needs_humanization' in result
+        assert "recommended_strategy" in result
+        assert "needs_humanization" in result
 
     def test_detect_human_text_no_action(self):
         from kunlun.humanize.engine import AntiAIDetector
+
         ad = AntiAIDetector()
         result = ad.detect(HUMAN_TEXT)
-        assert isinstance(result['needs_humanization'], bool)
+        assert isinstance(result["needs_humanization"], bool)
 
     def test_empty_text_handling(self):
         """空文本不应崩溃"""
         from kunlun.humanize.engine import AntiAIDetector
+
         ad = AntiAIDetector()
         result = ad.detect("")
         assert isinstance(result, dict)

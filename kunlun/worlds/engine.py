@@ -470,9 +470,9 @@ class WorldOverflowChecker:
                             chapter=chapter,
                             severity=severity,
                             suggestion=(
-                            f"确认此内容是否在{dim.label}设定范围内，"
-                            f"如需新增请在 story_bible.md 中记录"
-                        ),
+                                f"确认此内容是否在{dim.label}设定范围内，"
+                                f"如需新增请在 story_bible.md 中记录"
+                            ),
                         )
                     )
 
