@@ -300,7 +300,7 @@ class PromptCompressor:
             escaped = [re.escape(p) for p in all_phrases]
             PromptCompressor._redundancy_re = re.compile("|".join(escaped))
 
-        text = cast(re.Pattern[str], PromptCompressor._redundancy_re).sub("", text)
+        text = PromptCompressor._redundancy_re.sub("", text)
 
         # 清理残留的双空格
         text = re.sub(r" {2,}", " ", text)

@@ -140,7 +140,7 @@ class SixDimensionDashboard:
 
         for dim_key, mapping in DIMENSION_MAPPING.items():
             sub_scores = {}
-            issues = []
+            issues: list[str] = []
             weighted_score = 0.0
             for sub_key, sub_weight in mapping["subs"].items():
                 sub_score = raw_scores.get(sub_key, 0.5)
@@ -155,6 +155,13 @@ class SixDimensionDashboard:
                 weighted_score = max(0.0, weighted_score - cliche_penalty)
                 if cliche_penalty > 0.1:
                     issues.append(f"套路词密度偏高，惩罚{cliche_penalty*100:.0f}分")
+
+            # 逻辑维度增强：战力/时间/状态/数字冲突检测
+            if dim_key == "logic":
+                logic_penalty, logic_issues = _detect_logic_issues(text)
+                if logic_penalty > 0:
+                    weighted_score = max(0.0, weighted_score - logic_penalty)
+                    issues.extend(logic_issues)
 
             level = _score_to_level(weighted_score)
             dim = DimensionScore(
@@ -206,6 +213,109 @@ def _detect_cliche_penalty(text: str) -> float:
     cliche_count = sum(text.count(w) for w in CLICHE_WORDS)
     density = cliche_count / max(len(text) / 100, 1)
     return min(0.3, density * 0.1)
+
+
+# ══════════════════════════════════════════════════════
+# 逻辑维度增强：战力/时间/状态/数字冲突检测
+# ══════════════════════════════════════════════════════
+
+# 战力等级词表（按等级从低到高）
+CULTIVATION_LEVELS = [
+    ["炼气", "练气", "气感"],
+    ["筑基", "凝气"],
+    ["金丹", "凝丹"],
+    ["元婴", "凝婴"],
+    ["化神", "神变"],
+    ["炼虚", "合体"],
+    ["大乘", "渡劫"],
+    ["仙人", "真仙"],
+]
+
+# 时间词表（相对时间）
+TIME_WORDS = {
+    "past": ["昨天", "前日", "前天", "之前", "以前", "先前", "刚才", "刚刚"],
+    "present": ["今天", "今日", "现在", "此刻", "目前", "如今"],
+    "future": ["明天", "明日", "后天", "之后", "以后", "将来", "日后", "三天后", "一个月后"],
+}
+
+# 角色状态词表（互斥状态）
+CHARACTER_STATES = {
+    "alive": ["活着", "生还", "存活", "健在", "安然无恙"],
+    "dead": ["死亡", "死去", "身亡", "毙命", "陨落", "战死", "被杀"],
+    "injured": ["受伤", "负伤", "重伤", "轻伤", "带伤", "吐血", "昏迷"],
+    "healthy": ["完好", "健康", "无恙", "无伤", "状态良好", "精神饱满"],
+}
+
+
+def _detect_logic_issues(text: str) -> tuple[float, list[str]]:
+    """检测逻辑矛盾，返回(惩罚分, 问题列表)"""
+    if not text or len(text) < 100:
+        return 0.0, []
+
+    issues: list[str] = []
+    penalty = 0.0
+
+    # 1. 战力等级冲突检测（同一文本中出现多个不兼容等级）
+    found_levels = set()
+    for level_group in CULTIVATION_LEVELS:
+        for level in level_group:
+            if level in text:
+                found_levels.add(tuple(level_group))
+                break
+    if len(found_levels) >= 3:
+        # 三个不同等级可能是正常的（不同角色），但需要检查是否同一角色
+        issues.append(f"文本中出现{len(found_levels)}个不同战力等级，需确认是否为不同角色")
+        penalty += 0.05
+
+    # 2. 时间线冲突检测（过去/现在/未来混用）
+    time_categories = set()
+    for cat, words in TIME_WORDS.items():
+        if any(w in text for w in words):
+            time_categories.add(cat)
+    if "past" in time_categories and "future" in time_categories and len(text) < 2000:
+        issues.append("短文本中同时出现过去和未来时间词，可能存在时间线混乱")
+        penalty += 0.05
+
+    # 3. 角色状态冲突检测（互斥状态同时出现）
+    state_categories = set()
+    for cat, words in CHARACTER_STATES.items():
+        if any(w in text for w in words):
+            state_categories.add(cat)
+    if "dead" in state_categories and "alive" in state_categories:
+        issues.append("文本中同时出现死亡和存活状态，可能存在角色状态矛盾")
+        penalty += 0.10
+    if "injured" in state_categories and "healthy" in state_categories and len(text) < 1500:
+        issues.append("短文本中同时出现受伤和健康状态，需确认是否为不同时间点")
+        penalty += 0.05
+
+    # 4. 数字矛盾检测（简单检测：同一数量词出现不同数字）
+    import re
+    number_patterns = [
+        (r"(\d+)人", "人数"),
+        (r"(\d+)天", "天数"),
+        (r"(\d+)年", "年数"),
+        (r"(\d+)章", "章节"),
+        (r"第(\d+)层", "层数"),
+        (r"第(\d+)重", "重数"),
+    ]
+    for pattern, label in number_patterns:
+        matches = re.findall(pattern, text)
+        if len(matches) >= 2:
+            unique_nums = set(matches)
+            if len(unique_nums) >= 2:
+                # 多个不同数字可能是正常的（不同场景），但需要提醒
+                issues.append(f"文本中出现{label}的多个不同数值({', '.join(sorted(unique_nums))})，需确认一致性")
+                penalty += 0.03
+                break
+
+    # 5. 因果关系断裂检测（简单检测：有"因为"但无"所以"，或反之）
+    has_cause = any(w in text for w in ["因为", "由于", "原因是", "既然"])
+    has_effect = any(w in text for w in ["所以", "因此", "于是", "故而", "结果"])
+    if has_cause and not has_effect and len(text) < 1000:
+        issues.append("文本中有原因表述但无结果表述，可能存在因果断裂")
+        penalty += 0.03
+
+    return min(0.20, penalty), issues[:5]
 
 
 def _generate_suggestions(dim: str, score: float, issues: list[str]) -> list[str]:

@@ -132,17 +132,88 @@ class VibeQualityFeedback:
         # 5. 弃书点检测
         fb.drop_off_points = cls._detect_drop_off(text, fb)
 
-        # 6. 补充即时建议
-        if fb.dialogue_ratio < 0.15 and fb.word_count > 500:
-            fb.immediate_suggestions.append("对话占比过低，增加角色互动")
-        elif fb.dialogue_ratio > 0.60:
-            fb.immediate_suggestions.append("对话占比过高，加入动作和描写")
+        # 6. 基于文本特征的差异化即时建议
+        suggestions = []
 
-        if not fb.immediate_suggestions:
-            fb.immediate_suggestions = ["质量良好，继续保持"]
+        # 6.1 卡文针对性建议
+        if fb.is_stuck:
+            stuck_suggestions = {
+                "长时间无对话": "当前段落缺乏对话，加入角色互动或内心独白打破沉闷",
+                "长时间无动作": "当前段落缺乏动作，加入战斗、移动或肢体描写",
+                "心理描写过多": "心理描写过多，用动作和对话代替部分内心活动",
+                "段落开头重复": "段落开头重复，变化句式或视角避免单调",
+            }
+            if fb.stuck_reason in stuck_suggestions:
+                suggestions.append(stuck_suggestions[fb.stuck_reason])
+            else:
+                suggestions.append("检测到卡文状态，尝试引入新冲突或切换视角")
 
-        # 去重
-        fb.immediate_suggestions = list(dict.fromkeys(fb.immediate_suggestions))[:5]
+        # 6.2 弃书点针对性建议
+        if fb.drop_off_points:
+            for point in fb.drop_off_points[:2]:
+                if "纯描写" in point:
+                    suggestions.append("长段纯描写可能导致读者流失，穿插对话或动作打破描写")
+                elif "无冲突" in point:
+                    suggestions.append("开头缺乏冲突信号，前300字内引入矛盾或悬念")
+                elif "无爽点" in point:
+                    suggestions.append("超过1500字无爽点，设置小高潮或反转提升阅读动力")
+
+        # 6.3 AI率针对性建议
+        if fb.ai_rate >= 50:
+            suggestions.append(f"AI率{fb.ai_rate:.0f}%过高，必须进行人类化改写后再发布")
+        elif fb.ai_rate >= 35:
+            suggestions.append(f"AI率{fb.ai_rate:.0f}%偏高，建议替换高频AI词和冗余修饰")
+
+        # 6.4 对话占比针对性建议
+        if fb.dialogue_ratio < 0.10 and fb.word_count > 800:
+            suggestions.append("对话占比极低，网文读者偏好对话驱动，增加角色互动")
+        elif fb.dialogue_ratio < 0.20 and fb.word_count > 500:
+            suggestions.append("对话偏少，用对话代替部分叙述提升节奏")
+        elif fb.dialogue_ratio > 0.65:
+            suggestions.append("对话过多，加入环境描写和角色动作平衡节奏")
+
+        # 6.5 节奏针对性建议
+        if fb.paragraph_count <= 2 and fb.word_count > 1000:
+            suggestions.append("段落过少，长段落容易疲劳，适当分段提升可读性")
+
+        # 6.6 六维评分最低维度建议
+        if fb.six_dim_scores:
+            lowest_dim = min(fb.six_dim_scores, key=fb.six_dim_scores.get)
+            lowest_score = fb.six_dim_scores[lowest_dim]
+            if lowest_score < 0.6:
+                dim_suggestions = {
+                    "pacing": "节奏偏弱，每500字设置一个情节推进点",
+                    "pleasure": "爽感不足，增加冲突强度或设置小高潮",
+                    "character": "人物单薄，通过对话和细节展现角色性格",
+                    "logic": "逻辑待加强，检查前后设定和因果关系",
+                    "style": "文笔待提升，变化句式长度和增加感官描写",
+                    "innovation": "创新不足，避免套路化表达，尝试独特设定",
+                }
+                if lowest_dim in dim_suggestions:
+                    suggestions.append(dim_suggestions[lowest_dim])
+
+        # 6.7 合并六维评分的建议
+        for dim_name, dim_score in fb.six_dim_scores.items():
+            if dim_score < 0.70:
+                dim_sugs = {
+                    "pacing": ["增加场景切换频率"],
+                    "pleasure": ["增加动作描写和冲突场景"],
+                    "character": ["增加角色个性化对话"],
+                    "logic": ["确保因果关系清晰"],
+                    "style": ["变化句式长度"],
+                    "innovation": ["避免常见套路"],
+                }
+                if dim_name in dim_sugs and dim_sugs[dim_name][0] not in suggestions:
+                    suggestions.append(dim_sugs[dim_name][0])
+
+        # 6.8 如果没有建议，给出通用建议
+        if not suggestions:
+            if fb.overall_score >= 0.75:
+                suggestions.append("质量良好，继续保持当前风格")
+            else:
+                suggestions.append("质量中等，可从节奏和爽感方面提升")
+
+        fb.immediate_suggestions = list(dict.fromkeys(suggestions))[:5]
 
         return fb
 

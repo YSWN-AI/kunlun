@@ -62,7 +62,7 @@ def _reset_settings() -> None:
     _settings = None
 
 
-settings: Settings = cast(Settings, _get_settings())
+settings: Settings = _get_settings()
 
 
 __all__ = [
