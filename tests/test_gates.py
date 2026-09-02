@@ -1,5 +1,5 @@
 """
-测试: Audit Gates 8道门禁独立测试
+测试: Audit Gates 9道门禁独立测试
 """
 
 import pytest
@@ -16,6 +16,7 @@ from kunlun.audit.gates import (
     GateG6EmotionConsistency,
     GateG7DialogueEffectiveness,
     GateG8BattleRhythm,
+    GateG9AIRate,
     GateLevel,
     GateResult,
     audit_gates,
@@ -133,7 +134,7 @@ class TestAuditGatesFunction:
     """audit_gates 顶层函数"""
 
     def test_audit_gates_full_run(self):
-        """8道门禁全部运行不崩溃"""
+        """9道门禁全部运行不崩溃"""
         text = (
             "第一章正文。主角推开石门，走入秘境。四周氛围压抑。\n\n"
             '"你终于来了。"声音从阴影中传来。\n\n'
@@ -142,8 +143,8 @@ class TestAuditGatesFunction:
         )
         result = audit_gates(draft=text, blueprint={})
         assert isinstance(result, AuditResult)
-        assert len(result.gates) == 8
-        for gate_id in ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"]:
+        assert len(result.gates) == 9
+        for gate_id in ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9"]:
             assert gate_id in result.gates
         assert 0 <= result.score <= 1
 
@@ -151,7 +152,7 @@ class TestAuditGatesFunction:
         """空文本不崩溃"""
         result = audit_gates(draft="", blueprint={})
         assert isinstance(result, AuditResult)
-        assert len(result.gates) == 8
+        assert len(result.gates) == 9
         assert 0 <= result.score <= 1
 
     def test_audit_gates_scores_in_range(self):

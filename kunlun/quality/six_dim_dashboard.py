@@ -149,6 +149,13 @@ class SixDimensionDashboard:
                 if sub_key in raw_issues:
                     issues.extend(raw_issues[sub_key])
 
+            # 创新维度额外惩罚：套路词检测
+            if dim_key == "innovation":
+                cliche_penalty = _detect_cliche_penalty(text)
+                weighted_score = max(0.0, weighted_score - cliche_penalty)
+                if cliche_penalty > 0.1:
+                    issues.append(f"套路词密度偏高，惩罚{cliche_penalty*100:.0f}分")
+
             level = _score_to_level(weighted_score)
             dim = DimensionScore(
                 name=dim_key,
@@ -182,6 +189,23 @@ class SixDimensionDashboard:
         ][:3]
 
         return report
+
+
+CLICHE_WORDS = [
+    "微微一怔", "眼中闪过", "缓缓开口", "淡淡说道", "仿佛时间",
+    "不由自主", "心中暗道", "嘴角微微", "轻轻摇头", "深深看了",
+    "赫然发现", "气势暴涨", "天地变色", "风云际会", "雷霆万钧",
+    "不可思议", "难以置信", "原来如此", "恍然大悟", "不出所料",
+]
+
+
+def _detect_cliche_penalty(text: str) -> float:
+    """检测套路词密度，返回惩罚分(0-0.3)"""
+    if not text:
+        return 0.0
+    cliche_count = sum(text.count(w) for w in CLICHE_WORDS)
+    density = cliche_count / max(len(text) / 100, 1)
+    return min(0.3, density * 0.1)
 
 
 def _generate_suggestions(dim: str, score: float, issues: list[str]) -> list[str]:
