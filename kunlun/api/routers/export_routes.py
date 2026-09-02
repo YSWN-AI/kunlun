@@ -1,4 +1,4 @@
-"""
+﻿"""
 昆仑创作引擎 —— 导出路由
 /books/{book_id}/chapters/{chapter}/export, /books/{book_id}/export
 
@@ -76,7 +76,7 @@ async def list_formats() -> dict:
 async def export_chapter(
     book_id: str,
     chapter: int,
-    _request: Request = None,
+    request: Request = None,
     format: str = Query(default="txt", description=f"导出格式 ({'/'.join(_SUPPORTED_FORMATS)})"),
     layout: str = Query(default="standard", description="排版风格 (standard/compact/beautiful)"),
 ) -> dict:
@@ -118,7 +118,7 @@ async def export_chapter(
 @_export_rate_limit
 async def export_book(
     book_id: str,
-    _request: Request = None,
+    request: Request = None,
     format: str = Query(default="txt", description=f"导出格式 ({'/'.join(_SUPPORTED_FORMATS)})"),
     _scope: str = Query(default="all", description="导出范围 (all/chapters)"),
     layout: str = Query(default="standard", description="排版风格 (standard/compact/beautiful)"),

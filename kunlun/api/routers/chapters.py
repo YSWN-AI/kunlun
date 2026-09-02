@@ -1,4 +1,4 @@
-"""
+﻿"""
 昆仑创作引擎 — 章节路由 (v2)
 /books/{book_id}/chapters/batch-generate: 批量生成
 /books/{book_id}/chapters/{chapter}/generate: 单章生成
@@ -221,7 +221,7 @@ async def generate_chapter(
 @_gen_rate_limit
 async def batch_generate(
     book_id: str,
-    _request: Request,
+    request: Request,
     start: int = Query(default=1),
     end: int = Query(default=5),
     mode: str = Query(default="gacha_cascade"),

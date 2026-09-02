@@ -1,4 +1,4 @@
-"""
+﻿"""
 arc 引擎核心实现
 角色弧光追踪 + 情感线分析
 
@@ -8,8 +8,6 @@ arc 引擎核心实现
 Author: 昆仑创作引擎
 """
 
-from kunlun.common.json_store import load_json, save_json
-
 from __future__ import annotations
 
 import re
@@ -18,6 +16,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
+from kunlun.common.json_store import load_json, save_json
 from loguru import logger
 
 from kunlun.config import settings

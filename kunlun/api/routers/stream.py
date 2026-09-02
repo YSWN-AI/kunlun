@@ -1,4 +1,4 @@
-"""
+﻿"""
 昆仑创作引擎 — 流式生成 + 扩展路由
 /stream/generate, /api/orchestrate, /api/agents, /api/truth-status, /api/auto-fix
 """
@@ -25,7 +25,7 @@ _gen_rate_limit = (
 async def stream_generate(
     book_id: str,
     chapter: int,
-    _request: Request = None,
+    request: Request = None,
     prompt: str = "",
     mode: str = "single_fix",
     agent: str = "writer",
