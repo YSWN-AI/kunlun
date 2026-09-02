@@ -41,7 +41,7 @@ python -m uvicorn kunlun.api.main:app --host 127.0.0.1 --port 8000 --reload
 > 快速入口: [01-项目概览](docs/01-项目概览.md) · [02-Agent与管线](docs/02-Agent与管线.md) · [03-引擎与知识图谱](docs/03-引擎与知识图谱.md) · [04-API与前端](docs/04-API与前端.md) · [05-扩展模块](docs/05-扩展模块与宪法.md) · [06-版本与问题](docs/06-版本与问题.md) · [07-统计与检查清单](docs/07-统计与检查清单.md) · [08-修复报告](docs/08-修复报告.md)
 
 ```
-kunlun/                      # Python 包（155 个 .py 文件, 39 子包, ~44,000 行）
+kunlun/                      # Python 包（383 个 .py 文件, 78 子包, ~76,000 行）
 ├── vibe_writer/             # ★ Vibe Writing: 总调度(VibeOrchestrator) + 单章伙伴(VibeWriter)
 ├── conflict/                # ★ 冲突引擎: ConflictManager + TensionManager + 热力图
 ├── agents/                  # Agent 体系（10 + 1 个 Agent）
@@ -181,7 +181,7 @@ skills/                      # 技能 Markdown 文件
 ├── 过签审核清单.md
 ├── 口语化改写规则.md
 └── 内容引擎创作体系.md
-tests/                       # 32个测试文件, 415/415通过 (0失败)
+tests/                       # 49个测试文件, 841 passed, 1 skipped (覆盖率42%)
 scripts/                     # Windows 启动/安装脚本
 .github/workflows/           # CI 配置
 ```
