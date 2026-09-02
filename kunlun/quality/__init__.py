@@ -1,4 +1,4 @@
-"""
+﻿"""
 quality 扩展模块
 """
 
@@ -12,6 +12,11 @@ from kunlun.quality.engine import (
     get_quality_evaluator,
     get_quality_tracker,
 )
+from kunlun.quality.six_dim_dashboard import (
+    SixDimensionDashboard,
+    SixDimensionReport,
+    six_dim_dashboard,
+)
 
 __all__ = [
     "ChapterQualityReport",
@@ -20,7 +25,10 @@ __all__ = [
     "QualityEvaluator",
     "QualityScore",
     "QualityTrendTracker",
+    "SixDimensionDashboard",
+    "SixDimensionReport",
     "get_quality_evaluator",
     "get_quality_tracker",
     "quality_dashboard",
+    "six_dim_dashboard",
 ]

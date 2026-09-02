@@ -77,6 +77,7 @@ class VibeResponse:
     mood: VibeMood | None = None
     explanation: str = ""  # 为什么这样写
     word_count: int = 0
+    quality_feedback: dict | None = None  # 即时质量反馈
     created_at: float = field(default_factory=time.time)
 
     def summary(self) -> dict[str, Any]:
@@ -87,6 +88,8 @@ class VibeResponse:
             "suggestions_count": len(self.suggestions),
             "alternatives_count": len(self.alternatives),
             "mood": self.mood.value if self.mood else None,
+            "quality_score": self.quality_feedback.get("overall_score", 0) if self.quality_feedback else 0,
+            "ai_rate": self.quality_feedback.get("ai_rate", 0) if self.quality_feedback else 0,
         }
 
 
@@ -305,7 +308,17 @@ class VibeWriter(BaseExtensionModule):
                 logger.error(f"LLM调用失败: {e}")
                 generated_text = f"[生成失败: {e}]"
 
-        # 4. 构建响应
+        # 4. 即时质量反馈
+        quality_fb = None
+        if generated_text and len(generated_text) > 50:
+            try:
+                from kunlun.vibe_writer.quality_feedback import vibe_quality_feedback
+                qf = vibe_quality_feedback.analyze(generated_text, chapter=0)
+                quality_fb = qf.to_dict()
+            except Exception as e:
+                logger.debug(f"质量反馈生成失败: {e}")
+
+        # 5. 构建响应
         self._response_counter += 1
         response = VibeResponse(
             response_id=f"vibe_{self._response_counter}_{int(time.time())}",
@@ -316,12 +329,26 @@ class VibeWriter(BaseExtensionModule):
             explanation=f"检测到意图：{intent.value}（置信度{confidence:.0%}）"
             + (f"，情绪：{mood.value}" if mood else ""),
             word_count=len(generated_text),
+            quality_feedback=quality_fb,
         )
 
         self._history.append(response)
         logger.info(f"VibeWriter生成: {intent.value} ({response.word_count}字)")
 
         return response
+
+    def get_quality_feedback(self, text: str = "", chapter: int = 0) -> dict | None:
+        """获取即时质量反馈"""
+        target_text = text or (self._context.current_text if self._context else "")
+        if not target_text or len(target_text.strip()) < 20:
+            return None
+        try:
+            from kunlun.vibe_writer.quality_feedback import vibe_quality_feedback
+            qf = vibe_quality_feedback.analyze(target_text, chapter)
+            return qf.to_dict()
+        except Exception as e:
+            logger.debug(f"质量反馈失败: {e}")
+            return None
 
     def get_suggestions(self, context: VibeContext | None = None) -> list[str]:
         """获取写作建议（不生成文本，只给建议）"""
