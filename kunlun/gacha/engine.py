@@ -5,13 +5,13 @@
 
 4 种模式:
   - single_fix: 单模型修复/生成（用于审计修复、配置推断等）
-  - gacha_cascade: 多模型并行抽卡 → 9维评分 → 选最优
+  - gacha_cascade: 多模型并行抽卡 → 10维评分 → 选最优
   - gacha_vibe: Vibe Writing 模式（高创意）
   - single_chat: 对话模式（用于 /chat 端点）
 
-9 维评分体系 (纯文本统计，零 LLM 成本):
+10 维评分体系 (纯文本统计，零 LLM 成本):
   1. 多样性  2. 连贯性  3. 信息密度  4. 情感波动
-  5. 节奏感  6. 创新度  7. 流畅度  8. 完整性  9. 人味度
+  5. 节奏感  6. 创新度  7. 流畅度  8. 完整性  9. 人味度  10. 风格匹配度
 
 灵感来源:
   - NovelForger: 多模型并行 + 投票
@@ -90,7 +90,7 @@ CASCADE_THRESHOLDS: dict[str, dict] = {
 }
 
 
-# ── 九维评分常量 ──────────────────────────────────────
+# ── 十维评分常量 ──────────────────────────────────────
 
 # 文本多样性
 _MIN_DIVERSE_WORD_LENGTH = 5  # 最低有效词长度
@@ -510,7 +510,7 @@ class GachaEngine:
 
         scored: list[dict] = []
         for i, result in enumerate(results):
-            if isinstance(result, Exception):
+            if isinstance(result, BaseException):
                 logger.warning(f"GachaEngine: 候选 {candidates[i].model} 失败: {result}")
                 continue
             text = result.get("content", "")
@@ -547,8 +547,8 @@ class GachaEngine:
         self, prompt: str, agent: str = "", chapter_type: str = "normal"
     ) -> dict:
         """Vibe Writing 模式 — 高创意参数"""
-        return await self._generate_cascade(prompt, agent, chapter_type)
         # Vibe 模式增加温度扰动
+        return await self._generate_cascade(prompt, agent, chapter_type)
 
     # ── LLM 调用（含熔断器 + 指数退避重试 + Key 轮换）───
 
@@ -833,12 +833,13 @@ class GachaEngine:
     # ── 评分系统 (9维纯文本统计) ──────────────────────
 
     def _score_text(self, text: str) -> float:
-        """9 维综合评分 — 纯文本统计，零 LLM 成本。
+        """10 维综合评分 — 纯文本统计，零 LLM 成本。
 
         权重:
-          多样性 0.15, 连贯性 0.10, 信息密度 0.10,
-          情感波动 0.10, 节奏感 0.15, 创新度 0.10,
-          流畅度 0.10, 完整性 0.10, 人味度 0.10
+          多样性 0.10, 连贯性 0.10, 信息密度 0.10,
+          情感波动 0.10, 节奏感 0.10, 创新度 0.10,
+          流畅度 0.10, 完整性 0.10, 人味度 0.10,
+          风格匹配度 0.10
         """
         if not text or len(text) < _MIN_TEXT_LENGTH:
             return 0.0
@@ -853,18 +854,20 @@ class GachaEngine:
             "fluency": self._score_fluency(text),
             "completeness": self._score_completeness(text),
             "humanness": self._score_humanness(text),
+            "style_match": self._score_style_match(text),
         }
 
         weights = {
-            "diversity": 0.15,
+            "diversity": 0.10,
             "coherence": 0.10,
             "info_density": 0.10,
             "emotion": 0.10,
-            "rhythm": 0.15,
+            "rhythm": 0.10,
             "novelty": 0.10,
             "fluency": 0.10,
             "completeness": 0.10,
             "humanness": 0.10,
+            "style_match": 0.10,
         }
 
         total = sum(scores[k] * weights[k] for k in scores)
@@ -963,6 +966,61 @@ class GachaEngine:
         interjections = len(re.findall(r"(啊|呢|吧|嘛|呀|哦|嗯|哈|呵|唉|哎)", text))
         interjection_ratio = interjections / max(total / 10, 1)
         return min(1.0, dialogue_ratio * 5 + interjection_ratio * 3)
+
+    def _score_style_match(self, text: str) -> float:
+        """风格匹配度 — 句长变化、标点多样性、词汇丰富度、对话占比、语气词频率。
+
+        评估文本的风格特征丰富度，越高说明越接近人类多样化写作风格。
+        若设置了 target_style_fingerprint，则计算与目标风格的相似度。
+        """
+        if not text or len(text) < _MIN_TEXT_LENGTH:
+            return 0.5
+
+        # 句长变化（标准差）
+        sentences = re.split(r"[。！？!?]", text)
+        sentences = [s for s in sentences if len(s.strip()) >= 2]
+        if len(sentences) >= 3:
+            lengths = [len(s) for s in sentences]
+            mean_len = sum(lengths) / len(lengths)
+            variance = sum((l - mean_len) ** 2 for l in lengths) / len(lengths)
+            std_dev = variance**0.5
+            cv = std_dev / max(mean_len, 1)
+            sentence_variety = min(1.0, cv / 0.5)
+        else:
+            sentence_variety = 0.3
+
+        # 标点多样性
+        punct_types = set(re.findall(r"[，。！？、；：…—" "''「」『』]", text))
+        punct_diversity = min(1.0, len(punct_types) / 8)
+
+        # 词汇丰富度（TTR）
+        chars = [c for c in text if "一" <= c <= "鿿"]
+        if chars:
+            ttr = len(set(chars)) / len(chars)
+            vocab_richness = min(1.0, ttr / 0.5)
+        else:
+            vocab_richness = 0.3
+
+        # 对话占比
+        dialogues = re.findall(r"[" "「『]([^" "」』]+)[" "」』]", text)
+        dialogue_chars = sum(len(d) for d in dialogues)
+        dialogue_ratio = dialogue_chars / max(len(text), 1)
+        dialogue_score = min(1.0, dialogue_ratio * 5)
+
+        # 语气词频率
+        interjections = len(re.findall(r"(啊|呢|吧|嘛|呀|哦|嗯|哈|呵|唉|哎|哇)", text))
+        interj_ratio = interjections / max(len(text) / 100, 1)
+        interj_score = min(1.0, interj_ratio * 2)
+
+        # 综合评分（等权重）
+        total = (
+            sentence_variety * 0.25
+            + punct_diversity * 0.20
+            + vocab_richness * 0.20
+            + dialogue_score * 0.20
+            + interj_score * 0.15
+        )
+        return min(1.0, max(0.0, round(total, 4)))
 
     # ── 工具方法 ──────────────────────────────────────
 

@@ -1,14 +1,15 @@
 """
-审计门禁模块 — 8道门禁
+审计门禁模块 — 9道门禁
 
 G1: 英雄之旅弧线位置偏差
 G2: 信息释放节奏
-G3: AI味检测
+G3: AI味检测（24+维特征扫描）
 G4: 爽点间隔检测
 G5: 爽点类型多样性
 G6: 情绪一致性
 G7: 对话有效性
 G8: 战斗场景节奏
+G9: 综合AI率检测（12维度评分 + 自动人类化改写）
 
 使用方式:
   from kunlun.audit.gates import audit_gates, AuditResult
@@ -26,6 +27,7 @@ from kunlun.audit.gates.gate_g5_pleasure_diversity import GateG5PleasureDiversit
 from kunlun.audit.gates.gate_g6_emotion import GateG6EmotionConsistency
 from kunlun.audit.gates.gate_g7_dialogue import GateG7DialogueEffectiveness
 from kunlun.audit.gates.gate_g8_battle import GateG8BattleRhythm
+from kunlun.audit.gates.gate_g9_ai_rate import GateG9AIRate
 
 __all__ = [
     "AUDIT_GATES",
@@ -39,6 +41,7 @@ __all__ = [
     "GateG6EmotionConsistency",
     "GateG7DialogueEffectiveness",
     "GateG8BattleRhythm",
+    "GateG9AIRate",
     "GateLevel",
     "GateResult",
     "audit_gates",
@@ -47,14 +50,15 @@ __all__ = [
 # ─── 权重配置 ─────────────────────────────────────
 
 GATE_WEIGHTS = {
-    "G1": 0.15,
+    "G1": 0.10,
     "G2": 0.15,
-    "G3": 0.20,
+    "G3": 0.15,
     "G4": 0.10,
     "G5": 0.10,
     "G6": 0.10,
     "G7": 0.10,
     "G8": 0.10,
+    "G9": 0.10,
 }
 
 AUDIT_GATES = [
@@ -66,20 +70,24 @@ AUDIT_GATES = [
     {"id": "G6", "name": "情绪一致性"},
     {"id": "G7", "name": "对话有效性"},
     {"id": "G8", "name": "战斗节奏"},
+    {"id": "G9", "name": "综合AI率"},
 ]
 
 
 # ─── 门禁管理器 ─────────────────────────────────────
 
 
-def audit_gates(draft: str, blueprint: dict, kg_snapshot_id: str = "") -> AuditResult:
+def audit_gates(
+    draft: str, blueprint: dict, kg_snapshot_id: str = "", auto_humanize_g9: bool = False
+) -> AuditResult:
     """
-    执行8道门禁审计
+    执行9道门禁审计
 
     Args:
         draft: 正文草稿
         blueprint: 蓝图字典 (至少包含 chapter, chapter_type, arc_stage)
         kg_snapshot_id: KG快照ID (可选)
+        auto_humanize_g9: G9是否自动人类化改写 (默认False)
 
     Returns:
         AuditResult 对象
@@ -110,6 +118,9 @@ def audit_gates(draft: str, blueprint: dict, kg_snapshot_id: str = "") -> AuditR
     g8 = GateG8BattleRhythm()
     gates["G8"] = g8.run(draft)
 
+    g9 = GateG9AIRate()
+    gates["G9"] = g9.run(draft, auto_humanize=auto_humanize_g9)
+
     total_score = 0.0
     for gate_id, result in gates.items():
         weight = GATE_WEIGHTS.get(gate_id, 0.1)
@@ -117,7 +128,8 @@ def audit_gates(draft: str, blueprint: dict, kg_snapshot_id: str = "") -> AuditR
 
     fail_count = sum(1 for r in gates.values() if r.level == GateLevel.FAIL)
     critical_fail = any(
-        gate_id in ["G1", "G3"] and gates[gate_id].level == GateLevel.FAIL for gate_id in gates
+        gate_id in ["G1", "G3", "G9"] and gates[gate_id].level == GateLevel.FAIL
+        for gate_id in gates
     )
 
     passed = (fail_count <= 1) and not critical_fail
@@ -133,6 +145,7 @@ def audit_gates(draft: str, blueprint: dict, kg_snapshot_id: str = "") -> AuditR
         "G6": "情绪过渡自然，情感线连贯流畅",
         "G7": "对话精炼有效，角色鲜活",
         "G8": "战斗节奏张弛有度，画面感强",
+        "G9": "AI率低，人类风格自然，平台检测安全",
     }
     for gate_id in sorted(gates.keys()):
         result = gates[gate_id]

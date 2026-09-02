@@ -6,7 +6,7 @@
   - SAGA sliding window: 章节距离加权
 
 核心机制:
-  - 每章总 Token 预算按 6 段比例分配
+  - 每章总 Token 预算按 7 段比例分配
   - 超出比例的内容通过距离衰减函数截断
   - 离当前章节越近的上下文权重越高
 
@@ -25,13 +25,14 @@ from __future__ import annotations
 
 import math
 
-# WenShape 6段预算分配比例（各项占总预算的百分比，总和=1.0）
+# WenShape 7段预算分配比例（各项占总预算的百分比，总和=1.0）
 DEFAULT_BUDGET_ALLOCATION = {
-    "system_rules": 0.06,  # 系统规则
-    "character_cards": 0.18,  # 角色/世界观卡片
-    "dynamic_facts": 0.12,  # 动态事实（真相文件关键点）
-    "chapter_summaries": 0.22,  # 历史章节摘要
-    "current_blueprint": 0.12,  # 当前蓝图
+    "system_rules": 0.05,  # 系统规则
+    "character_cards": 0.16,  # 角色/世界观卡片
+    "dynamic_facts": 0.10,  # 动态事实（真相文件关键点）
+    "chapter_summaries": 0.20,  # 历史章节摘要
+    "current_blueprint": 0.11,  # 当前蓝图
+    "memory_injection": 0.08,  # 记忆注入（四层记忆动态加载）
     "output_reserve": 0.30,  # 输出预留（LLM 生成空间）
 }
 
@@ -173,6 +174,47 @@ class ContextBudgetAllocator:
             truncated = self.truncate_to_budget(text, budget, distance)
             result[key] = truncated
 
+        return result
+
+    def assemble_with_memory(
+        self,
+        segments: dict[str, str],
+        memory_manager=None,
+        query: str = "",
+        chapter: int = 0,
+        chapter_distances: dict[str, int] | None = None,
+    ) -> dict[str, str]:
+        """按预算装配上下文，并自动注入四层记忆。"""
+        result = self.assemble(segments, chapter_distances)
+        if memory_manager is not None:
+            try:
+                mr = memory_manager.query(
+                    query or "当前章节上下文",
+                    query_type="general",
+                    chapter=chapter,
+                    max_tokens=self.get_segment_budget("memory_injection"),
+                )
+                parts = []
+                if mr.working:
+                    parts.append("【工作记忆】")
+                    parts.extend(item.content[:300] for item in mr.working[:2])
+                if mr.semantic:
+                    parts.append("\n【关键实体】")
+                    parts.extend(f"- {e.name}: {e.description[:100]}" for e in mr.semantic[:5])
+                if mr.episodic:
+                    parts.append("\n【相关事件】")
+                    parts.extend(
+                        f"- 第{ev.chapter}章 {ev.scene}: {ev.summary[:100]}"
+                        for ev in mr.episodic[:3]
+                    )
+                if mr.procedural:
+                    parts.append("\n【写作模式】")
+                    parts.extend(f"- {p.name}: {p.description[:80]}" for p in mr.procedural[:2])
+                result["memory_injection"] = "\n".join(parts) if parts else ""
+            except Exception as e:
+                result["memory_injection"] = f"[记忆注入失败: {e}]"
+        else:
+            result["memory_injection"] = segments.get("memory_injection", "")
         return result
 
     def get_summary(self, segments: dict[str, str], result: dict[str, str]) -> str:
