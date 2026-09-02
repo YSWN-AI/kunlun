@@ -1,0 +1,216 @@
+[project]
+name = "kunlun"
+version = "0.4.0"
+description = "昆仑创作引擎 — AI 驱动的网络文学创作平台"
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+
+# ============================================================
+# Ruff — 统一 Linter + Formatter（替代 flake8/isort/black/pyupgrade）
+# ============================================================
+[tool.ruff]
+# 目标 Python 版本
+target-version = "py311"
+
+# 行宽（与 Black 兼容）
+line-length = 100
+
+# 排除目录
+exclude = [
+    "build/",
+    "dist/",
+    ".venv/",
+    "venv/",
+    "__pycache__/",
+    ".git/",
+    ".mypy_cache/",
+    ".ruff_cache/",
+    ".pytest_cache/",
+    "migrations/",
+    "scripts/archived/",
+    "frontend/",
+    ".cleanup_backups/",
+    "data/",
+]
+
+# ============================================================
+# Ruff Linter 规则集
+# ============================================================
+[tool.ruff.lint]
+# 启用规则：
+#   E/W  — pycodestyle（代码风格）
+#   F    — pyflakes（错误检查）
+#   I    — isort（import 排序）
+#   N    — pep8-naming（命名规范）
+#   UP   — pyupgrade（语法现代化，target=py311）
+#   B    — flake8-bugbear（常见陷阱）
+#   C4   — flake8-comprehensions（推导式优化）
+#   SIM  — flake8-simplify（代码简化）
+#   RUF  — Ruff 专属规则
+#   T20  — flake8-print（禁止 print）
+#   PTH  — flake8-use-pathlib（使用 pathlib）
+#   PERF — Perflint（性能优化）
+#   LOG  — flake8-logging-format（日志格式）
+#   RET  — flake8-return（返回检查）
+#   ARG  — flake8-unused-arguments（未使用参数）
+#   PL   — Pylint（精选规则）
+select = [
+    "E", "W", "F", "I", "N", "UP", "B", "C4", "SIM", "RUF",
+    "T20", "PTH", "PERF", "LOG", "RET", "ARG", "PL",
+]
+
+# 忽略规则（解释见下方）：
+#   T201        — print 允许（先统计后逐个替换，不直接报错）
+#   RUF001/2/3  — 中文项目全角/半角字符混淆是正常现象，非安全问题
+#   PLC0415     — 项目中大量使用延迟导入（lazy import）以优化启动速度和避免循环依赖
+#   RUF012      — 类常量列表/字典不会被实例级修改，ClassVar标注在20+文件中逐一进行成本大于收益
+#   E741        — `l` 在局部统计计算中作为循环变量不易与数字1混淆（for l in lengths），逐例修复ROI低
+ignore = [
+    "T201",       # print 允许（先统计后逐个替换，不直接报错）
+    "RUF001",     # 中文项目全角/半角字符混淆是正常现象
+    "RUF002",
+    "RUF003",
+    "PLC0415",    # 延迟导入（lazy import）优化启动速度
+    "RUF012",     # 类常量列表/字典 ClassVar 标注成本大于收益
+    "E741",       # `l` 作为循环变量在统计计算中常见
+    "N818",       # 异常类名后缀 Error 比 Exception 更语义化
+    "RUF100",     # 保留 noqa 注释不被自动移除
+    "PLR2004",    # 魔法数字在创作引擎中大量合理（字数/评分/阈值）
+]
+
+# 在 __init__.py 中允许未使用的 import（重导出）
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+# 插件基类：空钩子方法是有意设计的可覆盖钩子
+"kunlun/plugins/base.py" = ["B027", "B024"]
+"kunlun/__init__.py" = ["F401", "F403"]
+# 扩展模块 engine.py 占位文件：未使用参数是占位实现的正常情况
+"engine.py" = ["ARG001", "F841"]
+# 延迟导入文件：允许顶层之外的 import（性能优化和循环依赖避免）
+"kunlun/api/routes.py" = ["E402"]
+"kunlun/agents/makefile.py" = ["E402"]
+# 审计维度函数名：_check_A1_xxx 对应 33 维审计维度编号，有意保留大小写
+"kunlun/audit/groups/*.py" = ["N802"]
+# 诊断/状态工具：print 是用户交互的正常方式
+"kunlun/doctor.py" = ["T201"]
+"kunlun/status_cmd.py" = ["T201"]
+"kunlun/project_config.py" = ["T201"]
+"kunlun/brake.py" = ["T201"]
+"kunlun/cooldown.py" = ["T201"]
+"kunlun/precheck.py" = ["T201"]
+
+# ============================================================
+# Pylint (PL) 复杂度阈值 — 创作引擎业务逻辑较复杂，适当放宽
+# ============================================================
+[tool.ruff.lint.pylint]
+max-args = 12          # 默认5→12：Agent/管线/cost_tracker 需要多参数
+max-branches = 20      # 默认12→20：审计/状态导出有多分支判断
+max-statements = 80    # 默认50→80：管线步骤/导入引擎较长
+max-returns = 10       # 默认6→10：审计检查多条件返回
+max-positional-args = 12
+
+# ============================================================
+# Ruff Formatter（替代 Black）
+# ============================================================
+[tool.ruff.format]
+# 与 Black 兼容的格式化选项
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# ============================================================
+# isort（import 排序）— 通过 Ruff I 规则控制
+# ============================================================
+[tool.ruff.lint.isort]
+# 强制单行 import
+force-single-line = false
+# 已知第三方包
+known-third-party = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "pydantic_settings",
+    "neo4j",
+    "redis",
+    "qdrant_client",
+    "httpx",
+    "openai",
+    "anthropic",
+    "jieba",
+    "numpy",
+    "loguru",
+    "sentence_transformers",
+    "aiofiles",
+    "slowapi",
+]
+
+# ============================================================
+# pytest + coverage — 测试与覆盖率配置
+# ============================================================
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--cov=kunlun",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-fail-under=30",  # 渐进式：后续提高至 50 → 70 → 80（当前: 30）
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["kunlun"]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/scripts/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+[tool.mypy]
+python_version = "3.11"
+# 严格模式分项控制（逐步启用）
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+# 第三方库无类型注释 → 暂时跳过
+ignore_missing_imports = true
+# 不检查 migrations 和 tests
+exclude = [
+    "migrations/",
+    "tests/",
+    "scripts/",
+    "frontend/",
+    "build/",
+    "dist/",
+]
+# 渐进式收紧：检查未标注函数的函数体（v0.2→先检查，不强制标注）
+check_untyped_defs = true
+disallow_untyped_defs = false
+# 允许无类型的装饰器
+disallow_untyped_decorators = false

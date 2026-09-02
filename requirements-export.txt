@@ -1,0 +1,7 @@
+# 昆仑创作引擎 — 可选导出依赖
+# 安装: pip install -r requirements-export.txt
+
+ebooklib>=1.0.0         # EPUB 导出
+weasyprint>=62.0        # PDF 导出
+python-docx>=1.1.0      # DOCX 导出
+# calibre               # MOBI 导出 (需独立安装 calibre 软件)

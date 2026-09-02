@@ -1,0 +1,83 @@
+# ============================================================
+# 昆仑创作引擎 — K8s Deployment
+# 单副本 deployment，通过 ConfigMap/Secret 注入配置
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kunlun-deployment
+  namespace: kunlun
+  labels:
+    app: kunlun
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kunlun
+  template:
+    metadata:
+      labels:
+        app: kunlun
+    spec:
+      containers:
+        - name: kunlun
+          image: kunlun-engine:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          # 从 ConfigMap 注入非敏感配置
+          envFrom:
+            - configMapRef:
+                name: kunlun-config
+            - secretRef:
+                name: kunlun-secret
+          # 持久化数据卷
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+          # 资源限制
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "4Gi"
+              cpu: "2"
+          # 健康检查（指向 /api/v1/status 或 /health）
+          livenessProbe:
+            httpGet:
+              path: /api/v1/status
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/status
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: kunlun-data-pvc
+---
+# PersistentVolumeClaim — 持久化数据存储
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kunlun-data-pvc
+  namespace: kunlun
+  labels:
+    app: kunlun
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

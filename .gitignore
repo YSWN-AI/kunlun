@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+.codebuddy/
+.workbuddy/
+.playwright-cli/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project data (large binary files)
+data/
+output/
+*.db
+*.db-journal
+*.db-wal
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Linting & Type Checking
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Backup files
+*_backup_*
+*.bak
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Docker
+.env.docker
+
+# Project config (local)
+.claude/
+
+# Build artifacts
+昆仑创作引擎.exe
+
+# Cleanup backups
+.cleanup_backups/

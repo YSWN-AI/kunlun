@@ -1,0 +1,53 @@
+# ============================================================
+# 昆仑创作引擎 — K8s ConfigMap
+# 非敏感配置项，与应用镜像解耦，方便不同环境切换
+# ============================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kunlun-config
+  namespace: kunlun
+  labels:
+    app: kunlun
+data:
+  # --- 应用基础 ---
+  APP_ENV: "production"
+  APP_HOST: "0.0.0.0"
+  APP_PORT: "8000"
+  LOG_LEVEL: "INFO"
+
+  # --- Neo4j ---
+  NEO4J_URI: "bolt://neo4j-service:7687"
+
+  # --- Qdrant ---
+  QDRANT_PATH: "/data/qdrant"
+  QDRANT_COLLECTION: "kunlun_entities"
+
+  # --- SQLite ---
+  SQLITE_PATH: "/data/kunlun_search.db"
+
+  # --- Redis ---
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+
+  # --- NATS ---
+  NATS_URL: "nats://nats-service:4222"
+
+  # --- LLM API Base URLs ---
+  OPENAI_BASE_URL: "https://api.openai.com/v1"
+  DEEPSEEK_BASE_URL: "https://api.deepseek.com"
+
+  # --- 去AI味阈值 ---
+  AI_THRESHOLD_SENTENCE_CV: "0.30"
+  AI_THRESHOLD_CONJUNCTION_DENSITY: "3.0"
+  AI_THRESHOLD_PARAGRAPH_CV: "0.20"
+  AI_THRESHOLD_OPENING_DIVERSITY: "0.35"
+
+  # --- 审计阈值 ---
+  AUDIT_MAX_NEW_CONCEPTS_PER_CHAPTER: "3"
+  AUDIT_MAX_GAPS_BETWEEN_PLEASURE_POINTS: "3"
+  AUDIT_MAX_SAME_PLEASURE_TYPE_STREAK: "4"
+  AUDIT_ARC_MAX_POSITION_DEVIATION: "2"
+  AUDIT_EMOTION_MAX_DEVIATION_PCT: "0.30"
+  AUDIT_DIALOGUE_MAX_NONSENSE_PCT: "0.20"

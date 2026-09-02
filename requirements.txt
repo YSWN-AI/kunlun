@@ -1,0 +1,79 @@
+# ============================================================
+# 昆仑创作引擎 — Python 依赖 (Phase 1-2 基础设施 + 核心创作)
+# Python >= 3.11
+# ============================================================
+
+# --- Web 框架 ---
+fastapi==0.115.0
+uvicorn[standard]==0.34.0
+websockets==14.1
+slowapi==0.1.9
+
+# --- 数据库驱动 ---
+neo4j==5.28.0
+redis==5.2.1
+
+# --- 向量数据库 (嵌入式) ---
+qdrant-client==1.11.3
+
+# --- 消息总线 ---
+nats-py==2.9.0
+
+# --- 全文搜索 (SQLite FTS5, 内置无需额外包) ---
+# Python 标准库 sqlite3 已包含
+
+# --- LLM 客户端 ---
+openai==1.68.2
+anthropic==0.49.0
+
+# --- 向量嵌入 ---
+sentence-transformers==3.4.0
+torch>=2.1.0
+
+# --- 数据处理 ---
+pydantic==2.9.2
+pydantic-settings==2.5.2
+python-dotenv==1.0.1
+
+# --- 文本处理 ---
+jieba==0.42.1
+numpy>=2.0.0
+
+# --- 异步 ---
+httpx==0.27.2
+aiofiles==24.1.0
+
+# --- 日志 ---
+loguru==0.7.2
+
+# --- 测试 ---
+pytest-asyncio>=0.24.0
+
+# --- 数据库迁移 ---
+alembic==1.13.2
+sqlalchemy==2.0.35
+
+# --- 工具 ---
+tqdm==4.66.5
+pyyaml==6.0.2
+
+# --- 类型存根 ---
+types-pyyaml>=6.0.0
+
+# --- 代码质量（dev）---
+ruff>=0.11.0
+mypy>=1.14.0
+pre-commit>=4.0.0
+
+# ============================================================
+# 可选 extras — pip install -e ".[export]" 或 pip install -r requirements-export.txt
+# ============================================================
+
+# --- EPUB 导出 ---
+ebooklib>=1.0.0
+# --- PDF 导出 ---
+weasyprint>=62.0
+# --- DOCX 导出 ---
+python-docx>=1.1.0
+# --- MOBI 导出 (需独立安装 calibre) ---
+# calibre

@@ -1,0 +1,104 @@
+# 昆仑创作引擎 - Docker 一键部署
+# 适用于已安装 Docker Desktop 的环境
+# 
+# 使用方法:
+# 1. 复制 .env.example 为 .env 并配置各项参数（特别是密码）
+# 2. 运行: docker compose up -d
+# 
+# 安全提示: 以下端口均绑定到 127.0.0.1，防止外部网络访问
+
+name: kunlun
+
+services:
+  # ├── Neo4j 知识图谱 ────────────────────
+  neo4j:
+    image: docker.m.daocloud.io/library/neo4j:5-community
+    ports:
+      - "127.0.0.1:7474:7474"   # HTTP
+      - "127.0.0.1:7687:7687"   # Bolt
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD}
+      NEO4J_PLUGINS: '["apoc"]'
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD}", "RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ├── Redis 缓存 ────────────────────────
+  redis:
+    image: docker.m.daocloud.io/library/redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: redis-server --save 60 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ├── NATS 消息总线 ────────────────────
+  nats:
+    image: docker.m.daocloud.io/library/nats:2-alpine
+    ports:
+      - "127.0.0.1:4222:4222"   # Client
+      - "127.0.0.1:8222:8222"   # HTTP Monitoring
+    command: -js -m 8222
+    healthcheck:
+      test: ["CMD", "wget", "-q", "http://localhost:8222/healthz", "-O", "/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ├── Qdrant 向量检索(独立模式) ────────
+  qdrant:
+    image: docker.m.daocloud.io/qdrant/qdrant:v1.11.3
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ├── 昆仑应用服务 ─────────────────────
+  kunlun:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - .env
+    environment:
+      - NEO4J_URI=bolt://neo4j:7687
+      - REDIS_HOST=redis
+      - NATS_URL=nats://nats:4222
+      - QDRANT_URL=http://qdrant:6333
+    depends_on:
+      neo4j:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  redis_data:
+  qdrant_data:

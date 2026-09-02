@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>昆仑测试</title></head>
+<body>
+<h1>昆仑引擎测试页</h1>
+<div id="app">加载中...</div>
+<button onclick="testClick()">点我测试</button>
+<p id="result"></p>
+<script>
+function testClick() {
+    document.getElementById('result').textContent = '✅ JavaScript 正常执行！';
+    document.getElementById('app').textContent = 'Vibe Writing API 测试中...';
+
+    fetch('/api/v1/vibe/master/status')
+        .then(r => r.json())
+        .then(d => {
+            document.getElementById('app').textContent = '✅ API 连接成功！' +
+                (d.status && d.status.project ? ' 有项目' : ' 无项目');
+        })
+        .catch(e => {
+            document.getElementById('app').textContent = '❌ API 连接失败: ' + e.message;
+        });
+}
+</script>
+</body>
+</html>

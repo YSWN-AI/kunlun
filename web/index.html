@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>昆仑创作引擎 — Vibe Writing</title>
+<style>
+:root {
+  --primary: #5B8FF9;
+  --primary-dark: #4A7DE8;
+  --primary-light: #6DA0FA;
+  --bg-dark: #0F1117;
+  --bg-card: #161822;
+  --bg-input: #1A1D2E;
+  --text-primary: #E8EAED;
+  --text-secondary: #B0B3BD;
+  --text-muted: #8B8FA3;
+  --border: #252839;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --gradient-1: linear-gradient(135deg, #5B8FF9 0%, #4A7DE8 100%);
+  --primary-rgb: 91, 143, 249;
+  --warning-rgb: 245, 158, 11;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  padding: 20px 32px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: var(--gradient-1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+  font-weight: 700;
+}
+
+.header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.header-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.header-right {
+  display: flex;
+  gap: 12px;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Main Container */
+.main-container {
+  flex: 1;
+  display: flex;
+  padding: 24px;
+  gap: 24px;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.mode-list {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mode-item {
+  padding: 14px 16px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.mode-item:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.mode-item:hover {
+  background: var(--bg-input);
+  border-color: var(--border);
+}
+
+.mode-item.active {
+  background: rgba(var(--primary-rgb), 0.15);
+  border-color: var(--primary);
+}
+
+.mode-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--bg-input);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.mode-item.active .mode-icon {
+  background: var(--primary);
+}
+
+.mode-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mode-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Chat Area */
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.chat-container {
+  flex: 1;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-title {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.chat-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-btn {
+  padding: 6px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chat-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.msg {
+  max-width: 80%;
+  padding: 16px 20px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.8;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg.ai {
+  background: var(--bg-input);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.msg.user {
+  background: var(--primary);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.msg.system {
+  background: rgba(var(--warning-rgb), 0.15);
+  border: 1px solid rgba(var(--warning-rgb), 0.3);
+  color: var(--warning);
+  align-self: center;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Input Area */
+.input-area {
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+
+.input-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.input-box {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+.input-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.25);
+}
+
+#inputText {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 15px;
+  outline: none;
+  resize: none;
+  min-height: 24px;
+  max-height: 120px;
+}
+
+#inputText::placeholder {
+  color: var(--text-muted);
+}
+
+.send-btn {
+  width: 48px;
+  height: 48px;
+  background: var(--primary);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-btn:hover {
+  background: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+.send-btn:active {
+  transform: scale(0.95);
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.quick-btn {
+  padding: 8px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary-light);
+}
+
+/* Result Panel */
+.result-panel {
+  display: none;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.result-panel.show {
+  display: block;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.result-header {
+  padding: 16px 20px;
+  background: var(--bg-input);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.result-meta {
+  display: flex;
+  gap: 12px;
+}
+
+.meta-tag {
+  padding: 4px 10px;
+  background: rgba(var(--primary-rgb), 0.15);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--primary-light);
+}
+
+.result-body {
+  padding: 20px;
+  font-size: 15px;
+  line-height: 1.9;
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+.result-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.result-btn {
+  padding: 8px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.result-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Loading */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+  background: var(--bg-input);
+  border-radius: 12px;
+  align-self: flex-start;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
+
+/* Mobile menu toggle (hidden on desktop) */
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.menu-toggle:hover {
+  border-color: var(--primary-light);
+  color: var(--primary-light);
+}
+
+/* Sidebar scrim (mobile drawer backdrop) */
+.sidebar-scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 150;
+}
+
+/* Inline refine row */
+.refine-row {
+  display: none;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.refine-row.show {
+  display: flex;
+}
+
+.refine-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+}
+
+.refine-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.25);
+}
+
+.refine-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header { padding: 16px; }
+  .main-container { padding: 16px; }
+  .menu-toggle { display: inline-flex; }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 160;
+    width: 280px;
+    border-radius: 0;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-scrim.show { display: block; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="打开创作模式菜单">☰</button>
+    <div class="logo">昆</div>
+    <div>
+      <h1>昆仑创作引擎</h1>
+      <div class="header-sub">Vibe Writing — 不说参数，只说感受</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      服务就绪
+    </div>
+  </div>
+</div>
+
+<div class="sidebar-scrim" id="sidebarScrim" onclick="toggleSidebar()" aria-hidden="true"></div>
+
+<div class="main-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">创作模式</div>
+    <div class="mode-list">
+      <button type="button" class="mode-item active" data-mode="master" aria-label="切换到总调度模式">
+        <div class="mode-icon">🎯</div>
+        <div>
+          <div class="mode-name">总调度</div>
+          <div class="mode-desc">一句话指挥全部</div>
+        </div>
+      </button>
+      <button type="button" class="mode-item" data-mode="vibe" aria-label="切换到 Vibe 写作模式">
+        <div class="mode-icon">✨</div>
+        <div>
+          <div class="mode-name">Vibe写作</div>
+          <div class="mode-desc">感受驱动创作</div>
+        </div>
+      </button>
+      <button type="button" class="mode-item" data-mode="audit" aria-label="切换到质量审计模式">
+        <div class="mode-icon">🔍</div>
+        <div>
+          <div class="mode-name">质量审计</div>
+          <div class="mode-desc">48维质量检查</div>
+        </div>
+      </button>
+      <button type="button" class="mode-item" data-mode="export" aria-label="切换到导出全书模式">
+        <div class="mode-icon">📦</div>
+        <div>
+          <div class="mode-name">导出全书</div>
+          <div class="mode-desc">多格式输出</div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat Area -->
+  <div class="chat-area">
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="chat-title">创作对话</div>
+        <div class="chat-actions">
+          <button class="chat-btn" onclick="clearChat()">清空对话</button>
+          <button class="chat-btn" onclick="showHelp()">使用帮助</button>
+        </div>
+      </div>
+      <div id="chatBox" class="messages">
+        <div class="msg ai">🎯 说你想写什么，一句话就够了</div>
+        <div class="msg system">
+          示例：我想写一本玄幻小说 | 写第一章，雨夜被追杀 | 检查质量 → 导出全书
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <div class="input-wrapper">
+        <div class="input-box">
+          <textarea id="inputText" placeholder="说出你的创作意图..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
+        </div>
+        <button class="send-btn" onclick="sendMsg()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2l-7 20-4-4-4-4 20-7z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="quick-actions">
+        <button class="quick-btn" onclick="quickInput('我想写一本玄幻小说')">玄幻小说</button>
+        <button class="quick-btn" onclick="quickInput('写第一章')">写第一章</button>
+        <button class="quick-btn" onclick="quickInput('检查质量')">质量检查</button>
+        <button class="quick-btn" onclick="quickInput('导出全书')">导出全书</button>
+      </div>
+    </div>
+
+    <!-- Result Panel -->
+    <div id="resultPanel" class="result-panel">
+      <div class="result-header">
+        <div class="result-title">创作结果</div>
+        <div class="result-meta">
+          <span class="meta-tag" id="feelingTag">感受: -</span>
+          <span class="meta-tag" id="wordCountTag">字数: -</span>
+        </div>
+      </div>
+      <div class="result-body" id="resultBody"></div>
+      <div class="result-footer" id="resultActions">
+        <button class="result-btn" onclick="doWrite()">继续创作</button>
+        <button class="result-btn" onclick="toggleRefine()">调整感受</button>
+        <button class="result-btn" onclick="copyResult()">复制内容</button>
+      </div>
+      <div class="refine-row" id="refineRow">
+        <input id="refineInput" class="refine-input" type="text" placeholder="说出你的感受，AI 会据此调整…" onkeydown="if(event.key==='Enter')submitRefine()" />
+        <button class="result-btn" onclick="submitRefine()">提交</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var mode = 'master';
+var isLoading = false;
+
+function switchMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-item').forEach(item => {
+    var isActive = item.getAttribute('data-mode') === m;
+    item.classList.toggle('active', isActive);
+    if (isActive) item.setAttribute('aria-current', 'page');
+    else item.removeAttribute('aria-current');
+  });
+  closeSidebar();
+  clearChat();
+  addMsg('已切换到 ' + getModeName(m) + ' 模式', 'system');
+  hideResult();
+  var row = document.getElementById('refineRow');
+  if (row) row.classList.remove('show');
+}
+
+function toggleSidebar() {
+  var sb = document.querySelector('.sidebar');
+  var scrim = document.getElementById('sidebarScrim');
+  var open = sb.classList.toggle('open');
+  scrim.classList.toggle('show', open);
+}
+
+function closeSidebar() {
+  var sb = document.querySelector('.sidebar');
+  var scrim = document.getElementById('sidebarScrim');
+  if (sb) sb.classList.remove('open');
+  if (scrim) scrim.classList.remove('show');
+}
+
+function getModeName(m) {
+  return {master:'总调度', vibe:'Vibe写作', audit:'质量审计', export:'导出全书'}[m];
+}
+
+function addMsg(text, type) {
+  var box = document.getElementById('chatBox');
+  var msg = document.createElement('div');
+  msg.className = 'msg ' + type;
+  msg.innerHTML = text.replace(/\n/g, '<br>');
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+}
+
+function addTyping() {
+  var box = document.getElementById('chatBox');
+  var indicator = document.createElement('div');
+  indicator.className = 'typing-indicator';
+  indicator.id = 'typing';
+  indicator.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  box.appendChild(indicator);
+  box.scrollTop = box.scrollHeight;
+}
+
+function removeTyping() {
+  var typing = document.getElementById('typing');
+  if (typing) typing.remove();
+}
+
+function clearChat() {
+  document.getElementById('chatBox').innerHTML = '';
+}
+
+function showHelp() {
+  addMsg('使用指南：<br>• 总调度：一句话指挥所有功能<br>• Vibe写作：感受驱动，逐步创作<br>• 质量审计：48维度全面检查<br>• 导出全书：TXT/JSON/Markdown', 'ai');
+}
+
+function handleKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMsg();
+  }
+}
+
+function quickInput(text) {
+  document.getElementById('inputText').value = text;
+  sendMsg();
+}
+
+function sendMsg() {
+  if (isLoading) return;
+  var input = document.getElementById('inputText');
+  var text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  
+  addMsg(text, 'user');
+  isLoading = true;
+  addTyping();
+
+  if (mode === 'master') {
+    callMaster(text);
+  } else if (mode === 'vibe') {
+    callExpress(text);
+  } else if (mode === 'audit') {
+    callAudit(text);
+  } else if (mode === 'export') {
+    callExport(text);
+  }
+}
+
+function callMaster(text) {
+  fetch('/api/v1/vibe/master?text=' + encodeURIComponent(text), {method: 'POST'})
+    .then(r => r.json())
+    .then(d => {
+      removeTyping();
+      isLoading = false;
+      if (d.success) {
+        addMsg(d.message || '已完成', 'ai');
+        if (d.draft) showResult(d.draft, d.feeling);
+      } else {
+        addMsg('❌ ' + (d.error || '处理失败'), 'ai');
+      }
+    })
+    .catch(e => {
+      removeTyping();
+      isLoading = false;
+      addMsg('❌ 请求失败: ' + e.message, 'ai');
+    });
+}
+
+function callExpress(text) {
+  fetch('/api/v1/vibe/express?book_id=vibe_demo&intent=' + encodeURIComponent(text), {method: 'POST'})
+    .then(r => r.json())
+    .then(d => {
+      removeTyping();
+      isLoading = false;
+      addMsg(d.message || d.error || '已理解', 'ai');
+      if (d.success) showResult(d.draft || '', d.feeling);
+    })
+    .catch(e => {
+      removeTyping();
+      isLoading = false;
+      addMsg('❌ 请求失败: ' + e.message, 'ai');
+    });
+}
+
+function callAudit(text) {
+  addMsg('🔍 正在执行48维质量审计...', 'ai');
+  fetch('/api/v1/audit/run?book_id=vibe_demo', {method: 'POST'})
+    .then(r => r.json())
+    .then(d => {
+      removeTyping();
+      isLoading = false;
+      if (d.success) {
+        var report = d.report || {};
+        addMsg('审计完成：' + (report.score || '-') + '分', 'ai');
+        showResult(JSON.stringify(report, null, 2), '审计报告');
+      } else {
+        addMsg('❌ 审计失败', 'ai');
+      }
+    })
+    .catch(e => {
+      removeTyping();
+      isLoading = false;
+      addMsg('❌ 请求失败: ' + e.message, 'ai');
+    });
+}
+
+function callExport(text) {
+  addMsg('📦 正在导出...', 'ai');
+  fetch('/api/v1/export/book?book_id=vibe_demo&format=txt', {method: 'POST'})
+    .then(r => r.json())
+    .then(d => {
+      removeTyping();
+      isLoading = false;
+      if (d.success) {
+        addMsg('导出完成！文件已保存', 'ai');
+      } else {
+        addMsg('❌ 导出失败: ' + (d.error || '未知错误'), 'ai');
+      }
+    })
+    .catch(e => {
+      removeTyping();
+      isLoading = false;
+      addMsg('❌ 请求失败: ' + e.message, 'ai');
+    });
+}
+
+function doWrite() {
+  if (isLoading) return;
+  isLoading = true;
+  addTyping();
+  addMsg('继续创作...', 'user');
+  
+  fetch('/api/v1/vibe/write?book_id=vibe_demo', {method: 'POST'})
+    .then(r => r.json())
+    .then(d => {
+      removeTyping();
+      isLoading = false;
+      if (d.success) {
+        addMsg('✅ 创作完成', 'ai');
+        showResult(d.draft || '', d.feeling);
+      } else {
+        addMsg('❌ 创作失败', 'ai');
+      }
+    })
+    .catch(e => {
+      removeTyping();
+      isLoading = false;
+      addMsg('❌ 请求失败', 'ai');
+    });
+}
+
+function toggleRefine() {
+  var row = document.getElementById('refineRow');
+  var show = row.classList.toggle('show');
+  if (show) document.getElementById('refineInput').focus();
+}
+
+function submitRefine() {
+  var input = document.getElementById('refineInput');
+  var fb = (input.value || '').trim();
+  if (!fb) { input.focus(); return; }
+
+  if (isLoading) return;
+  isLoading = true;
+  addTyping();
+  addMsg('调整感受: ' + fb, 'user');
+  input.value = '';
+  document.getElementById('refineRow').classList.remove('show');
+
+  fetch('/api/v1/vibe/refine?book_id=vibe_demo&feedback=' + encodeURIComponent(fb), {method: 'POST'})
+    .then(r => r.json())
+    .then(d => {
+      removeTyping();
+      isLoading = false;
+      if (d.success) {
+        addMsg('✅ 已调整', 'ai');
+        showResult(d.draft || '', d.feeling);
+      } else {
+        addMsg('❌ 调整失败', 'ai');
+      }
+    })
+    .catch(e => {
+      removeTyping();
+      isLoading = false;
+      addMsg('❌ 请求失败', 'ai');
+    });
+}
+
+function showResult(content, feeling) {
+  var panel = document.getElementById('resultPanel');
+  var body = document.getElementById('resultBody');
+  var tag = document.getElementById('feelingTag');
+  var count = document.getElementById('wordCountTag');
+  
+  body.textContent = content;
+  tag.textContent = '感受: ' + (feeling || '-');
+  count.textContent = '字数: ' + (content.length || 0);
+  panel.classList.add('show');
+}
+
+function hideResult() {
+  document.getElementById('resultPanel').classList.remove('show');
+}
+
+function copyResult() {
+  var text = document.getElementById('resultBody').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    addMsg('✅ 已复制到剪贴板', 'system');
+  });
+}
+
+// Wire up mode items (delegated, driven by data-mode)
+document.querySelectorAll('.mode-item').forEach(function(item) {
+  item.addEventListener('click', function() {
+    switchMode(item.getAttribute('data-mode'));
+  });
+});
+
+// Auto-resize textarea
+document.getElementById('inputText').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+</script>
+
+</body>
+</html>

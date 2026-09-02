@@ -1,0 +1,247 @@
+/* ════════════════════════════════════════════════════
+   昆仑创作引擎 — 全局 CSS 设计 Token
+   参考: Soybean Admin / Naive UI Admin
+   统一所有视图的配色、间距、排版、圆角、阴影
+   ════════════════════════════════════════════════════ */
+
+:root {
+  /* ===== 主色调 ===== */
+  --color-primary: #5B8FF9;
+  --color-primary-hover: #6DA0FA;
+  --color-primary-pressed: #4A7DE8;
+  --color-primary-suppl: rgba(91, 143, 249, 0.1);
+
+  /* ===== 语义色 ===== */
+  --color-success: #52C41A;
+  --color-success-hover: #65D32B;
+  --color-success-suppl: rgba(82, 196, 26, 0.1);
+  --color-warning: #FAAD14;
+  --color-warning-hover: #FCC12E;
+  --color-warning-suppl: rgba(250, 173, 20, 0.1);
+  --color-error: #FF4D4F;
+  --color-error-hover: #FF6F71;
+  --color-error-suppl: rgba(255, 77, 79, 0.1);
+  --color-info: #5B8FF9;
+
+  /* ===== 表面色 (暗色主题) ===== */
+  --color-bg: #0F1117;             /* 通用背景 (WriteView/PromptsView) */
+  --color-bg-base: #0F1117;
+  --color-bg-elevated: #161822;
+  --color-bg-overlay: #1A1D2E;
+  --color-bg-hover: #1E2230;       /* 悬停态背景 */
+  --color-bg-muted: #1A1D2E;       /* 弱化背景 (标签/徽章) */
+  --color-bg-secondary: #141722;    /* 次要表面 (ImportView) */
+  --color-bg-mask: rgba(0, 0, 0, 0.5);
+  --color-bg-code: #111318;
+
+  /* ===== 边框色 ===== */
+  --color-border-light: #1E2030;
+  --color-border: #252839;
+  --color-border-hover: #3A3F55;
+  --color-border-active: #5B8FF9;
+
+  /* ===== 文本色 ===== */
+  --color-text-primary: #E8EAED;
+  --color-text-secondary: #B0B3BD;
+  --color-text-tertiary: #8B8FA3;
+  --color-text-disabled: #4A4E5A;
+  --color-text-inverse: #0F1117;
+
+  /* ===== 滚动条 ===== */
+  --color-scrollbar-track: #0F1117;
+  --color-scrollbar-thumb: #252839;
+  --color-scrollbar-thumb-hover: #3A3F55;
+
+  /* ===== 排版 ===== */
+  --font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --text-xs: 10px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+
+  --leading-tight: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.6;
+  --leading-loose: 1.8;
+
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* ===== 间距系统 (4px 基准) ===== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ===== 圆角 ===== */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* ===== 阴影 ===== */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  /* ===== 过渡 ===== */
+  --transition-fast: 0.12s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+
+  /* ===== 图表色板 (参考 ECharts 暗色主题) ===== */
+  --color-chart-1: #5B8FF9;   /* 蓝 - 多样性/主色 */
+  --color-chart-2: #5AD8A6;   /* 绿 - 流畅度/次要 */
+  --color-chart-3: #F6BD16;   /* 黄 - 情感/警告 */
+  --color-chart-4: #E86452;   /* 红 - 节奏/危险 */
+  --color-chart-5: #9270CA;   /* 紫 - 人味度/特殊 */
+  --color-chart-6: #FF9845;   /* 橙 - 补充色 */
+
+  /* ===== 布局 ===== */
+  --activity-bar-width: 48px;
+  --sidebar-min-width: 200px;
+  --sidebar-default-width: 260px;
+  --sidebar-max-width: 400px;
+  --right-panel-width: 320px;
+  --status-bar-height: 28px;
+
+  /* ===== Z-index ===== */
+  --z-sidebar: 100;
+  --z-activity-bar: 110;
+  --z-overlay: 200;
+  --z-dropdown: 300;
+  --z-modal: 400;
+  --z-command-palette: 500;
+  --z-toast: 600;
+}
+
+/* ════════════════════════════════════════════════════
+   亮色主题 — 同名词变量重映射
+   与 useTheme.ts 的 lightThemeOverrides 一一对应
+   挂载方式: <html class="light"> (见 App.vue)
+   切到亮色时 Naive UI 组件变亮，自定义组件靠这套变量同步，
+   避免出现“浅色卡片浮在近黑背景”的破图。
+   ════════════════════════════════════════════════════ */
+:root.light {
+  /* ===== 主色调 ===== */
+  --color-primary: #4A7DE8;
+  --color-primary-hover: #5B8FF9;
+  --color-primary-pressed: #3D6FD4;
+  --color-primary-suppl: rgba(74, 125, 232, 0.08);
+
+  /* ===== 语义色 ===== */
+  --color-success: #52C41A;
+  --color-success-hover: #65D32B;
+  --color-success-suppl: rgba(82, 196, 26, 0.08);
+  --color-warning: #FAAD14;
+  --color-warning-hover: #FCC12E;
+  --color-warning-suppl: rgba(250, 173, 20, 0.08);
+  --color-error: #FF4D4F;
+  --color-error-hover: #FF6F71;
+  --color-error-suppl: rgba(255, 77, 79, 0.08);
+  --color-info: #4A7DE8;
+
+  /* ===== 表面色 (亮色主题) ===== */
+  --color-bg: #F5F6FA;
+  --color-bg-base: #F5F6FA;
+  --color-bg-elevated: #FFFFFF;
+  --color-bg-overlay: #FAFBFC;
+  --color-bg-hover: #F0F2F6;
+  --color-bg-muted: #EAECF1;
+  --color-bg-secondary: #FAFBFC;
+  --color-bg-mask: rgba(0, 0, 0, 0.4);
+  --color-bg-code: #F5F6FA;
+
+  /* ===== 边框色 ===== */
+  --color-border-light: #EAECF1;
+  --color-border: #E2E4EA;
+  --color-border-hover: #B0B3BD;
+  --color-border-active: #4A7DE8;
+
+  /* ===== 文本色 (tertiary 提亮至 #8B8FA3, 满足 WCAG AA 对比度) ===== */
+  --color-text-primary: #1A1D2E;
+  --color-text-secondary: #4A4F62;
+  --color-text-tertiary: #8B8FA3;
+  --color-text-disabled: #B0B3BD;
+  --color-text-inverse: #FFFFFF;
+
+  /* ===== 滚动条 ===== */
+  --color-scrollbar-track: #F5F6FA;
+  --color-scrollbar-thumb: #D0D3DD;
+  --color-scrollbar-thumb-hover: #B0B3BD;
+
+  /* ===== 阴影 (亮色更轻) ===== */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  /* ===== 图表色板 (亮色背景下加深以保持对比度) ===== */
+  --color-chart-1: #4A7DE8;
+  --color-chart-2: #2BA471;
+  --color-chart-3: #D48806;
+  --color-chart-4: #D4380D;
+  --color-chart-5: #722ED1;
+  --color-chart-6: #D46B08;
+}
+
+/* ===== 全局过渡动画 ===== */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all var(--transition-normal);
+}
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity var(--transition-fast);
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: all var(--transition-normal);
+}
+.slide-left-enter-from,
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-16px);
+}
+
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all var(--transition-normal);
+}
+.slide-right-enter-from,
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(16px);
+}
+
+/* ===== 共享关键帧 ===== */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

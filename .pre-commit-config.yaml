@@ -1,0 +1,64 @@
+# ============================================================
+# pre-commit hooks — 代码质量门禁
+# 安装: pip install pre-commit && pre-commit install
+# 手动运行: pre-commit run --all-files
+# ============================================================
+repos:
+  # 1. Ruff — Linter（快速检查，不修改代码）
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.0
+    hooks:
+      - id: ruff
+        args: ["check", "--fix", "--exit-non-zero-on-fix"]
+        types_or: [python, pyi]
+
+  # 2. Ruff — Formatter（格式化代码）
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.0
+    hooks:
+      - id: ruff-format
+        types_or: [python, pyi]
+
+  # 3. 通用检查（EOF 换行、YAML 语法、合并冲突标记等）
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer          # 文件末尾加换行
+      - id: trailing-whitespace        # 删除行尾空格
+      - id: check-yaml                 # YAML 语法检查
+        args: ["--allow-multiple-documents"]
+      - id: check-json                 # JSON 语法检查
+      - id: check-merge-conflict       # 合并冲突标记检查
+      - id: mixed-line-ending          # 统一换行符
+        args: ["--fix=lf"]
+      - id: check-added-large-files    # 大文件警告（>500KB）
+        args: ["--maxkb=500"]
+      - id: detect-private-key         # 检测私钥泄露
+
+  # 4. mypy — 静态类型检查
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        args: ["--ignore-missing-imports", "--follow-imports=silent"]
+        types_or: [python, pyi]
+        additional_dependencies: [pydantic>=2.0, types-requests]
+
+  # 5. pytest — 单元测试（默认关闭，启用请取消注释）
+  # - repo: local
+  #   hooks:
+  #     - id: pytest
+  #       name: pytest
+  #       entry: pytest tests/ -q --tb=short
+  #       language: system
+  #       types: [python]
+  #       pass_filenames: false
+  #       always_run: false
+
+  # 6. bandit — 安全扫描（默认关闭，启用请取消注释）
+  # - repo: https://github.com/PyCQA/bandit
+  #   rev: 1.8.3
+  #   hooks:
+  #     - id: bandit
+  #       args: ["-c", "pyproject.toml", "-ll"]
+  #       types: [python]
