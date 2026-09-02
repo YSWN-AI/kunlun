@@ -15,6 +15,7 @@ import threading
 import time
 import webbrowser
 from pathlib import Path
+from typing import Any
 
 # ----------------------------------------------------------
 # 检测 tkinter 可用性
@@ -211,7 +212,7 @@ def _console_mode():
     print()
     print("  正在启动后端服务...")
 
-    status_queue = queue.Queue()
+    status_queue: queue.Queue[Any] = queue.Queue()
     start_server(status_queue)
 
     # 等待启动
@@ -360,7 +361,7 @@ class DesktopApp:
 
     # ---- 后端启动 ----
     def _start_backend(self):
-        self._status_queue = queue.Queue()
+        self._status_queue: queue.Queue[Any] = queue.Queue()
         self._host, self._port = _get_host_port()
         start_server(self._status_queue)
         # 轮询启动状态

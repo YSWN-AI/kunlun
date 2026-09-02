@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from loguru import logger
 
@@ -251,7 +251,7 @@ class PublisherAgent(BaseAgent):
                     "published_at": r["published_at"],
                 }
                 for r in records
-                if r.chapter == chapter_number
+                if r.get("chapter", 0) == chapter_number
             ],
         }
 
@@ -300,13 +300,14 @@ class PublisherAgent(BaseAgent):
     def suggest_platforms(self, book_style: str, word_count: int) -> list[str]:
         """根据书籍风格和字数建议目标平台。"""
         suggestions: list[tuple[str, int]] = []
-        for pid, cfg in {
+        platform_cfgs: dict[str, dict[str, Any]] = {
             "tomato": {"min_words": 80, "styles": ["爽文", "系统", "穿越"]},
             "qidian": {"min_words": 200, "styles": ["玄幻", "仙侠", "都市"]},
             "qimao": {"min_words": 60, "styles": ["言情", "甜宠", "总裁"]},
             "feilu": {"min_words": 100, "styles": ["同人", "爽文", "脑洞"]},
             "jinjiang": {"min_words": 60, "styles": ["耽美", "言情", "古言"]},
-        }.items():
+        }
+        for pid, cfg in platform_cfgs.items():
             score = 0
             if word_count >= cfg["min_words"] * 10000 * 0.5:
                 score += 1

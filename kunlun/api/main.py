@@ -48,7 +48,7 @@ if _rate_limit_enabled:
                         file_values[key] = value
             return file_values
 
-        _StarletteConfig._read_file = staticmethod(_utf8_read_file)
+        _StarletteConfig._read_file = staticmethod(_utf8_read_file)  # type: ignore[method-assign, assignment]
     except (ImportError, AttributeError) as e:
         logger.debug(f"[Startup] starlette Config monkey-patch 跳过: {e}")
 

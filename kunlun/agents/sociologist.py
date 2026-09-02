@@ -372,7 +372,9 @@ class SociologistAgent(BaseAgent):
             parallel_tasks = [_deduce_dim(dim, params) for dim, params in uncached_dims]
             parallel_results = await asyncio.gather(*parallel_tasks, return_exceptions=True)
             for item in parallel_results:
-                if isinstance(item, Exception):
+                if item is None:
+                    continue
+                if isinstance(item, BaseException):
                     logger.error(f"[Sociologist] 并行推演异常: {item}")
                     continue
                 dim, result = item
@@ -480,11 +482,10 @@ class SociologistAgent(BaseAgent):
                         dim,
                         SocietyResult(
                             dimension=dim,
-                            output="",
+                            prompt_used="",
                             model_used="",
-                            confidence=0.0,
+                            output=f"[推演失败] {e}",
                             tokens_used=0,
-                            error=str(e),
                         ),
                     )
 

@@ -129,7 +129,8 @@ async def make_choice(req: MakeChoiceRequest):
 @router.post("/add-choice")
 async def add_choice(req: AddChoiceRequest):
     validate_book_id(req.book_id)
-    from kunlun.interactive import ChoiceType, get_interactive_engine
+    from kunlun.interactive import get_interactive_engine
+    from kunlun.interactive.engine import ChoiceType
 
     engine = get_interactive_engine(req.book_id)
     try:

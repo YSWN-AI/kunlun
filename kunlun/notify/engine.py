@@ -496,7 +496,7 @@ class NotifyManager:
         channels: list[NotifyChannel] | None = None,
     ) -> dict[str, dict[str, bool]]:
         """批量通知 — 多条消息并行推送到多个通道"""
-        results: dict[str, dict[str, bool]] = {}
+        results: dict[str, dict[str, Any]] = {}
 
         async def send_one(msg_data: dict) -> tuple[str, dict[str, bool]]:
             msg_id = msg_data.get("id", str(time.time()))
@@ -514,10 +514,12 @@ class NotifyManager:
 
         for i, r in enumerate(all_results):
             msg_id = messages[i].get("id", str(i))
-            if isinstance(r, Exception):
+            if isinstance(r, BaseException):
                 results[msg_id] = {"error": str(r)}
-            else:
+            elif isinstance(r, tuple) and r:
                 results[msg_id] = r[1]
+            else:
+                results[msg_id] = {"ok": False, "error": "未知结果"}
 
         return results
 

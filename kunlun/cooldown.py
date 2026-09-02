@@ -274,7 +274,7 @@ class EventCooldownMatrix:
 
     def _get_usage_counts(self) -> dict[str, int]:
         """获取各事件类型的使用次数"""
-        counts = defaultdict(int)
+        counts: dict[str, int] = defaultdict(int)
         for r in self._history:
             counts[r.event_type] += 1
         return dict(counts)

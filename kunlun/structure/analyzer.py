@@ -781,7 +781,7 @@ class PlotPointDetector:
     def detect_setup_payoff_pairs(self, chapters: list[dict]) -> list[dict]:
         """检测伏笔-回收配对"""
         pairs = []
-        setups = []  # (ch_num, text, marker)
+        setups: list[tuple[int, str, str]] = []  # (ch_num, text, marker)
 
         for ch in chapters:
             text = ch.get("text", "")

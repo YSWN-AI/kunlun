@@ -23,7 +23,7 @@ import re
 from dataclasses import dataclass, field
 from enum import Enum
 from functools import lru_cache
-from typing import ClassVar, cast
+from typing import ClassVar
 
 from loguru import logger
 

@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any
 
 from kunlun.quality.engine import QualityEvaluator
 
@@ -84,7 +85,7 @@ SIX_DIM_WEIGHTS = {
     "innovation": 0.15,
 }
 
-DIMENSION_MAPPING = {
+DIMENSION_MAPPING: dict[str, dict[str, Any]] = {
     "pacing": {
         "name_cn": "节奏",
         "subs": {"pacing": 0.50, "sentence_variety": 0.30, "chapter_structure": 0.20},

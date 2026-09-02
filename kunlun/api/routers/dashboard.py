@@ -53,7 +53,7 @@ async def dashboard_progress(book_id: str):
 
 
 @router.post("/{book_id}/snapshot")
-async def take_snapshot(book_id: str, req: SnapshotRequest = None):
+async def take_snapshot(book_id: str, req: SnapshotRequest | None = None):
     """拍摄仪表盘快照"""
     validate_book_id(book_id)
     dash = cached_import("kunlun.dashboard.engine", "DashboardEngine")

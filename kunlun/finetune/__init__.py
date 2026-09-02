@@ -630,7 +630,7 @@ PARAMETER repeat_penalty 1.1
             "base_models": len(self._base_models),
             "adapters": len(self._adapters),
             "active_adapter": (
-                self.get_active_adapter().name if self.get_active_adapter() else None
+                _active.name if (_active := self.get_active_adapter()) else None
             ),
             "total_training_steps": sum(a.trained_steps for a in self._adapters.values()),
             "evaluations": len(self._eval_results),

@@ -392,7 +392,7 @@ class TextFingerprint:
 
         # 构建 bigram 频率表
         chars = list(text)
-        bigrams = Counter()
+        bigrams: Counter[str] = Counter()
         for i in range(len(chars) - 1):
             bigrams[chars[i] + chars[i + 1]] += 1
 

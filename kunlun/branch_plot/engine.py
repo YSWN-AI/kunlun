@@ -14,6 +14,7 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
 
@@ -494,8 +495,8 @@ class BranchPlotEngine:
     def export_for_browser(self) -> dict:
         """导出分支树供前端可视化使用"""
         tree = self.get_or_create_tree()
-        nodes = []
-        edges = []
+        nodes: list[dict[str, Any]] = []
+        edges: list[dict[str, Any]] = []
         for node in tree.nodes.values():
             nodes.append(
                 {
@@ -549,8 +550,10 @@ class BranchPlotEngine:
             "branch_counter": self._branch_counter,
             "nodes": {},
         }
+        nodes: dict[str, dict[str, Any]] = {}
+        data["nodes"] = nodes
         for nid, node in self.tree.nodes.items():
-            data["nodes"][nid] = {
+            nodes[nid] = {
                 "id": node.id,
                 "name": node.name,
                 "description": node.description,

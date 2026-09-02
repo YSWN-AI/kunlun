@@ -393,7 +393,7 @@ class EditorInChief:
         if not draft:
             return {"success": False, "error": "请提供待审计的正文"}
 
-        audit_result = await self._audit_chapter(chapter, draft, ctx.get("blueprint", {}))
+        audit_result = await self._audit_chapter(chapter, draft, ctx.get("blueprint", {}) if ctx else {})
         return {"success": True, "audit": audit_result}
 
     async def _handle_style(self, message: str, _ctx: dict | None = None) -> dict:
@@ -502,7 +502,13 @@ class EditorInChief:
             logger.exception(f"[Editor] 章节意图生成失败: {e}")
             logger.error(f"[Editor] 章节意图生成失败: {e}")
 
-        return ChapterIntent(chapter=chapter, word_target=word_target)
+        return ChapterIntent(
+            chapter=chapter,
+            must_keep=[],
+            must_avoid=[],
+            suggested_scenes=[],
+            word_target=word_target,
+        )
 
     async def _generate_blueprint(self, chapter: int, intent: ChapterIntent) -> dict:
         """Architect: 生成章节蓝图"""

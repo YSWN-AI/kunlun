@@ -264,7 +264,7 @@ class R5ContentCompliance(PreCheckRule):
             value for value in context.values() if isinstance(value, str) and len(value) > 10
         ]
 
-        violations = []
+        violations: list[str] = []
         for category, words in self.FORBIDDEN_CATEGORIES.items():
             for text in text_fields:
                 violations.extend(f"{category}: {word}" for word in words if word in text)

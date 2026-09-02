@@ -255,6 +255,17 @@ class IntentRouter(BaseExtensionModule):
         return base_prompt
 
 
+@dataclass
+class VibeParsedIntent:
+    """Vibe Writing 意图解析结果（供 /vibe/express API 展示）"""
+
+    scene_type: str = ""
+    emotion: str = ""
+    pace: str = ""
+    intensity: str = ""
+    key_elements: list[str] = field(default_factory=list)
+
+
 class VibeWriter(BaseExtensionModule):
     """随性写作引擎 — 主入口"""
 
@@ -266,6 +277,48 @@ class VibeWriter(BaseExtensionModule):
         self._context: VibeContext | None = None
         self._history: list[VibeResponse] = []
         self._response_counter = 0
+
+    async def express(self, user_input: str) -> VibeParsedIntent:
+        """解析用户的创作意图（供 /vibe/express API 调用）。
+
+        通过关键词规则从用户输入中提取场景类型、情感基调、节奏与强度，
+        供前端展示「已理解意图」的反馈。
+        """
+        intent, _confidence = self._router.detect_intent(user_input, self._context)
+        # 场景类型关键词
+        scene_map = {
+            "打": "战斗", "战": "战斗", "斗": "战斗", "追": "追逐", "逃": "追逐",
+            "说": "对话", "谈": "对话", "问": "对话", "想": "内心", "回忆": "回忆",
+            "描写": "环境", "景": "环境", "修炼": "修炼", "突破": "修炼", "交易": "交易",
+        }
+        # 情感基调关键词
+        emo_map = {
+            "怒": "愤怒", "激": "兴奋", "激动": "兴奋", "紧张": "紧张", "危急": "紧张",
+            "悲": "悲伤", "伤心": "悲伤", "甜": "甜蜜", "暖": "温馨", "开心": "喜悦", "平静": "平静",
+        }
+        # 节奏关键词
+        pace_map = {"快": "快速", "紧凑": "紧凑", "急": "急促", "慢": "舒缓", "悠闲": "舒缓", "稳": "稳健"}
+        # 强度关键词
+        inten_map = {"激烈": "高", "惨烈": "高", "生死": "高", "高": "强", "轻松": "低", "日常": "低"}
+
+        scene = next((v for k, v in scene_map.items() if k in user_input), "")
+        emotion = next((v for k, v in emo_map.items() if k in user_input), "")
+        pace = next((v for k, v in pace_map.items() if k in user_input), "")
+        intensity = next((v for k, v in inten_map.items() if k in user_input), "")
+        key_elements = [intent.value]
+        if scene:
+            key_elements.append(scene)
+        if emotion:
+            key_elements.append(emotion)
+        if pace:
+            key_elements.append(pace)
+        return VibeParsedIntent(
+            scene_type=scene,
+            emotion=emotion,
+            pace=pace,
+            intensity=intensity,
+            key_elements=key_elements,
+        )
 
     def set_context(self, context: VibeContext):
         """设置当前写作上下文"""

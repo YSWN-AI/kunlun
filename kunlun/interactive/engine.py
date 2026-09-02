@@ -375,17 +375,20 @@ class InteractiveFictionEngine:
         try:
             from kunlun.kg.client import kg_client
 
-            # 更新角色属性到KG
+            # 汇总每个角色的属性与关系
+            char_props: dict[str, dict[str, str]] = {}
             for char_id, attrs in state.character_attributes.items():
+                props = char_props.setdefault(char_id, {})
                 for attr_name, attr_val in attrs.items():
-                    kg_client.set_entity_property(
-                        "Character", char_id, f"attr_{attr_name}", str(attr_val)
-                    )
-
-            # 更新关系到KG
+                    props[f"attr_{attr_name}"] = str(attr_val)
             for char_a, rels in state.relationships.items():
+                props = char_props.setdefault(char_a, {})
                 for char_b, val in rels.items():
-                    kg_client.set_entity_property("Character", char_a, f"rel_{char_b}", str(val))
+                    props[f"rel_{char_b}"] = str(val)
+
+            # 写入KG（create_entity 为 INSERT OR REPLACE）
+            for char_id, props in char_props.items():
+                kg_client.create_entity(char_id, "Character", char_id, props)
         except Exception as e:
             logger.debug(f"[Interactive] KG同步失败: {e}")
 
@@ -398,9 +401,16 @@ class InteractiveFictionEngine:
         try:
             from kunlun.kg.client import kg_client
 
-            characters = kg_client.get_all("Character")
-            for char in characters:
-                char_id = char.get("id", "")
+            characters = kg_client.query_cypher("MATCH (c:Character) RETURN c")
+            for row in characters:
+                if not isinstance(row, dict):
+                    continue
+                char = row.get("c") if isinstance(row.get("c"), dict) else row
+                if not isinstance(char, dict):
+                    continue
+                char_id = str(char.get("id", ""))
+                if not char_id:
+                    continue
                 attrs = {k: float(v) for k, v in char.items() if k.startswith("attr_")}
                 if attrs:
                     state.character_attributes[char_id] = attrs
@@ -436,7 +446,7 @@ class InteractiveFictionEngine:
     def export_choice_tree(self) -> dict:
         """导出选择树供前端可视化"""
         nodes = []
-        edges = []
+        edges: list[dict] = []
 
         for node_id, choices in self.choices.items():
             nodes.append(

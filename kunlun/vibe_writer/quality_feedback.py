@@ -178,7 +178,7 @@ class VibeQualityFeedback:
 
         # 6.6 六维评分最低维度建议
         if fb.six_dim_scores:
-            lowest_dim = min(fb.six_dim_scores, key=fb.six_dim_scores.get)
+            lowest_dim = min(fb.six_dim_scores, key=lambda k: fb.six_dim_scores[k])
             lowest_score = fb.six_dim_scores[lowest_dim]
             if lowest_score < 0.6:
                 dim_suggestions = {

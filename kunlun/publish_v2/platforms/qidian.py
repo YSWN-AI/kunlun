@@ -224,7 +224,7 @@ class QidianAdapter(BasePlatformAdapter):
 
     async def get_publish_stats(self, book_id: str) -> dict[str, Any]:
         if not self._cookie:
-            return super().get_publish_stats(book_id)
+            return await super().get_publish_stats(book_id)
         try:
             async with httpx.AsyncClient(timeout=15.0) as client:
                 resp = await client.get(
@@ -242,4 +242,4 @@ class QidianAdapter(BasePlatformAdapter):
                 }
         except Exception:
             pass
-        return super().get_publish_stats(book_id)
+        return await super().get_publish_stats(book_id)

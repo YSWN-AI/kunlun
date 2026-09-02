@@ -532,8 +532,8 @@ class DebateReviewEngine:
             "emotion": 0.10,
             "worldbuilding": 0.05,
         }
-        total = 0
-        total_weight = 0
+        total = 0.0
+        total_weight = 0.0
         for dim, weight in weights.items():
             if dim in dimension_scores:
                 total += dimension_scores[dim] * weight
@@ -595,7 +595,7 @@ class DebateReviewEngine:
 class ReaderSimulator:
     """模拟读者引擎 — 模拟不同类型读者的阅读体验"""
 
-    READER_PROFILES = {
+    READER_PROFILES: dict[ReaderType, dict[str, Any]] = {
         ReaderType.NEWBIE: {
             "name": "小白读者",
             "description": "刚接触网文，追求简单直接的爽感，耐心较低",
@@ -689,7 +689,7 @@ class ReaderSimulator:
     def _simulate_single_reader(
         self, text: str, reader_type: ReaderType, chapter: int
     ) -> ReaderFeedback:
-        profile = self.READER_PROFILES[reader_type]
+        profile: dict[str, Any] = self.READER_PROFILES[reader_type]
         issues = self.rule_checker.check(text, chapter)
         dimension_scores = self.rule_checker.calculate_dimension_scores(text)
 

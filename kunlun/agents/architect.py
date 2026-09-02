@@ -83,8 +83,8 @@ class Architect(BaseAgent):
 
     async def execute(self, task: dict) -> dict:
         """生成章节蓝图"""
-        book_id = task.get("book_id")
-        chapter = task.get("chapter")
+        book_id = task.get("book_id") or ""
+        chapter = task.get("chapter") or 0
         kg_snapshot_id = task.get("kg_snapshot_id", "")
         chapter_type = task.get("chapter_type", "normal")
         preference_hints = task.get("preference_hints", "")
@@ -168,7 +168,7 @@ class Architect(BaseAgent):
         try:
             # 用 kg_summary 或章节类型描述作为查询向量
             query_text = f"第{chapter}章 {chapter_type} {kg_summary[:500] if kg_summary else ''}"
-            if not embedder.available:
+            if not embedder.available():
                 return ""
 
             query_vec = embedder.encode(query_text)

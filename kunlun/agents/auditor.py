@@ -9,6 +9,8 @@ _history: 私有方法仅保留与 gates.py 兼容的委托桩，供测试调用
 
 from __future__ import annotations
 
+from typing import Any
+
 from loguru import logger
 
 from kunlun.agents.base import AgentMessage, BaseAgent
@@ -54,7 +56,7 @@ class Auditor(BaseAgent):
         "opening_diversity": 0.62,
     }
     PLEASURE_KEYWORDS = GateG4PleasureGap.PLEASURE_KEYWORDS
-    EMOTION_KEYWORDS = {}
+    EMOTION_KEYWORDS: dict[str, list[str]] = {}
 
     # ─── 主入口 ──────────────────────────────────────
 
@@ -139,7 +141,7 @@ class Auditor(BaseAgent):
         """G5: 爽点多样性 → 委托 GateG5PleasureDiversity"""
         g5 = GateG5PleasureDiversity()
         r = g5.run(draft)
-        result = {"level": r.level.value, "score": r.score, "detail": r.detail}
+        result: dict[str, Any] = {"level": r.level.value, "score": r.score, "detail": r.detail}
         if r.data:
             result["distribution"] = r.data.get("type_counts", {})
         return result
@@ -148,7 +150,7 @@ class Auditor(BaseAgent):
         """G6: 情绪一致性 → 委托 GateG6EmotionConsistency"""
         g6 = GateG6EmotionConsistency()
         r = g6.run(draft)
-        result = {"level": r.level.value, "score": r.score, "detail": r.detail}
+        result: dict[str, Any] = {"level": r.level.value, "score": r.score, "detail": r.detail}
         if r.data:
             result["emotions"] = {
                 "start": r.data.get("front", ""),

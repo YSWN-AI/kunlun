@@ -47,9 +47,9 @@ def _extract_additions(old_text: str, new_text: str) -> list[str]:
     ]
 
 
-def _load_existing_patches(skills_dir: Path) -> set:
+def _load_existing_patches(skills_dir: Path) -> set[tuple[str, str]]:
     """加载已有的规则 patch，返回 (pattern, suggestion) 集合用于去重"""
-    existing = set()
+    existing: set[tuple[str, str]] = set()
     patch_file = skills_dir / "learned_patches.md"
     if not patch_file.exists():
         return existing

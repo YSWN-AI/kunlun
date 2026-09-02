@@ -92,7 +92,9 @@ def reset_repositories() -> None:
     for repo in (_graph_repo, _vector_repo, _fulltext_repo):
         if repo is not None:
             try:
-                repo.close_sync()
+                close_fn = getattr(repo, "close_sync", None)
+                if close_fn is not None:
+                    close_fn()
             except Exception:
                 logger.debug(f"仓库 {type(repo).__name__} 关闭失败（忽略）")
 

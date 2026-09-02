@@ -21,6 +21,7 @@ import json
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
 
@@ -165,7 +166,7 @@ class Reflector:
         count = 0
         for change in changes:
             uid = change.character_uid or f"{book_id}_{change.character_name}"
-            props = {"last_updated_chapter": chapter}
+            props: dict[str, Any] = {"last_updated_chapter": chapter}
 
             if change.emotion_change:
                 props["current_emotion"] = change.emotion_change

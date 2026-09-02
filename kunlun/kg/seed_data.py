@@ -11,6 +11,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from loguru import logger
 
 from kunlun.kg.client import kg_client
@@ -300,7 +302,7 @@ def seed_knowledge_graph() -> dict:
     如果 Neo4j 不可用，降级为 SQLite 模式写入。
     返回: {created: {genres, tropes, archetypes, rules, relationships}, errors: []}
     """
-    result = {
+    result: dict[str, Any] = {
         "created": {"genres": 0, "tropes": 0, "archetypes": 0, "rules": 0, "relationships": 0},
         "errors": [],
     }

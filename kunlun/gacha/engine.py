@@ -583,7 +583,7 @@ class GachaEngine:
 
         # 第 1 层：熔断器保护
         async with breaker:
-            last_error = None
+            last_error: BaseException | None = None
 
             for attempt in range(max_retries + 1):
                 # 当前使用的 API Key（可能被轮换）
@@ -671,7 +671,12 @@ class GachaEngine:
                     raise
 
             # 所有重试均失败
-            raise last_error or RuntimeError(f"{candidate.model} 调用失败（无详细错误）")
+            if last_error is not None:
+                raise last_error
+            raise RuntimeError(f"{candidate.model} 调用失败（无详细错误）")
+
+        # async with 块之后（__aexit__ 返回 False 不吞异常，理论上不可达）
+        raise RuntimeError(f"{candidate.model} 调用失败（熔断器异常退出）")
 
     async def _make_http_call(
         self,

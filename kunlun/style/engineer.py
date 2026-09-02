@@ -193,7 +193,7 @@ class StyleEngineer(BaseAgent):
         changes = 0
 
         # 统计各句首模式的命中数
-        opening_counts = {}
+        opening_counts: dict[str, int] = {}
         for s in sentences:
             stripped = s.strip()
             if not stripped:
@@ -222,7 +222,7 @@ class StyleEngineer(BaseAgent):
         text_after = "".join(sentences)
         name_verb_matches = self.NAME_VERB_PATTERN.findall(text)
         if name_verb_matches:
-            name_counts = {}
+            name_counts: dict[str, int] = {}
             for name, _verb in name_verb_matches:
                 name_counts[name] = name_counts.get(name, 0) + 1
 

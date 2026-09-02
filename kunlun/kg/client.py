@@ -17,7 +17,7 @@ import sqlite3
 import threading
 import uuid as uuid_mod
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
@@ -174,12 +174,13 @@ class KGClient:
         )
 
     def _ensure_qdrant_collection(self):
+        assert self._qdrant is not None, "Qdrant 未初始化"
         from qdrant_client.models import Distance, VectorParams
 
         collections = [c.name for c in self._qdrant.get_collections().collections]
         if settings.qdrant_collection not in collections:
             # 使用新版本 qdrant_client 兼容的参数格式
-            create_kwargs = {
+            create_kwargs: dict[str, Any] = {
                 "collection_name": settings.qdrant_collection,
                 "vectors_config": VectorParams(size=768, distance=Distance.COSINE),
             }
@@ -189,11 +190,15 @@ class KGClient:
             # 原始: 768维 * 4 bytes = 3072 bytes/vector
             # 量化后: 768维 * 1 byte = 768 bytes/vector（4x 节省）
             try:
-                from qdrant_client.models import ScalarQuantization, ScalarQuantizationConfig
+                from qdrant_client.models import (
+                    ScalarQuantization,
+                    ScalarQuantizationConfig,
+                    ScalarType,
+                )
 
                 quantization_config = ScalarQuantization(
                     scalar=ScalarQuantizationConfig(
-                        type="int8",  # 8位整数量化
+                        type=ScalarType.INT8,  # 8位整数量化
                         quantile=0.99,  # 忽略 1% 极端值，减少量化误差
                         always_ram=True,  # 量化结果常驻内存（更适合频繁查询）
                     )
@@ -221,12 +226,12 @@ class KGClient:
                 try:
                     from qdrant_client.models import HnswConfigDiff
 
-                    hnsw_config = HnswConfigDiff(
+                    hnsw_config_diff = HnswConfigDiff(
                         m=16,
                         ef_construct=100,
                         full_scan_threshold=10000,
                     )
-                    create_kwargs["hnsw_config"] = hnsw_config
+                    create_kwargs["hnsw_config"] = hnsw_config_diff
                     logger.info("Qdrant: 已启用 HNSW 索引优化 (m=16, ef_construct=100)")
                 except Exception as e:
                     logger.debug(f"Qdrant: HNSW不可用 ({e}), 使用默认集合索引")
@@ -662,6 +667,7 @@ class KGClient:
 
     def _ensure_fts_tables(self):
         """创建 FTS5 全文索引表"""
+        assert self._sqlite is not None, "SQLite 未初始化"
         self._sqlite.executescript("""
             CREATE VIRTUAL TABLE IF NOT EXISTS entity_fts USING fts5(
                 uid, name, entity_type, description
@@ -961,7 +967,7 @@ class KGClient:
         return self._cache.get("health_check", 5, self._do_health_check)
 
     def _do_health_check(self) -> dict:
-        result = {"neo4j": False, "qdrant": False, "sqlite": False, "sqlite_graph": False}
+        result: dict[str, bool | str] = {"neo4j": False, "qdrant": False, "sqlite": False, "sqlite_graph": False}
         try:
             self.neo4j.verify_connectivity()
             result["neo4j"] = True

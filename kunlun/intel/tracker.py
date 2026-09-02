@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
 
@@ -76,7 +77,7 @@ class IntelTracker:
         """持久化到磁盘"""
         if not self._data_dir:
             return
-        data = {
+        data: dict[str, Any] = {
             "characters": {},
             "global_intel": {},
         }

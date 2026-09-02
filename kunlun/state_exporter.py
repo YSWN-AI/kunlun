@@ -24,6 +24,7 @@ import contextlib
 import json
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
 
@@ -471,9 +472,9 @@ def _export_character_state(  # noqa: PLR0912
                 start = r.get("start", r.get("a.name", "?"))
                 end = r.get("end", r.get("b.name", "?"))
                 rtype = r.get("type", r.get("type(r)", "?"))
-                key = (start, end, rtype)
-                if key not in seen:
-                    seen.add(key)
+                rel_key = (start, end, rtype)
+                if rel_key not in seen:
+                    seen.add(rel_key)
                     lines.append(f"  {start} ──[{rtype}]──▶ {end}")
 
     # 互动记录
@@ -820,7 +821,7 @@ def export_state(book_id: str, output_dir: str | None = None) -> dict[str, Path]
 
     data = _collect_data(book_id)
 
-    exporters: dict[str, callable] = {
+    exporters: dict[str, Any] = {
         "global_summary.txt": _export_global_summary,
         "world_setting.txt": _export_world_setting,
         "character_state.txt": _export_character_state,

@@ -131,7 +131,7 @@ class WorldBuilder:
         if not settings:
             return {"contradictions": [], "score": 100, "summary": "无设定数据"}
 
-        report = self._consistency_checker.audit(settings)
+        report = self._consistency_checker.audit("", settings)
         return {
             "contradictions": [
                 {"dimension": d, "score": s, "severity": v}

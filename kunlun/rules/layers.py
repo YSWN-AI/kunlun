@@ -156,7 +156,7 @@ def _check_char_name_consistency(text: str, ctx: dict) -> RuleResult:
     for aliases_list in aliases.values():
         all_names.extend(aliases_list)
 
-    issues = []
+    issues: list[str] = []
     for name in all_names:
         if name and name not in text:
             continue
@@ -201,7 +201,7 @@ def _check_item_ownership(text: str, ctx: dict) -> RuleResult:
             rule_name="物品归属", layer=RuleLayer.HARD, passed=True, message="无重要物品列表"
         )
 
-    issues = []
+    issues: list[str] = []
     for item in items:
         item_name = item.get("name", "")
         owner = item.get("owner", "")

@@ -9,6 +9,7 @@ import json
 import os
 import re
 from pathlib import Path
+from typing import Any
 
 import httpx
 from loguru import logger
@@ -60,12 +61,12 @@ def call_llm_sync(prompt: str) -> str:
     raise RuntimeError("[AutoFix] 在 async 上下文中请直接使用 await call_llm()")
 
 
-def auto_fix(project_dir: str | None = None) -> dict:
+def auto_fix(project_dir: str | Path | None = None) -> dict:
     """主入口：扫描并修复 Python 语法错误"""
     if project_dir is None:
         project_dir = Path(__file__).resolve().parent
 
-    report = {"scanned": 0, "fixed": 0, "errors": [], "details": []}
+    report: dict[str, Any] = {"scanned": 0, "fixed": 0, "errors": [], "details": []}
 
     # 1. 收集所有 .py 文件
     py_files = [
@@ -79,7 +80,7 @@ def auto_fix(project_dir: str | None = None) -> dict:
     report["scanned"] = len(py_files)
 
     # 2. 逐个文件检查语法
-    broken_files = []
+    broken_files: list[dict] = []
     for fpath in py_files:
         try:
             with fpath.open(encoding="utf-8") as f:
@@ -113,7 +114,7 @@ def auto_fix(project_dir: str | None = None) -> dict:
 修复后的完整Python代码
 ===END==="""
 
-    fix_text = call_llm(prompt)
+    fix_text = call_llm_sync(prompt)  # 同步包装，正确执行异步LLM调用
     if not fix_text:
         report["details"].append("LLM 不可用，需手动修复以下文件：")
         for bf in broken_files[:5]:
@@ -129,7 +130,7 @@ def auto_fix(project_dir: str | None = None) -> dict:
         # 安全检查：只允许修复 kunlun/ 目录下的文件
         abs_path = Path(filepath).resolve()
         project_root = Path(__file__).resolve().parent
-        if not abs_path.startswith(str(project_root)):
+        if not str(abs_path).startswith(str(project_root)):
             logger.warning(f"[AutoFix] 拒绝写入项目外的文件: {filepath}")
             report["details"].append(f"跳过（安全限制）: {filepath}")
             continue

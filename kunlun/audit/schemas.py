@@ -213,7 +213,7 @@ def validate_and_repair(
     Returns:
         (validated_model, repair_log) — 模型实例和修复日志列表
     """
-    repairs = []
+    repairs: list[Any] = []
 
     # 1. 尝试直接校验
     try:

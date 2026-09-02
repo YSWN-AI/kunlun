@@ -60,7 +60,7 @@ class WorldAtlas:
             return {"total": 0, "developed": 0, "avg_completeness": 0}
         developed = sum(1 for loc in locations if loc.completeness >= 50)
         avg = sum(loc.completeness for loc in locations) / len(locations)
-        by_type = {}
+        by_type: dict[str, int] = {}
         for loc in locations:
             t = loc.location_type.value
             by_type[t] = by_type.get(t, 0) + 1

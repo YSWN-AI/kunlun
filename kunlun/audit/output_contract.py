@@ -217,12 +217,14 @@ class OutputContractValidator:
             "list[str]": lambda v: isinstance(v, list) and all(isinstance(i, str) for i in v),
             "list[dict]": lambda v: isinstance(v, list) and all(isinstance(i, dict) for i in v),
         }
-        checker = type_map.get(expected_type)
+        checker: object = type_map.get(expected_type)
         if checker is None:
             return True
         if isinstance(checker, type):
             return isinstance(value, checker)
-        return checker(value)
+        if callable(checker):
+            return checker(value)
+        return False
 
     def safe_update(self, schema_name: str, data: dict, update_fn) -> tuple[bool, dict | None]:
         """安全更新：校验通过后执行更新函数

@@ -531,6 +531,8 @@ class GoldenTripleEngine:
 
         ch = plan.chapters[chapter - 1]
         archetype = plan.archetype
+        if archetype is None:
+            archetype = ARCHETYPES["suspense"]
 
         prompt_parts = [
             f"【第{chapter}章：{ch['name']}】",
@@ -615,7 +617,7 @@ class GoldenTripleAgent(BaseAgent):
             if msg.msg_type == "ANALYZE_OPENING":
                 result = self._engine.analyze_opening(
                     text=msg.payload.get("text", ""),
-                    genre=msg.payload.get("genre", ""),
+                    _genre=msg.payload.get("genre", ""),
                     chapter_number=msg.payload.get("chapter_number", 1),
                 )
                 return AgentMessage(
@@ -695,7 +697,7 @@ class GoldenTripleAgent(BaseAgent):
             if action == "analyze_opening":
                 result = self._engine.analyze_opening(
                     text=task.get("text", ""),
-                    genre=task.get("genre", ""),
+                    _genre=task.get("genre", ""),
                     chapter_number=task.get("chapter_number", 1),
                 )
                 return {

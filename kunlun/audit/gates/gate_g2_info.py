@@ -60,7 +60,7 @@ class GateG2InfoRelease:
         )
 
     def _extract_new_concepts(self, draft: str) -> list:
-        concepts = []
+        concepts: list[str] = []
         pattern = r'[“"]([^“”"]+)[”"]|[《]([^《》]+)[》]|([一-鿿]{1,4}的[一-鿿]{1,6})'
         for match in re.finditer(pattern, draft):
             concepts.extend(group for group in match.groups() if group and len(group) >= 4)

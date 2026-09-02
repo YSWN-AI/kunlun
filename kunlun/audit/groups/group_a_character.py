@@ -54,7 +54,7 @@ class Auditor33GroupA:
         if self._truth_manager:
             state = self._truth_manager.get("current_state")
             chars = state.get("characters", {})
-            issues = []
+            issues: list[str] = []
             for name, data in chars.items():
                 if name in draft and "personality" in data:
                     personality = data.get("personality", [])
@@ -98,7 +98,7 @@ class Auditor33GroupA:
         if self._truth_manager:
             state = self._truth_manager.get("current_state")
             chars = state.get("characters", {})
-            issues = []
+            issues: list[str] = []
             for name, data in chars.items():
                 if name in draft and "appearance" in data:
                     stored_appearance = data.get("appearance", {})
@@ -146,7 +146,7 @@ class Auditor33GroupA:
         if self._truth_manager:
             state = self._truth_manager.get("current_state")
             chars = state.get("characters", {})
-            issues = []
+            issues: list[str] = []
             for name, data in chars.items():
                 if name in draft and "abilities" in data:
                     known_abilities = set(data.get("abilities", []))
@@ -183,7 +183,7 @@ class Auditor33GroupA:
         if self._truth_manager:
             state = self._truth_manager.get("current_state")
             chars = state.get("characters", {})
-            issues = []
+            issues: list[str] = []
             for name, data in chars.items():
                 stored_loc = data.get("location", "")
                 if not stored_loc or name not in draft:
@@ -294,7 +294,7 @@ class Auditor33GroupA:
         return DimResult("A7", "情绪状态", 85, "PASS", "情绪过渡自然")
 
     def _check_A8_dialogue_style(self, draft: str, _chapter: int, _blueprint: dict) -> DimResult:
-        dialogue_by_char = {}
+        dialogue_by_char: dict[str, list[str]] = {}
         for m in re.finditer(
             r'(?:^|。|！|？|"|」)([一-鿿]{2,4})(?:说道|喊道|问道|笑道|怒道|淡淡道|冷声道|道|说)',
             draft,

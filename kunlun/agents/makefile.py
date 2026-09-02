@@ -141,8 +141,8 @@ class _PipelineContext:
     revision_count: int = 0
     audit_result: dict = field(default_factory=dict)
     society_insights: dict = field(default_factory=dict)
-    progress_cb: object = None
-    learner_cb: object = None
+    progress_cb: Callable[..., Any] | None = None
+    learner_cb: Callable[..., Any] | None = None
     auditor: object = None
 
 
@@ -625,7 +625,7 @@ class Makefile(BaseAgent):
     async def _run_book_creation(self, task: dict) -> dict:
         book_id = task["book_id"]
         seed = task.get("seed", {})
-        results = {}
+        results: dict[str, Any] = {}
 
         try:
             title = seed.get("title", book_id)
@@ -755,7 +755,7 @@ class Makefile(BaseAgent):
         blueprint = task.get("blueprint", {})
         draft = task.get("draft", "")
 
-        results = {"updated": []}
+        results: dict[str, Any] = {"updated": []}
 
         try:
             kg_client.query_cypher(

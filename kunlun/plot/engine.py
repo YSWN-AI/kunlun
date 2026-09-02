@@ -47,7 +47,7 @@ class CausalChainEngine:
 
     def get_chain(self, start_event_id: str, max_depth: int = 10) -> list[CausalEvent]:
         """获取从某个事件开始的因果链"""
-        chain = []
+        chain: list[CausalEvent] = []
         current_id = start_event_id
         visited = set()
 
@@ -90,7 +90,7 @@ class CausalChainEngine:
 
     def detect_broken_chains(self) -> list[dict]:
         """检测断裂的因果链"""
-        broken = []
+        broken: list[dict] = []
         for eid, event in self._events.items():
             broken.extend(
                 {
@@ -322,7 +322,7 @@ class PacingController:
         }
 
     def check_pacing_health(self, _chapter_num: int, text: str) -> list[str]:
-        issues = []
+        issues: list[str] = []
         pacing = self.analyze_chapter_pacing(text)
         if pacing.get("error"):
             return issues

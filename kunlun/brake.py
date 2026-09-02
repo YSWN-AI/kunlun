@@ -127,7 +127,7 @@ class ReverseBrake:
 
         在 Architect 生成蓝图后调用，将警告注入 prompt 供 Writer 参考。
         """
-        warnings = []
+        warnings: list[str] = []
         scenes = blueprint.get("scenes", []) or []
         if not scenes:
             return warnings

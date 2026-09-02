@@ -304,7 +304,7 @@ class CharacterConsistencyChecker:
         if not profile:
             return [f"未找到角色 '{character_id}' 的设定"]
 
-        issues = []
+        issues: list[str] = []
 
         if profile.dialogue_style and profile.dialogue_style.taboo_words:
             issues.extend(
@@ -326,7 +326,7 @@ class CharacterConsistencyChecker:
     @staticmethod
     def _check_personality_consistency(profile: CharacterProfile, text: str) -> list[str]:
         """检查性格一致性"""
-        issues = []
+        issues: list[str] = []
         personality_map = {
             "冷酷": {"should_not_say": ["谢谢", "对不起", "请", "拜托", "好开心"]},
             "善良": {"should_not_say": ["去死", "活该", "废物"]},
@@ -347,7 +347,7 @@ class CharacterConsistencyChecker:
         if not profile:
             return []
 
-        issues = []
+        issues: list[str] = []
         ability_keywords = ["释放", "施展", "使用", "发动", "祭出", "催动"]
         for akw in ability_keywords:
             for match in re.finditer(

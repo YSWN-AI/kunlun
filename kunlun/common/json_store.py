@@ -15,14 +15,14 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, Generic, TypeVar
 
 from loguru import logger
 
 T = TypeVar("T")
 
 
-def load_json(path: Path, *, default: T = None) -> T:
+def load_json(path: Path, *, default: T | None = None) -> T | None:
     """从磁盘加载 JSON，失败时返回默认值。
 
     Args:
@@ -65,7 +65,7 @@ def save_json(path: Path, data: Any, *, pretty: bool = False, mkdir: bool = True
         return False
 
 
-class JsonStore:
+class JsonStore(Generic[T]):
     """带类型约束的 JSON 持久化容器。
 
     使用方式:
@@ -88,16 +88,18 @@ class JsonStore:
         self.pretty = pretty
 
     def load(self) -> T:
-        data = load_json(self.path, default={})
+        data: dict[str, Any] | None = load_json(self.path, default={})
         try:
-            return self.factory(**data) if isinstance(data, dict) else self.factory()
+            if isinstance(data, dict):
+                return self.factory(**data)
+            return self.factory()
         except (TypeError, ValueError) as e:
             logger.debug(f"[JsonStore] 数据反序列化失败: {e}")
             return self.factory()
 
     def save(self, obj: T) -> bool:
         if hasattr(obj, "__dict__"):
-            data = obj.__dict__
+            data: Any = obj.__dict__
         else:
             data = obj
         return save_json(self.path, data, pretty=self.pretty)

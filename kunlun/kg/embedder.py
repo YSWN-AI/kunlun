@@ -17,6 +17,7 @@ import os
 import time
 from collections import OrderedDict
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from loguru import logger
@@ -66,14 +67,14 @@ class Embedder:
     """
 
     def __init__(self):
-        self._model: object | None = None
+        self._model: Any | None = None
         self._model_name: str = ""
         self._model_dim: int = 0
         self._encode_count: int = 0
         self._total_time: float = 0.0
 
     @property
-    def model(self) -> object:
+    def model(self) -> Any:
         """懒加载模型"""
         if self._model is None:
             self._load_model()
@@ -120,7 +121,7 @@ class Embedder:
 
     def encode_batch(self, texts: list[str]) -> list[np.ndarray]:
         """批量嵌入 (最多 64 条一批)"""
-        results = []
+        results: list[np.ndarray | None] = []
         uncached = []
         uncached_indices = []
 
@@ -141,7 +142,7 @@ class Embedder:
                 results[idx] = vec
                 self._cache_and_count(uncached[pos], vec, elapsed / len(uncached))
 
-        return results
+        return [v for v in results if v is not None]
 
     def _try_cache(self, text: str) -> np.ndarray | None:
         key = hashlib.sha256(text.encode()).hexdigest()
@@ -208,8 +209,8 @@ class Embedder:
         hashes = []
         for i in range(0, len(text), 16):
             chunk = text[i : i + 16]
-            h = hashlib.md5(chunk.encode(), usedforsecurity=False)
-            hashes.append(int(h.hexdigest(), 16))
+            digest = hashlib.md5(chunk.encode(), usedforsecurity=False)
+            hashes.append(int(digest.hexdigest(), 16))
 
         rng = np.random.RandomState(42)
         vec = np.zeros(EMBEDDING_DIM, dtype=np.float32)

@@ -221,7 +221,7 @@ async def test_connection(base_url: str, api_key: str, model: str) -> dict:
         return {
             "ok": True,
             "model": model,
-            "response": choices[0].message.content[:50],
+            "response": (choices[0].message.content or "")[:50],
         }
     except Exception as e:
         return {"ok": False, "error": str(e)[:200]}

@@ -203,7 +203,7 @@ class PipelineInterventionManager(BaseExtensionModule):
             return [
                 a for a in self._interventions.get(pipeline_id, []) if a.action_type == "pending"
             ]
-        pending = []
+        pending: list[Any] = []
         for actions in self._interventions.values():
             pending.extend(a for a in actions if a.action_type == "pending")
         return pending

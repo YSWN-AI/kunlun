@@ -228,7 +228,7 @@ class SQLiteGraphRepository(GraphRepository):
         if match_result:
             match_clause = "MATCH " + match_result.group(1)
             matched = self._translate_match(conn, match_clause, params)
-            entity_ids = []
+            entity_ids: list[str] = []
             for item in matched:
                 entity_ids.extend(
                     var_data["entity_id"]

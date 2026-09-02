@@ -459,7 +459,7 @@ class SemanticMemory:
     def get_entity(self, name_or_id: str) -> SemanticEntity | None:
         if name_or_id in self.entities:
             entity = self.entities[name_or_id]
-            entity.last_accessed = time.time() if hasattr(entity, "last_accessed") else None
+            entity.last_appearance = int(time.time())
             return entity
         entity_id = self.name_index.get(name_or_id)
         if entity_id and entity_id in self.entities:

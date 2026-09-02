@@ -95,7 +95,7 @@ class GenerateChapterRequest(BaseModel):
 @router.post("/books/{book_id}/chapters/{chapter}/generate", summary="章节生成（全流程）")
 @_gen_rate_limit
 async def generate_chapter(
-    book_id: str, chapter: int, req: GenerateChapterRequest, request: Request = None
+    book_id: str, chapter: int, req: GenerateChapterRequest, request: Request = None  # type: ignore[assignment]
 ) -> dict:
     """触发完整的20步章节生成流水线，支持 WS 进度广播和 Learner 偏好学习"""
     import time as _time
@@ -114,7 +114,7 @@ async def generate_chapter(
     pipeline_id = f"{book_id}_ch{chapter}"
     learner = get_learner(book_id)
 
-    async def progress_cb(step: str, data: dict | None = None) -> dict:
+    async def progress_cb(step: str, data: dict | None = None) -> None:
         try:
             mapping = _SYNC_STEP_WS_MAP.get(step)
             if mapping:
@@ -145,7 +145,7 @@ async def generate_chapter(
         except Exception as e:
             logger.warning(f"[{pipeline_id}] 广播进度失败: {step} — {e}")
 
-    async def learner_cb(event_type: str, data: dict | None = None) -> dict:
+    async def learner_cb(event_type: str, data: dict | None = None) -> None:
         try:
             learner.on_event(event_type, data or {})
             if event_type == "CHAPTER_COMPLETED":
@@ -279,6 +279,7 @@ async def batch_generate(
                             {"chapter": ch, "success": False, "error": str(r)}
                         )
                     else:
+                        assert isinstance(r, dict), f"Unexpected result type: {type(r)}"
                         _batch_tasks[task_id]["results"].append(
                             {
                                 "chapter": ch,

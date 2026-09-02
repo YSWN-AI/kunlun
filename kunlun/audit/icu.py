@@ -149,7 +149,7 @@ class ICUSystem:
             if all(s == 0 for s in scores.values()):
                 segment_emotions.append("flat")
             else:
-                dominant = max(scores, key=scores.get)
+                dominant = max(scores, key=lambda k: scores[k])
                 segment_emotions.append(dominant)
 
         # 检查是否有情绪变化

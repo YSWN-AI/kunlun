@@ -56,7 +56,7 @@ async def analyze_opening(req: AnalyzeRequest) -> dict:
 
     result = golden_triple_engine.analyze_opening(
         text=req.text,
-        genre=req.genre,
+        _genre=req.genre,
         chapter_number=req.chapter_number,
     )
 

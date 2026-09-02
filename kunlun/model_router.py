@@ -678,7 +678,7 @@ class ModelRouter:
                 "models_tried": [],
             }
 
-        models_tried = []
+        models_tried: list[str] = []
         last_error = None
 
         for fm in chain:

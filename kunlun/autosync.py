@@ -148,14 +148,9 @@ def _sync_dashboard(_action_type: str, data: dict):
         from kunlun.dashboard import get_dashboard
 
         db = get_dashboard(book_id)
-        if draft:
-            db.update_word_count(chapter, len(draft))
-        # 其他数据更新
-        if "audit_summary" in data:
-            db.update_audit_summary(data["audit_summary"])
-        if "goal_progress" in data:
-            for name, progress in data["goal_progress"].items():
-                db.update_goal(name, progress.get("current", 0), progress.get("target", 1))
+        # DashboardEngine 为只读引擎，通过快照记录当前仪表盘状态
+        db.take_snapshot()
+        logger.debug(f"[AutoSync] 仪表盘快照已记录 (chapter={chapter}, draft_len={len(draft)})")
     except Exception as e:
         logger.warning(f"[AutoSync] 仪表盘更新失败: {e}")
 
@@ -165,25 +160,20 @@ def _sync_retention(_action_type: str, data: dict):
     book_id = data.get("book_id", "default")
     if "retention_features" in data:
         try:
-            from kunlun.retention import ChapterFeatures, get_retention_predictor
+            from kunlun.retention import get_retention_predictor
 
             pred = get_retention_predictor(book_id)
             feat = data["retention_features"]
-            features = ChapterFeatures(
-                chapter=feat.get("chapter", 0),
-                word_count=feat.get("word_count", 0),
-                pleasure_density=feat.get("pleasure_density", 0),
-                cliffhanger_score=feat.get("cliffhanger_score", 0),
-                info_reveal_count=feat.get("info_reveal_count", 0),
-                action_intensity=feat.get("action_intensity", 0),
-                dialogue_ratio=feat.get("dialogue_ratio", 0),
-                pacing_score=feat.get("pacing_score", 0),
-                emotional_peaks=feat.get("emotional_peaks", 0),
-                new_characters=feat.get("new_characters", 0),
-                plot_progress=feat.get("plot_progress", 0),
-                chapter_length_deviation=feat.get("chapter_length_deviation", 0),
-            )
-            pred.predict_chapter(features.chapter, features)
+            # 使用正文进行完整的追读力分析（真实API: analyze）
+            text = feat.get("text", "") or feat.get("draft", "") or ""
+            if text:
+                feat_chapter = int(feat.get("chapter", 0))
+                pred.analyze(
+                    text=text,
+                    chapter_number=feat_chapter,
+                    is_first_three=feat_chapter <= 3,
+                )
+            logger.debug(f"[AutoSync] 留存预测已保存 (book={book_id})")
         except Exception as e:
             logger.warning(f"[AutoSync] 留存预测保存失败: {e}")
 

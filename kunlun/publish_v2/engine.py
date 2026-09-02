@@ -114,9 +114,12 @@ class PublishV2Engine:
 
     def list_all_platforms(self) -> list[dict[str, Any]]:
         """列出所有支持的平台"""
-        return [
-            self.get_platform_info(pid) for pid in self._adapters if self.get_platform_info(pid)
-        ]
+        result: list[dict[str, Any]] = []
+        for pid in self._adapters:
+            info = self.get_platform_info(pid)
+            if info:
+                result.append(info)
+        return result
 
     async def publish_chapter(
         self,
@@ -188,7 +191,7 @@ class PublishV2Engine:
 
         publish_results: list[PublishResult] = []
         for pid, result in zip(platform_ids, results, strict=False):
-            if isinstance(result, Exception):
+            if isinstance(result, BaseException):
                 publish_results.append(
                     PublishResult(
                         success=False,

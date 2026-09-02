@@ -333,7 +333,7 @@ class TruthFileManager(BaseExtensionModule):
         revealed = sum(1 for t in self._truths.values() if t.revealed)
         unrevealed = total - revealed
 
-        level_counts = {}
+        level_counts: dict[str, int] = {}
         for t in self._truths.values():
             level_counts[t.level.value] = level_counts.get(t.level.value, 0) + 1
 
@@ -357,7 +357,7 @@ class TruthFileManager(BaseExtensionModule):
                 issues.append(
                     {
                         "truth_id": tid,
-                        "name": truth.name,
+                        "name": truth.title,
                         "status": "unrevealed",
                         "level": truth.level.value,
                     }

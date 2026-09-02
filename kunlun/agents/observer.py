@@ -380,7 +380,7 @@ class Observer:
 
         # 提取新角色名（不在已知列表中的2-4字中文名）
         all_names = re.findall(r"[\u4e00-\u9fff]{2,4}", text)
-        name_counts = {}
+        name_counts: dict[str, int] = {}
         for n in all_names:
             if n not in known_characters:
                 name_counts[n] = name_counts.get(n, 0) + 1

@@ -18,6 +18,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any
 
 from loguru import logger
 
@@ -313,7 +314,7 @@ class Scheduler:
             聚合的执行结果
         """
         ctx = shared_context or {}
-        results = {}
+        results: dict[str, Any] = {}
         semaphore = asyncio.Semaphore(self.max_parallel)
 
         async def run_subtask(st: SubTask):
@@ -389,9 +390,9 @@ class Scheduler:
 
         return self._aggregate_results(plan, results)
 
-    def _aggregate_results(self, plan: TaskPlan, _results: dict) -> dict:
+    def _aggregate_results(self, plan: TaskPlan, _results: dict[str, Any]) -> dict:
         """聚合子任务结果"""
-        aggregated = {
+        aggregated: dict[str, Any] = {
             "task_id": plan.task_id,
             "success": True,
             "subtasks_completed": 0,

@@ -408,35 +408,35 @@ class CommentAnalyzer(BaseExtensionModule):
 
         # 情感分布
         sentiment_counts: Counter[str] = Counter()
-        for c in analyzed:
-            sentiment_counts[c.sentiment.value] += 1
+        for cmt in analyzed:
+            sentiment_counts[cmt.sentiment.value] += 1
         report.sentiment_distribution = dict(sentiment_counts)
         report.sentiment_ratio = sentiment_counts.get("positive", 0) / len(analyzed)
 
         # 类别分布
         cat_counts: Counter[str] = Counter()
-        for c in analyzed:
-            for cat in c.categories:
+        for cmt in analyzed:
+            for cat in cmt.categories:
                 cat_counts[cat.value] += 1
         report.category_distribution = dict(cat_counts.most_common())
 
         # 高频关键词
         kw_counts: Counter[str] = Counter()
-        for c in analyzed:
-            for kw in c.keywords:
+        for cmt in analyzed:
+            for kw in cmt.keywords:
                 kw_counts[kw] += 1
         report.top_keywords = kw_counts.most_common(10)
 
         # 可操作的负面反馈
-        actionable: list[Comment] = [c for c in analyzed if c.is_actionable]
-        for c in actionable:
+        actionable: list[Comment] = [cmt for cmt in analyzed if cmt.is_actionable]
+        for ac in actionable:
             report.actionable_feedback.append(
                 {
-                    "comment_id": c.comment_id,
-                    "text": c.text[:100],
-                    "sentiment": c.sentiment.value,
-                    "keywords": c.keywords,
-                    "categories": [cat.value for cat in c.categories],
+                    "comment_id": ac.comment_id,
+                    "text": ac.text[:100],
+                    "sentiment": ac.sentiment.value,
+                    "keywords": ac.keywords,
+                    "categories": [cat.value for cat in ac.categories],
                 }
             )
 

@@ -441,7 +441,7 @@ class ArcTracker:
         "智慧增强": re.compile(r"(领悟|明悟|洞察|看透|理解|智慧)"),
     }
 
-    DEFAULT_TRAITS: dict[str, dict[str, float]] = {
+    DEFAULT_TRAITS: dict[str, dict[str, Any]] = {
         "力量": {"baseline": 0.3, "arc": ArcDirection.POSITIVE.value},
         "自信": {"baseline": 0.5, "arc": ArcDirection.POSITIVE.value},
         "善良": {"baseline": 0.6, "arc": ArcDirection.FLAT.value},
@@ -705,7 +705,7 @@ class ArcTracker:
     def _load(self):
         if not self._data_dir:
             return
-        data = load_json(self._data_dir / "arcs.json", default={})
+        data: dict[str, Any] | None = load_json(self._data_dir / "arcs.json", default={})
         if not data:
             return
         try:

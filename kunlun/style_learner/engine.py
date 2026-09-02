@@ -678,7 +678,7 @@ class StyleFingerprintExtractor:
         chars = [c for c in text if "\u4e00" <= c <= "\u9fff"]
         if len(chars) < self.ngram_n:
             return DimensionFeature(dimension=StyleDimension.NGRAM_SIGNATURE, value=0, vector=[])
-        ngrams = {}
+        ngrams: dict[str, int] = {}
         for i in range(len(chars) - self.ngram_n + 1):
             ng = "".join(chars[i : i + self.ngram_n])
             ngrams[ng] = ngrams.get(ng, 0) + 1
@@ -872,9 +872,9 @@ class StyleSimilarityCalculator:
         cosine = self._cosine_similarity(v1, v2)
         euclidean = self._euclidean_distance(v1, v2)
 
-        dimension_scores = {}
-        matched = []
-        divergent = []
+        dimension_scores: dict[str, float] = {}
+        matched: list[str] = []
+        divergent: list[str] = []
         for dim in StyleDimension:
             if dim.value in fp1.dimensions and dim.value in fp2.dimensions:
                 f1 = fp1.dimensions[dim.value]
@@ -888,11 +888,11 @@ class StyleSimilarityCalculator:
                     elif score < 40:
                         divergent.append(dim.value)
 
-        weighted_dim_score = 0
-        total_weight = 0
-        for dim, score in dimension_scores.items():
-            w = self.DIMENSION_WEIGHTS.get(StyleDimension(dim), 0.05)
-            weighted_dim_score += score * w
+        weighted_dim_score = 0.0
+        total_weight = 0.0
+        for dim_name, score in dimension_scores.items():
+            w = self.DIMENSION_WEIGHTS.get(StyleDimension(dim_name), 0.05)
+            weighted_dim_score += float(score) * w
             total_weight += w
         dim_avg = weighted_dim_score / max(0.01, total_weight)
 
@@ -1047,11 +1047,12 @@ class StyleGuidedGenerator:
             fingerprints.append(fp)
 
         base_fp = fingerprints[0]
-        results = []
-        drift_dims = set()
+        results: list[dict[str, Any]] = []
+        drift_dims: set[str] = set()
 
         for i in range(1, len(fingerprints)):
             sim = self.similarity.calculate(base_fp, fingerprints[i])
+            assert isinstance(sim, StyleSimilarityResult)
             results.append(
                 {
                     "chapter": i + 1,
@@ -1059,7 +1060,7 @@ class StyleGuidedGenerator:
                     "divergent": sim.divergent_dimensions,
                 }
             )
-            drift_dims.update(sim.divergent_dimensions)
+            drift_dims.update(list(sim.divergent_dimensions))
 
         avg_sim = sum(r["similarity"] for r in results) / len(results) if results else 100
         consistent = avg_sim >= 60

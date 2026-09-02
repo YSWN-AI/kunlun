@@ -6,7 +6,6 @@
 """
 
 from __future__ import annotations
-from typing import Any
 
 import asyncio
 import contextlib
@@ -18,6 +17,7 @@ import time
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
 

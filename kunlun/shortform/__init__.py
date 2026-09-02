@@ -67,7 +67,7 @@ class ShortformEngine:
 
         template = SHORTFORM_TEMPLATES.get(mode, SHORTFORM_TEMPLATES["short_story"])
         wmin, wmax = template["word_count"]
-        structure = " → ".join(template["structure"])
+        structure = " → ".join(str(s) for s in template["structure"])
 
         system_prompt = f"""你是专业短篇写手。请根据以下要求创作{mode}。
 

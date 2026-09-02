@@ -21,7 +21,7 @@ class TruthAndFingerprintStep(PipelineStepBase):
     degrade_on_failure = True
 
     async def _execute_impl(self, ctx: Any) -> dict:
-        result = {}
+        result: dict[str, Any] = {}
         # 真相文件更新
         try:
             from kunlun.truth import get_truth_manager
@@ -45,7 +45,7 @@ class TruthAndFingerprintStep(PipelineStepBase):
 
             fp = style_analyzer.load_fingerprint(ctx.book_id)
             if fp:
-                result["fingerprint_loaded"] = fp.name
+                result["fingerprint_loaded"] = str(fp.name)
                 logger.info(f"[{ctx.pipeline_id}] 文风指纹已加载: {fp.name}")
         except Exception as e:
             logger.debug(f"[{ctx.pipeline_id}] 文风指纹加载跳过: {e}")

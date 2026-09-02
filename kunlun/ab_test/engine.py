@@ -399,7 +399,7 @@ class ABExperiment(BaseExtensionModule):
                 MetricName.COMPLETENESS.value: 0.15,
                 MetricName.WORD_COUNT.value: 0.10,
             }
-            total_weight = 0
+            total_weight: float = 0.0
             weighted_sum: float = 0.0
             for m in report.metrics:
                 if m.value in variant.scores:

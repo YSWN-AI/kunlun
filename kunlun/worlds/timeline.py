@@ -80,7 +80,7 @@ class TimelineEngine:
 
     def check_timeline_consistency(self) -> list[str]:
         """时间线一致性检查"""
-        issues = []
+        issues: list[str] = []
         for event in self._events.values():
             issues.extend(
                 f"事件'{event.name}'的前置事件'{pid}'不存在"

@@ -332,7 +332,7 @@ class PleasureEngine(BaseExtensionModule):
     def detect_events(self, text: str, chapter: str = "") -> dict[str, Any]:
         """检测文本中的爽点事件（兼容接口，内部调用 analyze_chapter）"""
         try:
-            result = self.analyze_chapter(text, chapter_number=int(chapter) if chapter else 0)
+            result = self.analyze_chapter(text, chapter_id=str(chapter) if chapter else "")
             return {
                 "events": getattr(result, "events", []),
                 "rhythm": getattr(result, "rhythm_score", 0.0),

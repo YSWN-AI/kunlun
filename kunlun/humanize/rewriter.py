@@ -593,7 +593,7 @@ class FeedbackLoop:
 
     def _identify_problem_segments(self, _text: str, fp, detection) -> list[dict]:
         """识别问题段落"""
-        problems = []
+        problems: list[dict] = []
 
         # 从统计指纹中获取可疑句子
         if fp.flagged_segments:

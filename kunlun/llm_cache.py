@@ -18,13 +18,14 @@ LLM 响应的语义级缓存。
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import sqlite3
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from loguru import logger
 
@@ -163,6 +164,7 @@ class PersistentLLMCache:
         """查询缓存，检查 TTL，更新命中计数"""
         if not self._ensure_connection():
             return None
+        assert self._conn is not None
         try:
             row = self._conn.execute(
                 "SELECT response, created_at, ttl_seconds FROM llm_cache WHERE cache_key = ?",
@@ -189,6 +191,7 @@ class PersistentLLMCache:
         """INSERT OR REPLACE"""
         if not self._ensure_connection():
             return
+        assert self._conn is not None
         try:
             self._conn.execute(
                 """INSERT OR REPLACE INTO llm_cache
@@ -204,6 +207,7 @@ class PersistentLLMCache:
         """删除单条缓存"""
         if not self._ensure_connection():
             return
+        assert self._conn is not None
         try:
             self._conn.execute("DELETE FROM llm_cache WHERE cache_key = ?", (key,))
             self._conn.commit()
@@ -214,6 +218,7 @@ class PersistentLLMCache:
         """清理过期条目，返回清理数量"""
         if not self._ensure_connection():
             return 0
+        assert self._conn is not None
         try:
             cursor = self._conn.execute(
                 "DELETE FROM llm_cache WHERE ttl_seconds IS NOT NULL "
@@ -229,6 +234,7 @@ class PersistentLLMCache:
         """返回缓存统计"""
         if not self._ensure_connection():
             return {"total": 0, "hits": 0, "size_bytes": 0}
+        assert self._conn is not None
         try:
             total = self._conn.execute("SELECT COUNT(*) FROM llm_cache").fetchone()[0]
             hits = self._conn.execute(
@@ -243,9 +249,10 @@ class PersistentLLMCache:
 
     def export_all(self) -> list[dict]:
         """导出所有有效缓存条目（用于 save_to_disk 的 dump_sqlite 选项）"""
-        entries = []
+        entries: list[dict] = []
         if not self._ensure_connection():
             return entries
+        assert self._conn is not None
         try:
             now = time.time()
             rows = self._conn.execute(
@@ -303,7 +310,7 @@ class LLMCache:
         self._semantic_entries: list[CacheEntry] = []  # 简易语义库（生产用 Qdrant）
         self._stats = CacheStats()
         self._qdrant_available: bool = False
-        self._redis: object | None = None  # Redis 持久化客户端
+        self._redis: Any | None = None  # Redis 持久化客户端
         self._sqlite_cache: PersistentLLMCache | None = None  # SQLite 降级持久化
 
         # 尝试连接 Qdrant
@@ -584,16 +591,16 @@ class LLMCache:
         if query_vector is None:
             return None
 
-        # 在 Qdrant 中搜索最近邻
-        results = self._qdrant_repo.search(
-            collection_name="kunlun_llm_cache",
-            query_vector=query_vector,
-            limit=5,
-            score_threshold=threshold,
-        )
+        # 在 Qdrant 中搜索最近邻（search 为 async，用 asyncio.run 在同步上下文执行）
+        vector_list = query_vector.tolist() if hasattr(query_vector, "tolist") else list(query_vector)
+        try:
+            results = asyncio.run(self._qdrant_repo.search(vector=vector_list, top_k=5))
+        except RuntimeError:
+            # 已在事件循环中运行，无法用 asyncio.run，降级为 Jaccard
+            return None
 
         for result in results:
-            cache_key = result.payload.get("cache_key", "")
+            cache_key = result.metadata.get("cache_key", "") if result.metadata else ""
             if cache_key and cache_key in self._exact_cache:
                 entry = self._exact_cache[cache_key]
                 if time.time() - entry.created_at < entry.ttl:
