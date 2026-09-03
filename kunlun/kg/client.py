@@ -939,6 +939,180 @@ class KGClient:
             weights.append(round(w, 4))
         return weights
 
+    # ─── 时序关系 & 邻域查询（KG 增强模块） ───────────
+
+    def add_temporal_relationship(
+        self,
+        source_id: str,
+        target_id: str,
+        rel_type: str,
+        properties: dict | None = None,
+        valid_from_chapter: int = 0,
+        valid_to_chapter: int | None = None,
+    ) -> bool:
+        """添加带时序属性的关系（在现有 create_relationship 基础上扩展）
+
+        自动在 properties 中加入 valid_from_chapter 和 valid_to_chapter。
+        时序属性存储在 edges 表的 properties JSON 字段中，不修改表结构。
+
+        Args:
+            source_id: 源实体ID
+            target_id: 目标实体ID
+            rel_type: 关系类型
+            properties: 附加属性
+            valid_from_chapter: 关系生效起始章节
+            valid_to_chapter: 关系失效章节（None 表示持续有效）
+
+        Returns:
+            是否创建成功
+        """
+        from kunlun.kg.temporal import TemporalRelationManager
+
+        manager = TemporalRelationManager(self)
+        return manager.add_temporal_relation(
+            source_id,
+            target_id,
+            rel_type,
+            properties,
+            valid_from_chapter,
+            valid_to_chapter,
+        )
+
+    def get_relationships(
+        self,
+        source_id: str,
+        direction: str = "out",
+        rel_type: str | None = None,
+        chapter: int | None = None,
+    ) -> list[dict]:
+        """统一关系查询方法（支持方向过滤、类型过滤、时序过滤）
+
+        直接查询 edges 表，不走 Cypher 解析。
+
+        Args:
+            source_id: 实体ID
+            direction: "out"（出边）/ "in"（入边）/ "both"（双向）
+            rel_type: 关系类型过滤（None 表示不过滤）
+            chapter: 章节过滤（>0 时只返回该章节有效的关系）
+
+        Returns:
+            关系列表，每条含 id/source_id/target_id/type/properties/valid_from/valid_to
+        """
+        conn = self._get_graph_conn()
+        if direction == "out":
+            sql = "SELECT * FROM edges WHERE source_id = ?"
+            params: list = [source_id]
+        elif direction == "in":
+            sql = "SELECT * FROM edges WHERE target_id = ?"
+            params = [source_id]
+        else:  # both
+            sql = "SELECT * FROM edges WHERE source_id = ? OR target_id = ?"
+            params = [source_id, source_id]
+
+        if rel_type:
+            sql += " AND type = ?"
+            params.append(rel_type)
+
+        cursor = conn.execute(sql, params)
+        results = []
+        for row in cursor.fetchall():
+            try:
+                props = json.loads(row["properties"] or "{}")
+            except (json.JSONDecodeError, TypeError):
+                props = {}
+            rel = {
+                "id": row["id"],
+                "source_id": row["source_id"],
+                "target_id": row["target_id"],
+                "type": row["type"],
+                "properties": props,
+                "valid_from_chapter": props.get("valid_from_chapter", 0),
+                "valid_to_chapter": props.get("valid_to_chapter"),
+            }
+            # 时序过滤
+            if chapter is not None and chapter > 0:
+                vf = rel["valid_from_chapter"]
+                vt = rel["valid_to_chapter"]
+                if not (vf <= chapter and (vt is None or chapter < vt)):
+                    continue
+            results.append(rel)
+        return results
+
+    def get_entity_neighborhood(self, entity_id: str, depth: int = 1) -> dict:
+        """获取实体邻域子图（节点 + 边）
+
+        Args:
+            entity_id: 中心实体ID
+            depth: 扩展深度（1=直接邻居，2=邻居的邻居）
+
+        Returns:
+            {"nodes": [...], "edges": [...], "center": entity_id, "depth": depth}
+        """
+        conn = self._get_graph_conn()
+        visited: set[str] = {entity_id}
+        nodes: list[dict] = []
+        edges: list[dict] = []
+        frontier: set[str] = {entity_id}
+
+        for _ in range(depth):
+            next_frontier: set[str] = set()
+            for nid in frontier:
+                # 查询出边和入边
+                cursor = conn.execute(
+                    "SELECT * FROM edges WHERE source_id = ? OR target_id = ?",
+                    (nid, nid),
+                )
+                for row in cursor.fetchall():
+                    edge_id = row["id"]
+                    if any(e["id"] == edge_id for e in edges):
+                        continue
+                    try:
+                        props = json.loads(row["properties"] or "{}")
+                    except (json.JSONDecodeError, TypeError):
+                        props = {}
+                    edges.append(
+                        {
+                            "id": edge_id,
+                            "source_id": row["source_id"],
+                            "target_id": row["target_id"],
+                            "type": row["type"],
+                            "properties": props,
+                        }
+                    )
+                    for other in (row["source_id"], row["target_id"]):
+                        if other not in visited:
+                            visited.add(other)
+                            next_frontier.add(other)
+            frontier = next_frontier
+
+        # 查询所有访问到的节点信息
+        if visited:
+            placeholders = ",".join("?" * len(visited))
+            cursor = conn.execute(
+                f"SELECT id, type, name, properties FROM nodes WHERE id IN ({placeholders})",
+                list(visited),
+            )
+            for row in cursor.fetchall():
+                try:
+                    props = json.loads(row["properties"] or "{}")
+                except (json.JSONDecodeError, TypeError):
+                    props = {}
+                nodes.append(
+                    {
+                        "id": row["id"],
+                        "type": row["type"],
+                        "name": row["name"],
+                        "properties": props,
+                    }
+                )
+
+        return {
+            "center": entity_id,
+            "depth": depth,
+            "nodes": nodes,
+            "edges": edges,
+        }
+
     # ─── 生命周期 ────────────────────────────────────
 
     def close(self) -> None:
@@ -967,7 +1141,9 @@ class KGClient:
         return self._cache.get("health_check", 5, self._do_health_check)
 
     def _do_health_check(self) -> dict:
-        result: dict[str, bool | str] = {"neo4j": False, "qdrant": False, "sqlite": False, "sqlite_graph": False}
+        result: dict[str, bool | str] = {
+            "neo4j": False, "qdrant": False, "sqlite": False, "sqlite_graph": False,
+        }
         try:
             self.neo4j.verify_connectivity()
             result["neo4j"] = True
