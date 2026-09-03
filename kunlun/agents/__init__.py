@@ -5,6 +5,16 @@ from __future__ import annotations
 from kunlun.agents.architect import Architect
 from kunlun.agents.auditor import Auditor
 from kunlun.agents.base import AgentMessage, AgentStatus, BaseAgent
+from kunlun.agents.critic import CRITIC_DIMENSIONS, CriticAgent, CriticReport
+from kunlun.agents.debate_orchestrator import (
+    CRITICVerification,
+    DebateOrchestrator,
+    DebateResult,
+    DebateRoundDetail,
+    PipelineResult,
+    PipelineStage,
+    ReflexionEntry,
+)
 from kunlun.agents.editor import (
     ChapterIntent,
     CreativeBrief,
@@ -22,6 +32,12 @@ from kunlun.agents.observer import (
     ObserverReport,
 )
 from kunlun.agents.publisher import PublishAction, PublisherAgent, PublisherResult, PublisherTask
+from kunlun.agents.reader import (
+    EnhancedReaderFeedback,
+    ExtendedReaderType,
+    EXTENDED_READER_PROFILES,
+    ReaderAgent,
+)
 from kunlun.agents.reflector_agent import Reflector, ReflectorResult, SnapshotVersion
 from kunlun.agents.scheduler import (
     AgentCluster,
@@ -45,8 +61,18 @@ __all__ = [
     "ChapterIntent",
     "CharacterStateChange",
     "CreativeBrief",
+    "CRITIC_DIMENSIONS",
+    "CRITICVerification",
+    "CriticAgent",
+    "CriticReport",
+    "DebateOrchestrator",
+    "DebateResult",
+    "DebateRoundDetail",
     "EditorInChief",
+    "EnhancedReaderFeedback",
     "EventExtracted",
+    "ExtendedReaderType",
+    "EXTENDED_READER_PROFILES",
     "ForeshadowingDelta",
     "InProcessMessageBus",
     "Makefile",
@@ -54,14 +80,18 @@ __all__ = [
     "ObserverReport",
     "OutlineNode",
     "PipelineCheckpoint",
+    "PipelineResult",
+    "PipelineStage",
     "PipelineState",
     "PipelineStep",
     "PublishAction",
     "PublisherAgent",
     "PublisherResult",
     "PublisherTask",
+    "ReaderAgent",
     "Reflector",
     "ReflectorResult",
+    "ReflexionEntry",
     "Scheduler",
     "SnapshotVersion",
     "SocietyRequest",

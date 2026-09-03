@@ -108,6 +108,7 @@ class TestGachaStyleDimension:
         from kunlun.gacha.engine import GachaEngine
         engine = GachaEngine.__new__(GachaEngine)
         engine._models = []
+        engine.target_style_fingerprint = None
         return engine
 
     def test_style_match_method_exists(self):

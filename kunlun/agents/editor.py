@@ -41,7 +41,6 @@ from kunlun.filesync import get_syncer
 from kunlun.gacha.engine import gacha_engine
 from kunlun.kg.snapshot import snapshot_manager
 from kunlun.learn.evolve import get_evolution_tracker
-from kunlun.style.engineer import StyleEngineer
 from kunlun.style.fingerprint import style_analyzer, style_injector
 from kunlun.truth import get_truth_manager
 
@@ -631,6 +630,7 @@ class EditorInChief:
             logger.debug(f"[Editor] 风格注入跳过: {e}")
 
         # 降级到规则润色
+        from kunlun.style.engineer import StyleEngineer
 
         engineer = StyleEngineer()
         result = await engineer.execute({"draft": draft})

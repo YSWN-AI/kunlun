@@ -29,7 +29,6 @@ from kunlun.agents.publisher import PublisherAgent
 from kunlun.agents.sociologist import sociologist
 from kunlun.agents.writer import Writer
 from kunlun.kg.snapshot import snapshot_manager
-from kunlun.style.engineer import StyleEngineer
 
 
 class TaskPriority(Enum):
@@ -231,6 +230,8 @@ class AgentCluster:
             elif agent_type == "sociologist":
                 self._agents[agent_type] = sociologist
             elif agent_type == "style_engineer":
+                from kunlun.style.engineer import StyleEngineer
+
                 self._agents[agent_type] = StyleEngineer()
             elif agent_type == "publisher":
                 self._agents[agent_type] = PublisherAgent()

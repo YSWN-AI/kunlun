@@ -165,6 +165,8 @@ class GachaEngine:
         self._key_rotator: KeyRotator | None = None
         # 共享 httpx 客户端 — 连接池复用，避免每次调用重建 TCP+TLS
         self._http_client: httpx.AsyncClient | None = None
+        # 目标风格指纹 — 用于第10维风格匹配评分（延迟导入类型避免循环依赖）
+        self.target_style_fingerprint = None
         self._init_models()
         self._init_key_rotator()
 
@@ -250,6 +252,18 @@ class GachaEngine:
     def get_cascade_threshold(self, chapter_type: str = "normal") -> dict:
         """获取指定章节类型的级联阈值"""
         return CASCADE_THRESHOLDS.get(chapter_type, CASCADE_THRESHOLDS["normal"])
+
+    def set_target_style(self, fp) -> None:
+        """设置目标风格指纹，用于第10维风格匹配评分
+
+        Args:
+            fp: StyleFingerprint 对象或 None（清除目标）
+        """
+        self.target_style_fingerprint = fp
+        if fp is not None:
+            logger.info(f"GachaEngine: 目标风格指纹已设置: {fp.name}")
+        else:
+            logger.info("GachaEngine: 目标风格指纹已清除")
 
     # ── 核心方法 ──────────────────────────────────────
 
@@ -973,13 +987,23 @@ class GachaEngine:
         return min(1.0, dialogue_ratio * 5 + interjection_ratio * 3)
 
     def _score_style_match(self, text: str) -> float:
-        """风格匹配度 — 句长变化、标点多样性、词汇丰富度、对话占比、语气词频率。
+        """风格匹配度 — 第10维评分。
 
-        评估文本的风格特征丰富度，越高说明越接近人类多样化写作风格。
-        若设置了 target_style_fingerprint，则计算与目标风格的相似度。
+        若设置了 target_style_fingerprint，计算文本与目标风格的余弦相似度。
+        否则使用通用风格丰富度评分（句长变化、标点多样性、词汇丰富度等）。
         """
         if not text or len(text) < _MIN_TEXT_LENGTH:
             return 0.5
+
+        # 如果设置了目标风格指纹，计算与目标的相似度
+        if self.target_style_fingerprint is not None:
+            try:
+                from kunlun.style.fingerprint import style_analyzer
+                current_fp = style_analyzer.analyze(text, name="gacha_candidate")
+                sim = current_fp.cosine_similarity(self.target_style_fingerprint)
+                return round(min(1.0, max(0.0, sim)), 4)
+            except Exception as e:
+                logger.debug(f"GachaEngine: 风格相似度计算失败，回退通用评分: {e}")
 
         # 句长变化（标准差）
         sentences = re.split(r"[。！？!?]", text)
