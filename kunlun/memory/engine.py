@@ -33,6 +33,7 @@ import re
 import time
 from dataclasses import asdict, dataclass, field
 from enum import Enum
+from pathlib import Path
 from typing import Any
 
 # ══════════════════════════════════════════════════════
@@ -144,6 +145,10 @@ class SemanticEntity:
     importance: MemoryImportance = MemoryImportance.MEDIUM
     aliases: list[str] = field(default_factory=list)
     status: str = "active"  # active / deceased / missing / sealed
+    # L3 增强：关系图谱引用（运行时绑定，不序列化）
+    relation_graph_ref: Any = None
+    # L3 增强：时序属性（如实力随章节变化）
+    temporal_attributes: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -159,6 +164,7 @@ class SemanticEntity:
             "importance": self.importance.value,
             "aliases": self.aliases,
             "status": self.status,
+            "temporal_attributes": self.temporal_attributes,
         }
 
     @classmethod
@@ -176,6 +182,7 @@ class SemanticEntity:
             importance=MemoryImportance(data.get("importance", 3)),
             aliases=data.get("aliases", []),
             status=data.get("status", "active"),
+            temporal_attributes=data.get("temporal_attributes", {}),
         )
 
 
@@ -311,8 +318,9 @@ class WorkingMemory:
             parts.append(f"【当前章节上下文】\n{self.current_context}")
         if include_summaries and self.recent_summaries:
             sorted_chapters = sorted(self.recent_summaries.keys(), reverse=True)
-            for ch in sorted_chapters[:3]:
-                parts.append(f"【第{ch}章摘要】\n{self.recent_summaries[ch]}")
+            parts.extend(
+                f"【第{ch}章摘要】\n{self.recent_summaries[ch]}" for ch in sorted_chapters[:3]
+            )
         return "\n\n".join(parts)
 
     def estimate_tokens(self) -> int:
@@ -330,9 +338,7 @@ class WorkingMemory:
 
     def get_character_states(self) -> list[dict[str, Any]]:
         """获取所有在场角色状态卡"""
-        return [
-            {"name": name, **state} for name, state in self.character_states.items()
-        ]
+        return [{"name": name, **state} for name, state in self.character_states.items()]
 
     def add_foreshadow_alert(self, alert: dict[str, Any]):
         """添加伏笔预警
@@ -386,9 +392,7 @@ class WorkingMemory:
                     created_at=note.created_at,
                 )
                 events.append(event)
-        self.temporary_notes = [
-            n for n in self.temporary_notes if n.importance.value < 2
-        ]
+        self.temporary_notes = [n for n in self.temporary_notes if n.importance.value < 2]
         return events
 
     def clear_temporary(self):
@@ -444,7 +448,6 @@ class EpisodicMemory:
 
     def _sync_event_to_summary_tree(self, event: EpisodicEvent):
         """将事件同步到摘要树（内部方法）"""
-        from kunlun.memory.summary_tree import SummaryTree
 
         if self.summary_tree is None:
             return
@@ -486,19 +489,17 @@ class EpisodicMemory:
 
     def get_plot_timeline(self) -> list[dict[str, Any]]:
         """获取情节时间线（压缩版）"""
-        timeline = []
-        for e in sorted(self.events, key=lambda e: e.chapter):
-            if e.plot_relevance >= 0.5:
-                timeline.append(
-                    {
-                        "chapter": e.chapter,
-                        "scene": e.scene,
-                        "summary": e.summary[:100],
-                        "type": e.event_type,
-                        "relevance": e.plot_relevance,
-                    }
-                )
-        return timeline
+        return [
+            {
+                "chapter": e.chapter,
+                "scene": e.scene,
+                "summary": e.summary[:100],
+                "type": e.event_type,
+                "relevance": e.plot_relevance,
+            }
+            for e in sorted(self.events, key=lambda e: e.chapter)
+            if e.plot_relevance >= 0.5
+        ]
 
     def _compress_old_events(self):
         """压缩旧事件：将低重要度事件合并为摘要"""
@@ -516,7 +517,7 @@ class EpisodicMemory:
                         chapter=chapter,
                         scene=f"第{chapter}章综合",
                         summary="；".join(e.summary[:50] for e in group[:5]),
-                        participants=list(set(p for e in group for p in e.participants))[:5],
+                        participants=list({p for e in group for p in e.participants})[:5],
                         event_type="compressed",
                         plot_relevance=0.3,
                         compressed=True,
@@ -695,7 +696,7 @@ class EpisodicMemory:
         }
         if self.summary_tree is not None:
             data["summary_tree"] = self.summary_tree.to_dict()
-        with open(filepath, "w", encoding="utf-8") as f:
+        with Path(filepath).open("w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2, default=str)
 
     def load(self, filepath: str):
@@ -704,12 +705,10 @@ class EpisodicMemory:
 
         from kunlun.memory.summary_tree import SummaryTree
 
-        with open(filepath, encoding="utf-8") as f:
+        with Path(filepath).open(encoding="utf-8") as f:
             data = json.load(f)
         self.max_events = data.get("max_events", self.max_events)
-        self.compression_threshold = data.get(
-            "compression_threshold", self.compression_threshold
-        )
+        self.compression_threshold = data.get("compression_threshold", self.compression_threshold)
         self.events = []
         self.event_index = {}
         for edata in data.get("events", []):
@@ -718,10 +717,8 @@ class EpisodicMemory:
             for p in event.participants:
                 self.event_index.setdefault(p, []).append(len(self.events) - 1)
             if event.location:
-                self.event_index.setdefault(event.location, []).append(
-                    len(self.events) - 1
-                )
-        if "summary_tree" in data and data["summary_tree"]:
+                self.event_index.setdefault(event.location, []).append(len(self.events) - 1)
+        if data.get("summary_tree"):
             self.summary_tree = SummaryTree.from_dict(data["summary_tree"])
         else:
             self.summary_tree = None
@@ -842,6 +839,233 @@ class SemanticMemory:
                 scored.append((score, entity))
         scored.sort(key=lambda x: x[0], reverse=True)
         return [e for _, e in scored[:limit]]
+
+    # ── L3 增强：关系图谱方法 ──────────────────────────
+
+    def set_relation_graph(self, graph: Any):
+        """绑定实体关系图谱
+
+        Args:
+            graph: EntityRelationGraph 实例
+        """
+        self._relation_graph = graph
+        # 同步绑定到所有实体
+        for entity in self.entities.values():
+            entity.relation_graph_ref = graph
+
+    def add_entity_relation(
+        self,
+        source_name: str,
+        target_name: str,
+        rel_type: str,
+        attributes: dict[str, Any] | None = None,
+        valid_from_chapter: int = 0,
+    ) -> Any | None:
+        """通过名称查找实体并添加关系
+
+        Args:
+            source_name: 源实体名称
+            target_name: 目标实体名称
+            rel_type: 关系类型
+            attributes: 关系属性
+            valid_from_chapter: 关系起始章节
+
+        Returns:
+            创建的关系对象，未绑定图谱或实体不存在时返回 None
+        """
+        graph = getattr(self, "_relation_graph", None)
+        if graph is None:
+            return None
+        source = self.get_entity(source_name)
+        target = self.get_entity(target_name)
+        if not source or not target:
+            return None
+        return graph.add_relation(
+            source_id=source.id,
+            target_id=target.id,
+            rel_type=rel_type,
+            attributes=attributes or {},
+            valid_from_chapter=valid_from_chapter,
+        )
+
+    def get_entity_relations(
+        self,
+        name: str,
+        direction: str = "both",
+        chapter: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """获取实体关系（支持时序过滤）
+
+        Args:
+            name: 实体名称
+            direction: "out"/"in"/"both"
+            chapter: 可选章节号，提供时只返回该章节有效的关系
+
+        Returns:
+            关系字典列表
+        """
+        graph = getattr(self, "_relation_graph", None)
+        if graph is None:
+            return []
+        entity = self.get_entity(name)
+        if not entity:
+            return []
+        if chapter is not None:
+            relations = graph.get_relations_at_chapter(entity.id, chapter)
+        else:
+            relations = graph.get_relations(entity.id, direction=direction)
+        return [r.to_dict() for r in relations]
+
+    def get_entity_neighborhood(self, name: str, depth: int = 1) -> dict[str, Any]:
+        """获取实体邻域子图（返回实体+关系的结构化数据）
+
+        Args:
+            name: 中心实体名称
+            depth: 扩展深度
+
+        Returns:
+            含 center_entity, entities, relations 的字典
+        """
+        graph = getattr(self, "_relation_graph", None)
+        if graph is None:
+            return {
+                "center": name,
+                "entities": [],
+                "relations": [],
+                "entity_count": 0,
+                "relation_count": 0,
+            }
+        entity = self.get_entity(name)
+        if not entity:
+            return {
+                "center": name,
+                "entities": [],
+                "relations": [],
+                "entity_count": 0,
+                "relation_count": 0,
+            }
+        neighborhood = graph.get_neighborhood(entity.id, depth=depth)
+        # 将实体 ID 转换为实体名称信息
+        entity_details = []
+        for eid in neighborhood.get("entities", []):
+            # 反向查找实体
+            ent = None
+            for e in self.entities.values():
+                if e.id == eid:
+                    ent = e
+                    break
+            if ent:
+                entity_details.append(
+                    {
+                        "id": ent.id,
+                        "name": ent.name,
+                        "entity_type": ent.entity_type.value,
+                        "description": ent.description[:100],
+                    }
+                )
+            else:
+                entity_details.append({"id": eid, "name": eid, "entity_type": "unknown"})
+        neighborhood["entity_details"] = entity_details
+        neighborhood["center_entity"] = {
+            "id": entity.id,
+            "name": entity.name,
+            "entity_type": entity.entity_type.value,
+        }
+        return neighborhood
+
+    def graphrag_search(self, query: str, limit: int = 5) -> dict[str, Any]:
+        """GraphRAG式检索：实体搜索 + 关系扩展 + 上下文聚合
+
+        Args:
+            query: 搜索查询
+            limit: 返回实体数量上限
+
+        Returns:
+            含 entities, relations, neighborhood_summary, context 的结构化上下文
+        """
+        # 第一步：实体搜索（复用现有 search）
+        matched_entities = self.search(query, limit=limit)
+        if not matched_entities:
+            return {
+                "query": query,
+                "entities": [],
+                "relations": [],
+                "neighborhood_summary": "",
+                "context": "",
+            }
+
+        graph = getattr(self, "_relation_graph", None)
+        all_relations: list[dict[str, Any]] = []
+        all_entity_ids: set[str] = set()
+        neighborhood_parts: list[str] = []
+
+        for entity in matched_entities:
+            all_entity_ids.add(entity.id)
+            if graph is not None:
+                # 关系扩展：获取该实体的一阶邻域
+                neighborhood = graph.get_neighborhood(entity.id, depth=1)
+                for rel in neighborhood.get("relations", []):
+                    if rel["id"] not in {r["id"] for r in all_relations}:
+                        all_relations.append(rel)
+                for eid in neighborhood.get("entities", []):
+                    all_entity_ids.add(eid)
+                # 构建邻域摘要
+                neighbor_names = []
+                for eid in neighborhood.get("entities", []):
+                    if eid == entity.id:
+                        continue
+                    for e in self.entities.values():
+                        if e.id == eid:
+                            neighbor_names.append(e.name)
+                            break
+                if neighbor_names:
+                    neighbor_str = ", ".join(neighbor_names[:5])
+                    neighborhood_parts.append(f"{entity.name} 关联: {neighbor_str}")
+
+        # 构建上下文文本
+        entity_lines = [
+            f"[{entity.entity_type.value}] {entity.name}: {entity.description[:80]}"
+            for entity in matched_entities
+        ]
+        relation_lines = []
+        for rel in all_relations[:20]:
+            source_name = rel.get("source_id", "")
+            target_name = rel.get("target_id", "")
+            # 尝试转换为名称
+            for e in self.entities.values():
+                if e.id == rel.get("source_id"):
+                    source_name = e.name
+                if e.id == rel.get("target_id"):
+                    target_name = e.name
+            relation_lines.append(f"  {source_name} --[{rel.get('rel_type', '')}]--> {target_name}")
+
+        context_parts = ["【GraphRAG 检索结果】"]
+        context_parts.append("相关实体:")
+        context_parts.extend(f"  {line}" for line in entity_lines)
+        if relation_lines:
+            context_parts.append("关系网络:")
+            context_parts.extend(relation_lines)
+        if neighborhood_parts:
+            context_parts.append("邻域摘要:")
+            context_parts.extend(f"  {p}" for p in neighborhood_parts)
+
+        return {
+            "query": query,
+            "entities": [
+                {
+                    "id": e.id,
+                    "name": e.name,
+                    "entity_type": e.entity_type.value,
+                    "description": e.description,
+                }
+                for e in matched_entities
+            ],
+            "relations": all_relations,
+            "neighborhood_summary": "; ".join(neighborhood_parts),
+            "context": "\n".join(context_parts),
+            "entity_count": len(all_entity_ids),
+            "relation_count": len(all_relations),
+        }
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -978,6 +1202,84 @@ class ProceduralMemory:
         ]
         for p in defaults:
             self.add_pattern(p)
+
+    # ── L4 增强：场景模板库方法 ────────────────────────
+
+    def set_template_library(self, library: Any):
+        """绑定场景模板库
+
+        Args:
+            library: SceneTemplateLibrary 实例
+        """
+        self._template_library = library
+
+    def get_scene_templates(self, scene_type: str, limit: int = 5) -> list[dict[str, Any]]:
+        """获取场景模板
+
+        Args:
+            scene_type: 场景类型
+            limit: 返回数量上限
+
+        Returns:
+            模板字典列表
+        """
+        library = getattr(self, "_template_library", None)
+        if library is None:
+            return []
+        templates = library.get_templates_by_type(scene_type)
+        return [t.to_dict() for t in templates[:limit]]
+
+    def recommend_scene_template(
+        self,
+        scene_type: str,
+        context_keywords: list[str] | None = None,
+    ) -> dict[str, Any] | None:
+        """推荐场景模板
+
+        Args:
+            scene_type: 场景类型
+            context_keywords: 上下文关键词
+
+        Returns:
+            推荐模板字典，未绑定模板库时返回 None
+        """
+        library = getattr(self, "_template_library", None)
+        if library is None:
+            return None
+        templates = library.get_recommended_templates(scene_type, context_keywords, limit=1)
+        if templates:
+            return templates[0].to_dict()
+        return None
+
+    def extract_from_chapter(self, chapter_text: str, chapter_num: int = 0) -> dict[str, Any]:
+        """从章节提取模式（委托给模板库）
+
+        Args:
+            chapter_text: 章节正文
+            chapter_num: 章节号
+
+        Returns:
+            提取结果字典
+        """
+        library = getattr(self, "_template_library", None)
+        if library is None:
+            return {"matched_templates": [], "matched_pleasure_points": [], "analysis": {}}
+        return library.extract_patterns_from_chapter(chapter_text, chapter_num)
+
+    def get_pleasure_points(self, limit: int = 10) -> list[dict[str, Any]]:
+        """获取爽点模式
+
+        Args:
+            limit: 返回数量上限
+
+        Returns:
+            爽点模式字典列表
+        """
+        library = getattr(self, "_template_library", None)
+        if library is None:
+            return []
+        points = library.get_pleasure_points(limit=limit)
+        return [p.to_dict() for p in points]
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1169,8 +1471,7 @@ class MemoryManager:
             return "暂无情节记录"
 
         lines = ["【情节回顾】"]
-        for e in events:
-            lines.append(f"  第{e['chapter']}章 [{e['type']}]: {e['summary']}")
+        lines.extend(f"  第{e['chapter']}章 [{e['type']}]: {e['summary']}" for e in events)
         return "\n".join(lines)
 
     async def retrieve_for_writing(
@@ -1188,12 +1489,11 @@ class MemoryManager:
             含 working_context, relevant_events, world_rules, patterns 的字典
         """
         # L1：角色状态
-        character_states = []
-        for name in present_characters:
-            if name in self.working.character_states:
-                character_states.append(
-                    {"name": name, **self.working.character_states[name]}
-                )
+        character_states = [
+            {"name": name, **self.working.character_states[name]}
+            for name in present_characters
+            if name in self.working.character_states
+        ]
         # L1：增强上下文
         working_context = self.working.get_context_enhanced()
 
@@ -1226,6 +1526,47 @@ class MemoryManager:
         scene_type = chapter_outline.get("scene_type", "general")
         patterns = self.procedural.get_recommended_patterns(scene_type, limit=3)
 
+        # L3-L4 增强：实体关系、场景模板、爽点、GraphRAG 上下文
+        entity_relations: list[dict[str, Any]] = []
+        recommended_templates: list[dict[str, Any]] = []
+        pleasure_point_suggestions: list[dict[str, Any]] = []
+        graph_context: dict[str, Any] = {}
+
+        semantic_graph = getattr(self.semantic, "_relation_graph", None)
+        template_lib = getattr(self.procedural, "_template_library", None)
+
+        # 在场角色的关系列表
+        if semantic_graph is not None:
+            for name in present_characters:
+                entity = self.semantic.get_entity(name)
+                if entity:
+                    rels = semantic_graph.get_relations(entity.id, direction="both")
+                    for rel in rels:
+                        rel_dict = rel.to_dict()
+                        # 转换 ID 为名称
+                        for ent in self.semantic.entities.values():
+                            if ent.id == rel.source_id:
+                                rel_dict["source_name"] = ent.name
+                            if ent.id == rel.target_id:
+                                rel_dict["target_name"] = ent.name
+                        entity_relations.append(rel_dict)
+
+        # 基于章节大纲 scene_type 推荐场景模板
+        if template_lib is not None:
+            rec_templates = template_lib.get_recommended_templates(
+                scene_type, context_keywords=None, limit=3
+            )
+            recommended_templates = [t.to_dict() for t in rec_templates]
+            # 爽点模式建议
+            pp_suggestions = template_lib.get_pleasure_points(limit=5)
+            pleasure_point_suggestions = [p.to_dict() for p in pp_suggestions]
+
+        # GraphRAG 检索上下文（基于大纲关键词）
+        if semantic_graph is not None:
+            outline_summary = str(chapter_outline.get("summary", ""))
+            outline_keywords = " ".join(present_characters) + " " + outline_summary
+            graph_context = self.semantic.graphrag_search(outline_keywords, limit=5)
+
         return {
             "working_context": working_context,
             "character_states": character_states,
@@ -1242,11 +1583,72 @@ class MemoryManager:
             "world_rules": [
                 {"name": r.name, "description": r.description} for r in world_rules[:5]
             ],
-            "patterns": [
-                {"name": p.name, "description": p.description} for p in patterns
-            ],
+            "patterns": [{"name": p.name, "description": p.description} for p in patterns],
             "foreshadow_alerts": self.working.foreshadow_alerts,
+            # L3-L4 增强字段
+            "entity_relations": entity_relations,
+            "recommended_templates": recommended_templates,
+            "pleasure_point_suggestions": pleasure_point_suggestions,
+            "graph_context": graph_context,
         }
+
+    # ── L3-L4 增强：便捷方法 ───────────────────────────
+
+    def init_advanced_memory(self):
+        """初始化 EntityRelationGraph 和 SceneTemplateLibrary 并绑定
+
+        自动加载默认模板和爽点模式。
+        """
+        from kunlun.memory.entity_graph import EntityRelationGraph
+        from kunlun.memory.scene_templates import SceneTemplateLibrary
+
+        graph = EntityRelationGraph()
+        self.semantic.set_relation_graph(graph)
+
+        library = SceneTemplateLibrary()
+        library.load_default_templates()
+        library.load_default_pleasure_points()
+        self.procedural.set_template_library(library)
+
+    def add_character_relation(
+        self,
+        source_name: str,
+        target_name: str,
+        rel_type: str,
+        attributes: dict[str, Any] | None = None,
+        chapter: int = 0,
+    ) -> Any | None:
+        """便捷添加角色关系
+
+        Args:
+            source_name: 源角色名
+            target_name: 目标角色名
+            rel_type: 关系类型
+            attributes: 关系属性
+            chapter: 关系起始章节
+
+        Returns:
+            创建的关系对象
+        """
+        return self.semantic.add_entity_relation(
+            source_name=source_name,
+            target_name=target_name,
+            rel_type=rel_type,
+            attributes=attributes or {},
+            valid_from_chapter=chapter,
+        )
+
+    def get_character_relation_network(self, name: str, depth: int = 2) -> dict[str, Any]:
+        """获取角色关系网络
+
+        Args:
+            name: 角色名称
+            depth: 网络扩展深度
+
+        Returns:
+            含 center, entities, relations, layers 的关系网络字典
+        """
+        return self.semantic.get_entity_neighborhood(name, depth=depth)
 
     def store_after_writing(
         self,
@@ -1359,14 +1761,14 @@ class MemoryManager:
             "forgetting_check_interval": self.forgetting_check_interval,
             "last_forgetting_check": self.last_forgetting_check,
         }
-        with open(filepath, "w", encoding="utf-8") as f:
+        with Path(filepath).open("w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2, default=str)
 
     def load(self, filepath: str):
         """从文件加载记忆（完整加载四层记忆）"""
         from kunlun.memory.summary_tree import SummaryTree
 
-        with open(filepath, encoding="utf-8") as f:
+        with Path(filepath).open(encoding="utf-8") as f:
             data = json.load(f)
         self.book_id = data.get("book_id", self.book_id)
         self.token_budget = data.get("token_budget", self.token_budget)
@@ -1410,7 +1812,7 @@ class MemoryManager:
                     self.episodic.event_index.setdefault(event.location, []).append(
                         len(self.episodic.events) - 1
                     )
-            if "summary_tree" in ed and ed["summary_tree"]:
+            if ed.get("summary_tree"):
                 self.episodic.summary_tree = SummaryTree.from_dict(ed["summary_tree"])
             else:
                 self.episodic.summary_tree = None
@@ -1449,15 +1851,13 @@ def create_memory_manager(book_id: str = "default", token_budget: int = 6000) ->
 
 def extract_entities_from_text(text: str) -> list[dict[str, Any]]:
     """从文本中简单提取实体（人物/地点/物品）"""
-    entities = []
     # 简单的人名提取（"XXX道"、"XXX说"模式）
     name_patterns = re.findall(r"([\u4e00-\u9fa5]{2,4})(?:道|说|喊|叫|问|答|笑|怒|叹)", text)
-    for name in set(name_patterns):
-        entities.append(
-            {
-                "name": name,
-                "entity_type": "character",
-                "description": f"在文本中出现的人物: {name}",
-            }
-        )
-    return entities
+    return [
+        {
+            "name": name,
+            "entity_type": "character",
+            "description": f"在文本中出现的人物: {name}",
+        }
+        for name in set(name_patterns)
+    ]
