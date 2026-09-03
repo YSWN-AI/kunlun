@@ -28,7 +28,14 @@ Usage:
     print(f"综合评分: {assessment['combined_score']}/100")
     for rec in assessment["recommendations"]:
         print(f"  优先级{rec['priority']}: {rec['suggestion']} (预估提升+{rec['estimated_improvement']})")
+
+    # 新增 Agent 类（延迟导入，避免循环依赖）
+    from kunlun.debate_review import CriticAgent, ReaderAgent, DebateOrchestrator
 """
+
+from __future__ import annotations
+
+from typing import Any
 
 from kunlun.debate_review.engine import (
     DebateReviewEngine,
@@ -47,6 +54,26 @@ from kunlun.debate_review.engine import (
     simulate_readers,
 )
 
+# 新增 Agent 类使用延迟导入（__getattr__），避免循环依赖
+# 循环链: kunlun.agents.critic → kunlun.debate_review.engine →
+#         kunlun.debate_review.__init__ → kunlun.debate_review.agents →
+#         kunlun.agents.critic (部分初始化)
+_LAZY_AGENT_EXPORTS: dict[str, str] = {
+    "CRITICVerification": "kunlun.agents.debate_orchestrator",
+    "CriticAgent": "kunlun.agents.critic",
+    "CriticReport": "kunlun.agents.critic",
+    "DebateOrchestrator": "kunlun.agents.debate_orchestrator",
+    "DebateResult": "kunlun.agents.debate_orchestrator",
+    "DebateRoundDetail": "kunlun.agents.debate_orchestrator",
+    "EnhancedReaderFeedback": "kunlun.agents.reader",
+    "ExtendedReaderType": "kunlun.agents.reader",
+    "EXTENDED_READER_PROFILES": "kunlun.agents.reader",
+    "PipelineResult": "kunlun.agents.debate_orchestrator",
+    "PipelineStage": "kunlun.agents.debate_orchestrator",
+    "ReaderAgent": "kunlun.agents.reader",
+    "ReflexionEntry": "kunlun.agents.debate_orchestrator",
+}
+
 __all__ = [
     "DebateReviewEngine",
     "DebateReviewResult",
@@ -62,4 +89,28 @@ __all__ = [
     "debate_review",
     "full_quality_assessment",
     "simulate_readers",
+    # 新增 Agent 类（延迟导入）
+    "CRITICVerification",
+    "CriticAgent",
+    "CriticReport",
+    "DebateOrchestrator",
+    "DebateResult",
+    "DebateRoundDetail",
+    "EnhancedReaderFeedback",
+    "ExtendedReaderType",
+    "EXTENDED_READER_PROFILES",
+    "PipelineResult",
+    "PipelineStage",
+    "ReaderAgent",
+    "ReflexionEntry",
 ]
+
+
+def __getattr__(name: str) -> Any:
+    """模块级延迟导入，避免循环依赖"""
+    if name in _LAZY_AGENT_EXPORTS:
+        import importlib
+
+        module = importlib.import_module(_LAZY_AGENT_EXPORTS[name])
+        return getattr(module, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
