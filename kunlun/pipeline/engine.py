@@ -402,6 +402,148 @@ class PipelineRunner(BaseExtensionModule):
             state.status = NodeStatus.PENDING
 
 
+
+    # ── 辩论阶段集成（可插拔，不影响现有执行流程） ──────
+
+    def register_debate_stage(self, debate_type: str, position: int) -> bool:
+        """注册辩论阶段到指定位置
+
+        将 DebateStage 作为一个节点插入到流水线节点列表的指定位置。
+        不修改现有 run() 方法的签名，仅扩展节点列表。
+
+        Args:
+            debate_type: 辩论类型 (blueprint_review / chapter_final / quality_gate)
+            position: 插入位置（节点列表索引）
+
+        Returns:
+            是否注册成功
+        """
+        from kunlun.agents.debate_pipeline import VALID_TRIGGERS
+
+        if debate_type not in VALID_TRIGGERS:
+            logger.warning(f"[PipelineRunner] 无效辩论类型: {debate_type}")
+            return False
+
+        for state in self._pipelines.values():
+            node_id = f"debate_{debate_type}"
+            if any(n.node_id == node_id for n in state.nodes):
+                logger.debug(f"[PipelineRunner] 辩论节点已存在: {node_id}")
+                continue
+
+            debate_node = PipelineNode(
+                node_id=node_id,
+                name=f"辩论_{debate_type}",
+                description=f"多Agent辩论阶段: {debate_type}",
+                depends_on=[],
+                max_retries=1,
+            )
+            insert_pos = min(position, len(state.nodes))
+            state.nodes.insert(insert_pos, debate_node)
+            logger.info(
+                f"[PipelineRunner] 注册辩论节点 {node_id} 到位置 {insert_pos}"
+            )
+        return True
+
+    def enable_debate(
+        self, blueprint_review: bool = True, chapter_final: bool = True
+    ) -> None:
+        """启用辩论阶段
+
+        Args:
+            blueprint_review: 是否启用蓝图评审辩论
+            chapter_final: 是否启用章节终评辩论
+        """
+        self._debate_enabled = True
+        self._debate_blueprint = blueprint_review
+        self._debate_chapter_final = chapter_final
+
+        if blueprint_review:
+            self.register_debate_stage("blueprint_review", position=2)
+        if chapter_final:
+            self.register_debate_stage("chapter_final", position=999)
+
+        logger.info(
+            f"[PipelineRunner] 辩论已启用: blueprint_review={blueprint_review}, "
+            f"chapter_final={chapter_final}"
+        )
+
+    def disable_debate(self) -> None:
+        """禁用辩论阶段
+
+        从所有流水线中移除辩论节点。
+        """
+        self._debate_enabled = False
+        removed = 0
+        for state in self._pipelines.values():
+            before = len(state.nodes)
+            state.nodes = [
+                n for n in state.nodes if not n.node_id.startswith("debate_")
+            ]
+            removed += before - len(state.nodes)
+        logger.info(f"[PipelineRunner] 辩论已禁用，移除 {removed} 个辩论节点")
+
+
+class DebateStage:
+    """辩论阶段 — 可插拔的管线步骤
+
+    在管线执行过程中调用 DebatePipelineIntegration 触发多Agent辩论。
+    独立类（不继承BaseStep），提供简洁的 async execute 接口。
+
+    用法:
+        stage = DebateStage(debate_type="chapter_final")
+        result = await stage.execute(context)
+        context["debate_result"] = result
+    """
+
+    def __init__(self, debate_type: str = "chapter_final") -> None:
+        self.debate_type = debate_type
+        self._integration: Any = None
+
+    async def execute(self, context: dict[str, Any]) -> dict[str, Any]:
+        """执行辩论阶段
+
+        从context中提取 text, chapter, outline, book_id，
+        调用 DebatePipelineIntegration.run_debate_at_stage。
+
+        Args:
+            context: 管线上下文字典，需包含:
+                - text/draft: 章节文本
+                - chapter: 章节号
+                - outline: 大纲信息（可选）
+                - book_id: 书籍ID（可选）
+
+        Returns:
+            辩论结果字典，包含 triggered, debate_result, final_decision 等
+        """
+        from kunlun.agents.debate_pipeline import DebatePipelineIntegration
+
+        if self._integration is None:
+            self._integration = DebatePipelineIntegration()
+
+        text = context.get("text", context.get("draft", ""))
+        chapter = context.get("chapter", 0)
+        outline = context.get("outline", "")
+        book_id = context.get("book_id", "default")
+
+        if not text:
+            logger.warning(f"[DebateStage] 上下文缺少文本，跳过辩论 (chapter={chapter})")
+            return {"triggered": False, "reason": "上下文缺少文本"}
+
+        result = await self._integration.run_debate_at_stage(
+            trigger_type=self.debate_type,
+            text=text,
+            chapter=chapter,
+            outline=outline,
+            book_id=book_id,
+        )
+
+        context["debate_result"] = result
+        context["debate_final_decision"] = result.get("final_decision", "")
+        context["debate_triggered"] = result.get("triggered", False)
+
+        return result
+
+
 class PipelineInterventionStub:
     """管线干预外观 — 供 makefile 调用的轻量接口"""
 
