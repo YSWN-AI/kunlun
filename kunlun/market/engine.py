@@ -5,6 +5,7 @@
   - 热点趋势分析: 通过LLM分析当前网文市场趋势
   - 拆书: 分析优秀作品的叙事结构、爽点布局、角色设计
   - 热搜关联: 将社会热点与创作方向关联
+  - 规则版分析: 委托给 MarketAnalyzer 进行纯规则统计分析
 """
 
 from __future__ import annotations
@@ -119,6 +120,55 @@ class MarketIntelligence:
             logger.error(f"[Market] 热点关联失败: {e}")
 
         return []
+
+    # ─── 规则版市场分析 (委托给 MarketAnalyzer) ────
+
+    def get_rule_based_analyzer(self):
+        """获取规则版市场分析器实例 (延迟导入)"""
+        from kunlun.market.analyzer import MarketAnalyzer
+
+        if not hasattr(self, "_rule_analyzer"):
+            self._rule_analyzer = MarketAnalyzer()
+        return self._rule_analyzer
+
+    def analyze_market_rule_based(self, genre=None):
+        """规则版市场分析 (题材热度 + 竞品格局 + 机会点)"""
+        analyzer = self.get_rule_based_analyzer()
+
+        result: dict = {
+            "hot_genres": [
+                {
+                    "genre_name": g.genre_name,
+                    "heat_score": g.heat_score,
+                    "trend": g.trend,
+                    "sample_count": g.sample_count,
+                }
+                for g in analyzer.list_hot_genres(limit=10)
+            ],
+            "opportunities": [],
+        }
+
+        if genre:
+            result["genre"] = genre
+            result["competitor_landscape"] = analyzer.analyze_competitor_landscape(genre)
+            result["opportunities"] = analyzer.identify_opportunities(genre)
+            heat = analyzer.get_genre_heat(genre)
+            if heat:
+                result["genre_heat"] = {
+                    "heat_score": heat.heat_score,
+                    "trend": heat.trend,
+                    "prediction": analyzer.predict_genre_heat(genre),
+                }
+        else:
+            for g in analyzer.list_hot_genres(limit=5):
+                result["opportunities"].extend(analyzer.identify_opportunities(g.genre_name))
+
+        return result
+
+    def predict_book_performance(self, book_metrics):
+        """预测作品表现 (委托给 MarketAnalyzer.predict_completion_rate)"""
+        analyzer = self.get_rule_based_analyzer()
+        return analyzer.predict_completion_rate(book_metrics)
 
 
 market_intel = MarketIntelligence()

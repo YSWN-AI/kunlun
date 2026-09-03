@@ -640,6 +640,52 @@ class BranchPlotEngine:
             logger.warning("分支树数据加载失败，使用空状态")
 
 
+    # ─── 分支对比与合并 (委托给 BranchComparator) ──
+
+    def get_comparator(self):
+        """获取分支对比器实例 (延迟导入)"""
+        from kunlun.branch_plot.comparator import BranchComparator
+
+        if not hasattr(self, "_comparator"):
+            self._comparator = BranchComparator(branch_engine=self)
+        return self._comparator
+
+    def compare_branches(self, branch_a_id: str, branch_b_id: str) -> dict:
+        """对比两个分支 (委托给 BranchComparator)"""
+        comparator = self.get_comparator()
+        tree = self.get_or_create_tree()
+        return comparator.compare_branches(branch_a_id, branch_b_id, tree)
+
+    def propose_branch_merge(self, branch_ids: list[str], strategy: str | None = None):
+        """提议合并 (委托给 BranchComparator)"""
+
+        comparator = self.get_comparator()
+        tree = self.get_or_create_tree()
+        decision = comparator.propose_merge(branch_ids, tree, strategy)
+        self._save()
+        return decision
+
+    def execute_branch_merge(self, merge_decision) -> dict:
+        """执行合并 (委托给 BranchComparator)"""
+        comparator = self.get_comparator()
+        tree = self.get_or_create_tree()
+        result = comparator.execute_merge(merge_decision, tree)
+        self._save()
+        return result
+
+    def suggest_pruning(self, min_quality: float = 0.3) -> list[dict]:
+        """建议修剪分支 (委托给 BranchComparator)"""
+        comparator = self.get_comparator()
+        tree = self.get_or_create_tree()
+        return comparator.suggest_branch_pruning(tree, min_quality=min_quality)
+
+    def get_branch_network(self, center_branch_id: str, depth: int = 2) -> dict:
+        """获取分支网络 (委托给 BranchComparator)"""
+        comparator = self.get_comparator()
+        tree = self.get_or_create_tree()
+        return comparator.get_branch_network(center_branch_id, tree, depth)
+
+
 # ─── 工厂函数 ──────────────────────────────────
 
 _branch_engines: dict[str, BranchPlotEngine] = {}
