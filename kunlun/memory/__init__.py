@@ -48,6 +48,9 @@ from kunlun.memory.engine import (
     create_memory_manager,
     extract_entities_from_text,
 )
+from kunlun.memory.event_extractor import EventExtractor
+from kunlun.memory.forgetting import EbbinghausForgetting
+from kunlun.memory.summary_tree import SummaryTree, SummaryTreeNode
 
 __all__ = [
     "EpisodicEvent",
@@ -65,4 +68,8 @@ __all__ = [
     "WorkingMemory",
     "create_memory_manager",
     "extract_entities_from_text",
+    "EventExtractor",
+    "EbbinghausForgetting",
+    "SummaryTree",
+    "SummaryTreeNode",
 ]

@@ -195,6 +195,9 @@ class EpisodicEvent:
     foreshadowing: list[str] = field(default_factory=list)
     resolved_hooks: list[str] = field(default_factory=list)
     created_at: float = field(default_factory=time.time)
+    last_accessed: float = field(default_factory=time.time)
+    access_count: int = 0
+    importance: MemoryImportance = MemoryImportance.MEDIUM
     compressed: bool = False
 
     def to_dict(self) -> dict[str, Any]:
@@ -265,6 +268,10 @@ class WorkingMemory:
         self.recent_chapters: dict[int, str] = {}
         self.recent_summaries: dict[int, str] = {}
         self.temporary_notes: list[MemoryItem] = []
+        # 增强：在场角色状态卡
+        self.character_states: dict[str, dict[str, Any]] = {}
+        # 增强：伏笔预警
+        self.foreshadow_alerts: list[dict[str, Any]] = []
 
     def set_current_chapter(self, chapter: int, context: str = ""):
         self.current_chapter = chapter
@@ -312,6 +319,78 @@ class WorkingMemory:
         text = self.get_context()
         return len(text) // 2  # 中文约2字/token
 
+    def set_character_state(self, name: str, state: dict[str, Any]):
+        """设置在场角色状态卡
+
+        Args:
+            name: 角色名
+            state: 状态字典（emotion/VAD, ability, known_info, motivation等）
+        """
+        self.character_states[name] = state
+
+    def get_character_states(self) -> list[dict[str, Any]]:
+        """获取所有在场角色状态卡"""
+        return [
+            {"name": name, **state} for name, state in self.character_states.items()
+        ]
+
+    def add_foreshadow_alert(self, alert: dict[str, Any]):
+        """添加伏笔预警
+
+        Args:
+            alert: 预警字典（type: 应揭示/应安插/逾期, content, chapter等）
+        """
+        self.foreshadow_alerts.append(alert)
+
+    def get_context_enhanced(self) -> str:
+        """增强上下文（原get_context + 角色状态卡 + 伏笔预警）"""
+        parts = [self.get_context()]
+        # 角色状态卡
+        if self.character_states:
+            state_lines = ["【在场角色状态】"]
+            for name, state in self.character_states.items():
+                emotion = state.get("emotion", "未知")
+                motivation = state.get("motivation", "")
+                ability = state.get("ability", "")
+                line = f"  {name}: 情绪={emotion}"
+                if ability:
+                    line += f", 能力={ability}"
+                if motivation:
+                    line += f", 动机={motivation}"
+                state_lines.append(line)
+            parts.append("\n".join(state_lines))
+        # 伏笔预警
+        if self.foreshadow_alerts:
+            alert_lines = ["【伏笔预警】"]
+            for alert in self.foreshadow_alerts:
+                atype = alert.get("type", "未知")
+                acontent = alert.get("content", "")
+                alert_lines.append(f"  [{atype}] {acontent}")
+            parts.append("\n".join(alert_lines))
+        return "\n\n".join(p for p in parts if p)
+
+    def consolidate_to_episodic(self) -> list[EpisodicEvent]:
+        """将工作记忆中的临时笔记巩固为情景记忆事件"""
+        events: list[EpisodicEvent] = []
+        for note in self.temporary_notes:
+            if note.importance.value >= 2:  # 只巩固LOW及以上的笔记
+                event = EpisodicEvent(
+                    id=f"consolidated_{note.id}",
+                    chapter=note.source_chapter,
+                    scene="工作记忆巩固",
+                    summary=note.content[:100],
+                    participants=[],
+                    event_type="general",
+                    plot_relevance=0.3 + 0.1 * note.importance.value,
+                    importance=note.importance,
+                    created_at=note.created_at,
+                )
+                events.append(event)
+        self.temporary_notes = [
+            n for n in self.temporary_notes if n.importance.value < 2
+        ]
+        return events
+
     def clear_temporary(self):
         self.temporary_notes = []
 
@@ -324,6 +403,8 @@ class WorkingMemory:
             "recent_chapters": self.recent_chapters,
             "recent_summaries": self.recent_summaries,
             "temporary_notes": [n.to_dict() for n in self.temporary_notes],
+            "character_states": self.character_states,
+            "foreshadow_alerts": self.foreshadow_alerts,
         }
 
 
@@ -336,10 +417,16 @@ class EpisodicMemory:
     """情景记忆 — 具体事件/场景/对话，按时间线组织"""
 
     def __init__(self, max_events: int = 500, compression_threshold: int = 100):
+        from kunlun.memory.forgetting import EbbinghausForgetting
+
         self.max_events = max_events
         self.compression_threshold = compression_threshold
         self.events: list[EpisodicEvent] = []
         self.event_index: dict[str, list[int]] = {}  # tag -> event indices
+        # 增强：摘要树（可选，默认None，启用时创建）
+        self.summary_tree: Any = None  # SummaryTree | None
+        # 增强：遗忘曲线实例
+        self.forgetting = EbbinghausForgetting()
 
     def add_event(self, event: EpisodicEvent):
         self.events.append(event)
@@ -348,9 +435,38 @@ class EpisodicMemory:
             self.event_index.setdefault(participant, []).append(len(self.events) - 1)
         if event.location:
             self.event_index.setdefault(event.location, []).append(len(self.events) - 1)
+        # 增强：同步更新摘要树（如果启用）
+        if self.summary_tree is not None:
+            self._sync_event_to_summary_tree(event)
         # 超过上限时压缩旧事件
         if len(self.events) > self.max_events:
             self._compress_old_events()
+
+    def _sync_event_to_summary_tree(self, event: EpisodicEvent):
+        """将事件同步到摘要树（内部方法）"""
+        from kunlun.memory.summary_tree import SummaryTree
+
+        if self.summary_tree is None:
+            return
+        # 检查该章是否已有摘要，没有则用事件summary创建
+        has_ch = False
+        for vol in self.summary_tree.root.children:
+            for ch in vol.children:
+                if ch.chapter_range == (event.chapter, event.chapter):
+                    has_ch = True
+                    ch.event_ids.append(event.id)
+                    break
+        if not has_ch:
+            self.summary_tree.add_chapter_summary(
+                chapter=event.chapter,
+                summary=event.summary[:80],
+            )
+            # 重新找到章节点并添加event_id
+            for vol in self.summary_tree.root.children:
+                for ch in vol.children:
+                    if ch.chapter_range == (event.chapter, event.chapter):
+                        ch.event_ids.append(event.id)
+                        break
 
     def get_events_by_chapter(self, chapter: int) -> list[EpisodicEvent]:
         return [e for e in self.events if e.chapter == chapter]
@@ -429,11 +545,195 @@ class EpisodicMemory:
         scored.sort(key=lambda x: x[0], reverse=True)
         return [e for _, e in scored[:limit]]
 
-    def to_dict(self) -> dict[str, Any]:
+    def enable_summary_tree(self, volume_size: int = 50):
+        """启用摘要树
+
+        Args:
+            volume_size: 每卷章数，默认50
+        """
+        from kunlun.memory.summary_tree import SummaryTree
+
+        self.summary_tree = SummaryTree(volume_size=volume_size)
+        # 将已有事件同步到摘要树
+        chapter_summaries: dict[int, str] = {}
+        for event in self.events:
+            if event.chapter not in chapter_summaries:
+                chapter_summaries[event.chapter] = event.summary[:80]
+        for ch, summary in sorted(chapter_summaries.items()):
+            self.summary_tree.add_chapter_summary(chapter=ch, summary=summary)
+
+    def add_chapter_with_events(
+        self,
+        chapter: int,
+        text: str,
+        summary: str = "",
+    ) -> list[EpisodicEvent]:
+        """用 EventExtractor 自动提取事件并添加，同时添加摘要到摘要树
+
+        Args:
+            chapter: 章节号
+            text: 章节文本
+            summary: 章节摘要（空则自动取文本前100字）
+
+        Returns:
+            提取并添加的事件列表
+        """
+        from kunlun.memory.event_extractor import EventExtractor
+
+        extractor = EventExtractor()
+        event_dicts = extractor.extract_events(text, chapter)
+        events: list[EpisodicEvent] = []
+        for idx, ed in enumerate(event_dicts):
+            event = EpisodicEvent(
+                id=f"ev_auto_{chapter}_{idx}_{int(time.time() * 1000) % 100000}",
+                chapter=chapter,
+                scene=ed["scene"],
+                summary=ed["summary"],
+                participants=ed["participants"],
+                event_type=ed["event_type"],
+                emotional_arc=ed["emotional_arc"],
+                plot_relevance=ed["plot_relevance"],
+                importance=MemoryImportance.MEDIUM,
+            )
+            self.add_event(event)
+            events.append(event)
+        # 添加章节摘要到摘要树
+        if self.summary_tree is not None:
+            ch_summary = summary if summary else text[:100]
+            self.summary_tree.add_chapter_summary(chapter=chapter, summary=ch_summary)
+        return events
+
+    def search_with_forgetting(
+        self,
+        query: str,
+        limit: int = 10,
+        current_time: float | None = None,
+    ) -> list[EpisodicEvent]:
+        """带遗忘加权的搜索（retention * relevance_score）
+
+        Args:
+            query: 搜索关键词
+            limit: 返回数量上限
+            current_time: 当前时间戳
+
+        Returns:
+            按遗忘加权得分排序的事件列表
+        """
+        keywords = [k for k in re.split(r"[，。！？\s]", query) if len(k) >= 2]
+        scored: list[tuple[float, EpisodicEvent]] = []
+        for e in self.events:
+            relevance = 0
+            for kw in keywords:
+                if kw in e.summary:
+                    relevance += 2
+                if kw in e.scene:
+                    relevance += 1
+                if kw in e.participants:
+                    relevance += 3
+            if relevance > 0:
+                retention = self.forgetting.calculate_retention(e, current_time)
+                final_score = relevance * retention
+                scored.append((final_score, e))
+                # 访问增强
+                self.forgetting.boost_memory(e.id, self.events)
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [e for _, e in scored[:limit]]
+
+    def get_events_by_chapter_with_summary(self, chapter: int) -> dict[str, Any]:
+        """获取章节事件+摘要
+
+        Args:
+            chapter: 章节号
+
+        Returns:
+            含 chapter, events, summary 的字典
+        """
+        events = self.get_events_by_chapter(chapter)
+        summary = ""
+        if self.summary_tree is not None:
+            for vol in self.summary_tree.root.children:
+                for ch in vol.children:
+                    if ch.chapter_range == (chapter, chapter):
+                        summary = ch.summary
+                        break
         return {
+            "chapter": chapter,
+            "events": events,
+            "summary": summary,
+            "event_count": len(events),
+        }
+
+    def apply_forgetting_cycle(self, current_time: float | None = None) -> int:
+        """执行一次遗忘周期（清理低保持率事件）
+
+        Args:
+            current_time: 当前时间戳
+
+        Returns:
+            被遗忘清理的事件数量
+        """
+        kept, forgotten = self.forgetting.apply_forgetting(self.events, current_time)
+        if forgotten:
+            self.events = kept
+            # 重建索引
+            self.event_index = {}
+            for i, event in enumerate(self.events):
+                for p in event.participants:
+                    self.event_index.setdefault(p, []).append(i)
+                if event.location:
+                    self.event_index.setdefault(event.location, []).append(i)
+        return len(forgotten)
+
+    def save(self, filepath: str):
+        """L2持久化（events + summary_tree）"""
+        import json
+
+        data: dict[str, Any] = {
+            "max_events": self.max_events,
+            "compression_threshold": self.compression_threshold,
+            "events": [e.to_dict() for e in self.events],
+        }
+        if self.summary_tree is not None:
+            data["summary_tree"] = self.summary_tree.to_dict()
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2, default=str)
+
+    def load(self, filepath: str):
+        """从文件加载L2记忆（events + summary_tree）"""
+        import json
+
+        from kunlun.memory.summary_tree import SummaryTree
+
+        with open(filepath, encoding="utf-8") as f:
+            data = json.load(f)
+        self.max_events = data.get("max_events", self.max_events)
+        self.compression_threshold = data.get(
+            "compression_threshold", self.compression_threshold
+        )
+        self.events = []
+        self.event_index = {}
+        for edata in data.get("events", []):
+            event = EpisodicEvent.from_dict(edata)
+            self.events.append(event)
+            for p in event.participants:
+                self.event_index.setdefault(p, []).append(len(self.events) - 1)
+            if event.location:
+                self.event_index.setdefault(event.location, []).append(
+                    len(self.events) - 1
+                )
+        if "summary_tree" in data and data["summary_tree"]:
+            self.summary_tree = SummaryTree.from_dict(data["summary_tree"])
+        else:
+            self.summary_tree = None
+
+    def to_dict(self) -> dict[str, Any]:
+        data: dict[str, Any] = {
             "max_events": self.max_events,
             "events": [e.to_dict() for e in self.events],
         }
+        if self.summary_tree is not None:
+            data["summary_tree"] = self.summary_tree.to_dict()
+        return data
 
 
 # ══════════════════════════════════════════════════════
@@ -873,6 +1173,123 @@ class MemoryManager:
             lines.append(f"  第{e['chapter']}章 [{e['type']}]: {e['summary']}")
         return "\n".join(lines)
 
+    async def retrieve_for_writing(
+        self,
+        chapter_outline: dict[str, Any],
+        present_characters: list[str],
+    ) -> dict[str, Any]:
+        """写作前记忆检索（整合L1角色状态+L2相关事件+L3世界观规则+L4模板建议）
+
+        Args:
+            chapter_outline: 章节大纲字典
+            present_characters: 本章在场角色列表
+
+        Returns:
+            含 working_context, relevant_events, world_rules, patterns 的字典
+        """
+        # L1：角色状态
+        character_states = []
+        for name in present_characters:
+            if name in self.working.character_states:
+                character_states.append(
+                    {"name": name, **self.working.character_states[name]}
+                )
+        # L1：增强上下文
+        working_context = self.working.get_context_enhanced()
+
+        # L2：相关事件（按角色和大纲关键词搜索）
+        relevant_events: list[EpisodicEvent] = []
+        outline_text = str(chapter_outline)
+        for name in present_characters:
+            events = self.episodic.get_events_by_participant(name, limit=5)
+            relevant_events.extend(events)
+        # 去重
+        seen_ids: set[str] = set()
+        unique_events: list[EpisodicEvent] = []
+        for e in relevant_events:
+            if e.id not in seen_ids:
+                seen_ids.add(e.id)
+                unique_events.append(e)
+        # 如果摘要树启用，获取范围摘要
+        range_summary = ""
+        if self.episodic.summary_tree is not None:
+            current_ch = chapter_outline.get("chapter", self.working.current_chapter)
+            from_ch = max(1, current_ch - 5)
+            range_summary = self.episodic.summary_tree.get_summary_for_range(
+                from_ch, current_ch, max_level=2
+            )
+
+        # L3：世界观规则
+        world_rules = self.semantic.get_world_facts()
+
+        # L4：写作模板建议
+        scene_type = chapter_outline.get("scene_type", "general")
+        patterns = self.procedural.get_recommended_patterns(scene_type, limit=3)
+
+        return {
+            "working_context": working_context,
+            "character_states": character_states,
+            "relevant_events": [
+                {
+                    "chapter": e.chapter,
+                    "scene": e.scene,
+                    "summary": e.summary,
+                    "type": e.event_type,
+                }
+                for e in unique_events[:10]
+            ],
+            "range_summary": range_summary,
+            "world_rules": [
+                {"name": r.name, "description": r.description} for r in world_rules[:5]
+            ],
+            "patterns": [
+                {"name": p.name, "description": p.description} for p in patterns
+            ],
+            "foreshadow_alerts": self.working.foreshadow_alerts,
+        }
+
+    def store_after_writing(
+        self,
+        chapter: int,
+        text: str,
+        summary: str = "",
+    ) -> dict[str, Any]:
+        """写作后记忆写入（自动提取事件+更新摘要树+巩固工作记忆）
+
+        Args:
+            chapter: 章节号
+            text: 章节正文
+            summary: 章节摘要
+
+        Returns:
+            含 extracted_events, consolidated_count 的字典
+        """
+        # 启用摘要树（如果未启用）
+        if self.episodic.summary_tree is None:
+            self.episodic.enable_summary_tree()
+
+        # 自动提取事件并添加
+        events = self.episodic.add_chapter_with_events(chapter, text, summary)
+
+        # 更新工作记忆
+        self.working.add_chapter(chapter, text, summary)
+        self.working.set_current_chapter(chapter, summary)
+
+        # 巩固工作记忆到情景记忆
+        consolidated = self.working.consolidate_to_episodic()
+        for event in consolidated:
+            self.episodic.add_event(event)
+
+        return {
+            "extracted_events": len(events),
+            "consolidated_count": len(consolidated),
+            "chapter": chapter,
+        }
+
+    def get_enhanced_context(self) -> str:
+        """获取增强上下文（调用 working.get_context_enhanced()）"""
+        return self.working.get_context_enhanced()
+
     def _active_forgetting(self, current_chapter: int):
         """主动遗忘：压缩/丢弃旧的低重要度记忆"""
         # 工作记忆：自动保留最近N章（已在add_chapter中处理）
@@ -930,7 +1347,7 @@ class MemoryManager:
         return truncated
 
     def save(self, filepath: str):
-        """保存记忆到文件"""
+        """保存记忆到文件（完整保存四层记忆）"""
         data = {
             "book_id": self.book_id,
             "token_budget": self.token_budget,
@@ -938,23 +1355,87 @@ class MemoryManager:
             "episodic": self.episodic.to_dict(),
             "semantic": self.semantic.to_dict(),
             "procedural": self.procedural.to_dict(),
+            "forgetting_enabled": self.forgetting_enabled,
+            "forgetting_check_interval": self.forgetting_check_interval,
+            "last_forgetting_check": self.last_forgetting_check,
         }
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2, default=str)
 
     def load(self, filepath: str):
-        """从文件加载记忆"""
+        """从文件加载记忆（完整加载四层记忆）"""
+        from kunlun.memory.summary_tree import SummaryTree
+
         with open(filepath, encoding="utf-8") as f:
             data = json.load(f)
         self.book_id = data.get("book_id", self.book_id)
         self.token_budget = data.get("token_budget", self.token_budget)
-        # 加载各层记忆（简化版，实际需要完整反序列化）
+        self.forgetting_enabled = data.get("forgetting_enabled", True)
+        self.forgetting_check_interval = data.get("forgetting_check_interval", 10)
+        self.last_forgetting_check = data.get("last_forgetting_check", 0)
+
+        # 加载工作记忆
+        if "working" in data:
+            wd = data["working"]
+            self.working.max_chapters = wd.get("max_chapters", self.working.max_chapters)
+            self.working.token_budget = wd.get("token_budget", self.working.token_budget)
+            self.working.current_chapter = wd.get("current_chapter", 0)
+            self.working.current_context = wd.get("current_context", "")
+            self.working.recent_chapters = {
+                int(k): v for k, v in wd.get("recent_chapters", {}).items()
+            }
+            self.working.recent_summaries = {
+                int(k): v for k, v in wd.get("recent_summaries", {}).items()
+            }
+            self.working.temporary_notes = [
+                MemoryItem.from_dict(n) for n in wd.get("temporary_notes", [])
+            ]
+            self.working.character_states = wd.get("character_states", {})
+            self.working.foreshadow_alerts = wd.get("foreshadow_alerts", [])
+
+        # 加载情景记忆
+        if "episodic" in data:
+            ed = data["episodic"]
+            self.episodic.max_events = ed.get("max_events", self.episodic.max_events)
+            self.episodic.events = []
+            self.episodic.event_index = {}
+            for edata in ed.get("events", []):
+                event = EpisodicEvent.from_dict(edata)
+                self.episodic.events.append(event)
+                for p in event.participants:
+                    self.episodic.event_index.setdefault(p, []).append(
+                        len(self.episodic.events) - 1
+                    )
+                if event.location:
+                    self.episodic.event_index.setdefault(event.location, []).append(
+                        len(self.episodic.events) - 1
+                    )
+            if "summary_tree" in ed and ed["summary_tree"]:
+                self.episodic.summary_tree = SummaryTree.from_dict(ed["summary_tree"])
+            else:
+                self.episodic.summary_tree = None
+
+        # 加载语义记忆
         if "semantic" in data:
+            self.semantic.entities = {}
+            self.semantic.name_index = {}
+            self.semantic.type_index = {}
             for eid, edata in data["semantic"].get("entities", {}).items():
                 entity = SemanticEntity.from_dict(edata)
                 self.semantic.entities[eid] = entity
                 self.semantic.name_index[entity.name] = eid
+                for alias in entity.aliases:
+                    self.semantic.name_index[alias] = eid
                 self.semantic.type_index.setdefault(entity.entity_type.value, []).append(eid)
+
+        # 加载程序记忆
+        if "procedural" in data:
+            self.procedural.patterns = {}
+            self.procedural.type_index = {}
+            for pid, pdata in data["procedural"].get("patterns", {}).items():
+                pattern = ProceduralPattern.from_dict(pdata)
+                self.procedural.patterns[pid] = pattern
+                self.procedural.type_index.setdefault(pattern.pattern_type, []).append(pid)
 
 
 # ══════════════════════════════════════════════════════
