@@ -640,3 +640,47 @@ PARAMETER repeat_penalty 1.1
 
 # 全局单例
 finetune_engine = FineTuneEngine()
+
+# ── 新框架模块导出（延迟导入，失败不影响现有功能）──────────
+
+try:
+    from kunlun.finetune.data_prep import DatasetBuilder  # noqa: F401
+except ImportError:
+    DatasetBuilder = None  # type: ignore[assignment,misc]
+
+try:
+    from kunlun.finetune.train_lora import LoRATrainer  # noqa: F401
+except ImportError:
+    LoRATrainer = None  # type: ignore[assignment,misc]
+
+try:
+    from kunlun.finetune.adapter_manager import AdapterManager  # noqa: F401
+except ImportError:
+    AdapterManager = None  # type: ignore[assignment,misc]
+
+
+# ── 便捷工厂函数 ──────────────────────────────────────
+
+
+def create_dataset_builder(
+    books_dir: str = "data/books",
+    output_dir: str = "data/finetune_datasets",
+) -> "DatasetBuilder | None":
+    """创建数据集构建器"""
+    if DatasetBuilder is None:
+        return None
+    return DatasetBuilder(books_dir=books_dir, output_dir=output_dir)
+
+
+def create_lora_trainer(config: TrainConfig) -> "LoRATrainer | None":
+    """创建 LoRA 训练器"""
+    if LoRATrainer is None:
+        return None
+    return LoRATrainer(config)
+
+
+def create_adapter_manager(adapters_dir: str = "data/adapters") -> "AdapterManager | None":
+    """创建适配器管理器"""
+    if AdapterManager is None:
+        return None
+    return AdapterManager(adapters_dir=adapters_dir)
