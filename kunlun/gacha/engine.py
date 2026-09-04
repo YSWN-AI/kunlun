@@ -88,6 +88,12 @@ DEFAULT_MODELS: list[dict] = [
         "base_url": "",
         "api_key_env": "",
     },
+    {
+        "provider": "local",
+        "model": "novel_style_qwen7b_v2",
+        "base_url": "",
+        "api_key_env": "",
+    },
 ]
 
 
