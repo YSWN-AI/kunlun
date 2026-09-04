@@ -468,15 +468,23 @@ from kunlun.api.routers.admin import router as admin_router  # noqa: E402
 
 app.include_router(admin_router)
 
-_frontend_dist = settings.PROJECT_ROOT / "frontend" / "dist"
-if _frontend_dist.is_dir() and (_frontend_dist / "index.html").exists():
-    app.mount("/", StaticFiles(directory=str(_frontend_dist), html=True), name="frontend")
-    logger.debug("Vue桌面版 → /")
+try:
+    from kunlun.api.routers.workstation import router as workstation_router
+
+    app.include_router(workstation_router, prefix="/api/v1")
+    logger.debug("工作台路由 /api/v1/workstation")
+except Exception as e:
+    logger.debug(f"工作台路由跳过: {e}")
+
+_web_dir = settings.PROJECT_ROOT / "web"
+if _web_dir.is_dir() and (_web_dir / "index.html").exists():
+    app.mount("/", StaticFiles(directory=str(_web_dir), html=True), name="web")
+    logger.debug("Web UI → /")
 else:
-    _web_dir = settings.PROJECT_ROOT / "web"
-    if _web_dir.is_dir():
-        app.mount("/", StaticFiles(directory=str(_web_dir), html=True), name="web")
-        logger.debug("Web UI (降级) → /")
+    _frontend_dist = settings.PROJECT_ROOT / "frontend" / "dist"
+    if _frontend_dist.is_dir():
+        app.mount("/", StaticFiles(directory=str(_frontend_dist), html=True), name="frontend")
+        logger.debug("Vue桌面版 → /")
 
 if __name__ == "__main__":
     import uvicorn

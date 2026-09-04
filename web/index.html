@@ -3,8 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>昆仑创作引擎 — Vibe Writing</title>
+<title>昆仑创作引擎 — 桌面创作工作台</title>
 <style>
+/* ============================================================
+   昆仑创作引擎 · 桌面创作工作台
+   单文件内联 CSS / JS，深色主题
+   ============================================================ */
+
+/* ---------- CSS 变量（沿用现有） ---------- */
 :root {
   --primary: #5B8FF9;
   --primary-dark: #4A7DE8;
@@ -22,6 +28,8 @@
   --gradient-1: linear-gradient(135deg, #5B8FF9 0%, #4A7DE8 100%);
   --primary-rgb: 91, 143, 249;
   --warning-rgb: 245, 158, 11;
+  --success-rgb: 16, 185, 129;
+  --error-rgb: 239, 68, 68;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,56 +42,76 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 1000px;
 }
 
-/* Header */
+/* ---------- 滚动条 ---------- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ============================================================
+   Header
+   ============================================================ */
 .header {
-  padding: 20px 32px;
+  padding: 14px 24px;
   background: var(--bg-card);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .logo {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   background: var(--gradient-1);
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 18px;
   color: white;
   font-weight: 700;
 }
 
 .header h1 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .header-sub {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .header-right {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
+}
+
+.version-tag {
+  padding: 4px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 .status-badge {
-  padding: 6px 12px;
+  padding: 5px 12px;
   background: rgba(16, 185, 129, 0.15);
   border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 20px;
@@ -104,125 +132,600 @@ body {
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.4; }
 }
 
-/* Main Container */
-.main-container {
+/* ============================================================
+   主体布局：侧边栏 + 内容区
+   ============================================================ */
+.workspace {
   flex: 1;
   display: flex;
-  padding: 24px;
-  gap: 24px;
   overflow: hidden;
 }
 
-/* Sidebar */
+/* ---------- 侧边导航 ---------- */
 .sidebar {
-  width: 280px;
+  width: 220px;
+  flex-shrink: 0;
   background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  padding: 16px 10px;
+  gap: 4px;
+  overflow-y: auto;
 }
 
-.sidebar-header {
-  padding: 20px;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.mode-list {
-  flex: 1;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.mode-item {
-  padding: 14px 16px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  appearance: none;
-  -webkit-appearance: none;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  user-select: none;
 }
 
-.mode-item:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.mode-item:hover {
+.nav-item:hover {
   background: var(--bg-input);
-  border-color: var(--border);
+  color: var(--text-primary);
 }
 
-.mode-item.active {
+.nav-item.active {
   background: rgba(var(--primary-rgb), 0.15);
   border-color: var(--primary);
+  color: var(--primary-light);
 }
 
-.mode-icon {
-  width: 32px;
-  height: 32px;
-  background: var(--bg-input);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
+.nav-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
-.mode-item.active .mode-icon {
-  background: var(--primary);
-}
-
-.mode-name {
-  font-size: 14px;
+.nav-label {
   font-weight: 500;
 }
 
-.mode-desc {
-  font-size: 12px;
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 14px;
+  font-size: 11px;
   color: var(--text-muted);
-  margin-top: 2px;
+  border-top: 1px solid var(--border);
+  line-height: 1.6;
 }
 
-/* Chat Area */
-.chat-area {
+/* ---------- 主内容区 ---------- */
+.main-content {
   flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  min-width: 0;
+}
+
+.panel {
+  display: none;
+  animation: fadeIn 0.25s ease;
+}
+
+.panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.panel-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+/* ============================================================
+   通用组件
+   ============================================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title .badge {
+  font-size: 11px;
+  font-weight: 400;
+  padding: 2px 8px;
+  background: rgba(var(--primary-rgb), 0.15);
+  color: var(--primary-light);
+  border-radius: 4px;
+}
+
+textarea, input[type="text"], input[type="number"], select {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+textarea:focus, input:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.7;
+}
+
+textarea::placeholder, input::placeholder {
+  color: var(--text-muted);
+}
+
+label.field-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.field-group {
+  flex: 1;
+  min-width: 140px;
+}
+
+/* ---------- 按钮 ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary-light);
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: white;
+}
+
+.btn-success {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+
+.btn-success:hover {
+  background: #059669;
+  border-color: #059669;
+  color: white;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+/* ---------- 标签页 ---------- */
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.tab {
+  padding: 10px 18px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.tab:hover {
+  color: var(--text-secondary);
+}
+
+.tab.active {
+  color: var(--primary-light);
+  border-bottom-color: var(--primary);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ---------- 结果展示 ---------- */
+.result-box {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.7;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-secondary);
+}
+
+.result-box.empty {
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: 30px;
+}
+
+.json-view {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ---------- 加载状态 ---------- */
+.loading-overlay {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.loading-overlay.show {
+  display: flex;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- 评分条 ---------- */
+.score-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.score-bar-label {
+  width: 100px;
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.score-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.score-bar-value {
+  width: 50px;
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Consolas', monospace;
+}
+
+/* ---------- 大数字 ---------- */
+.big-score {
+  font-size: 48px;
+  font-weight: 700;
+  font-family: 'Consolas', 'Monaco', monospace;
+  line-height: 1;
+}
+
+.big-score.green { color: var(--success); }
+.big-score.yellow { color: var(--warning); }
+.big-score.red { color: var(--error); }
+
+/* ---------- 标签 / 徽章 ---------- */
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin: 2px 4px 2px 0;
+}
+
+.tag-green { background: rgba(var(--success-rgb), 0.15); color: var(--success); }
+.tag-yellow { background: rgba(var(--warning-rgb), 0.15); color: var(--warning); }
+.tag-red { background: rgba(var(--error-rgb), 0.15); color: var(--error); }
+.tag-blue { background: rgba(var(--primary-rgb), 0.15); color: var(--primary-light); }
+
+/* ---------- 问题列表 ---------- */
+.issue-item {
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border-left: 3px solid var(--border);
+}
+
+.issue-item.severity-high { border-left-color: var(--error); }
+.issue-item.severity-mid { border-left-color: var(--warning); }
+.issue-item.severity-low { border-left-color: var(--primary); }
+
+.issue-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.issue-severity {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.issue-severity.high { background: rgba(var(--error-rgb), 0.2); color: var(--error); }
+.issue-severity.mid { background: rgba(var(--warning-rgb), 0.2); color: var(--warning); }
+.issue-severity.low { background: rgba(var(--primary-rgb), 0.2); color: var(--primary-light); }
+
+.issue-location {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.issue-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+
+.issue-suggestion {
+  font-size: 12px;
+  color: var(--success);
+  line-height: 1.5;
+}
+
+/* ---------- 预设风格卡片 ---------- */
+.style-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.style-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.style-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.style-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.style-card-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ---------- 对比视图 ---------- */
+.compare-view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.compare-col {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.compare-col-title {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.compare-col-body {
+  font-size: 13px;
+  line-height: 1.7;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  color: var(--text-secondary);
+}
+
+/* ---------- 键值对列表 ---------- */
+.kv-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  min-width: 0;
+  gap: 6px;
+}
+
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--bg-input);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.kv-key {
+  color: var(--text-muted);
+}
+
+.kv-val {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-family: 'Consolas', monospace;
+}
+
+/* ---------- 滑块 ---------- */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: 3px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* ---------- 按钮组 ---------- */
+.btn-group {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.btn-group .btn {
+  border: none;
+  border-radius: 0;
+  padding: 8px 16px;
+}
+
+.btn-group .btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* ============================================================
+   创作面板专用样式
+   ============================================================ */
+.create-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: calc(100vh - 140px);
 }
 
 .chat-container {
   flex: 1;
   background: var(--bg-card);
-  border-radius: 16px;
   border: 1px solid var(--border);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0;
 }
 
 .chat-header {
-  padding: 16px 20px;
+  padding: 12px 18px;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -230,7 +733,7 @@ body {
 }
 
 .chat-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -239,57 +742,22 @@ body {
   gap: 8px;
 }
 
-.chat-btn {
-  padding: 6px 12px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text-secondary);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.chat-btn:hover {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-}
-
 .messages {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-
-.messages::-webkit-scrollbar {
-  width: 6px;
-}
-
-.messages::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.messages::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
+  gap: 12px;
 }
 
 .msg {
-  max-width: 80%;
-  padding: 16px 20px;
-  border-radius: 16px;
-  font-size: 15px;
+  max-width: 82%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
   line-height: 1.8;
   animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .msg.ai {
@@ -306,203 +774,26 @@ body {
 }
 
 .msg.system {
-  background: rgba(var(--warning-rgb), 0.15);
-  border: 1px solid rgba(var(--warning-rgb), 0.3);
+  background: rgba(var(--warning-rgb), 0.12);
+  border: 1px solid rgba(var(--warning-rgb), 0.25);
   color: var(--warning);
   align-self: center;
-  font-size: 13px;
+  font-size: 12px;
   text-align: center;
 }
 
-/* Input Area */
-.input-area {
-  background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  padding: 16px;
-}
-
-.input-wrapper {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-}
-
-.input-box {
-  flex: 1;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: all 0.2s;
-}
-
-.input-box:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.25);
-}
-
-#inputText {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  font-size: 15px;
-  outline: none;
-  resize: none;
-  min-height: 24px;
-  max-height: 120px;
-}
-
-#inputText::placeholder {
-  color: var(--text-muted);
-}
-
-.send-btn {
-  width: 48px;
-  height: 48px;
-  background: var(--primary);
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.send-btn:hover {
-  background: var(--primary-dark);
-  transform: scale(1.05);
-}
-
-.send-btn:active {
-  transform: scale(0.95);
-}
-
-/* Quick Actions */
-.quick-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
-
-.quick-btn {
-  padding: 8px 16px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.quick-btn:hover {
-  border-color: var(--primary-light);
-  color: var(--primary-light);
-}
-
-/* Result Panel */
-.result-panel {
-  display: none;
-  background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  margin-top: 16px;
-  overflow: hidden;
-}
-
-.result-panel.show {
-  display: block;
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.result-header {
-  padding: 16px 20px;
-  background: var(--bg-input);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.result-title {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.result-meta {
-  display: flex;
-  gap: 12px;
-}
-
-.meta-tag {
-  padding: 4px 10px;
-  background: rgba(var(--primary-rgb), 0.15);
-  border-radius: 6px;
-  font-size: 12px;
-  color: var(--primary-light);
-}
-
-.result-body {
-  padding: 20px;
-  font-size: 15px;
-  line-height: 1.9;
-  max-height: 300px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-}
-
-.result-footer {
-  padding: 12px 20px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.result-btn {
-  padding: 8px 16px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.result-btn:hover {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-}
-
-/* Loading */
 .typing-indicator {
   display: flex;
   gap: 4px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   background: var(--bg-input);
-  border-radius: 12px;
+  border-radius: 10px;
   align-self: flex-start;
 }
 
 .typing-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background: var(--text-muted);
   border-radius: 50%;
   animation: typing 1.4s infinite;
@@ -516,42 +807,157 @@ body {
   30% { transform: translateY(-4px); }
 }
 
-/* Mobile menu toggle (hidden on desktop) */
-.menu-toggle {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
+.input-area {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.input-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.input-box {
+  flex: 1;
   background: var(--bg-input);
   border: 1px solid var(--border);
   border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.input-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+}
+
+#createInput {
+  flex: 1;
+  background: transparent;
+  border: none;
   color: var(--text-primary);
-  font-size: 20px;
+  font-size: 14px;
+  outline: none;
+  resize: none;
+  min-height: 22px;
+  max-height: 100px;
+  font-family: inherit;
+}
+
+#createInput::placeholder {
+  color: var(--text-muted);
+}
+
+.send-btn {
+  width: 42px;
+  height: 42px;
+  background: var(--primary);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.send-btn:hover {
+  background: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+.quick-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.quick-btn {
+  padding: 6px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.menu-toggle:hover {
+.quick-btn:hover {
   border-color: var(--primary-light);
   color: var(--primary-light);
 }
 
-/* Sidebar scrim (mobile drawer backdrop) */
-.sidebar-scrim {
+.create-result {
   display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 150;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-/* Inline refine row */
+.create-result.show {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+.create-result-header {
+  padding: 12px 18px;
+  background: var(--bg-input);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.create-result-title {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.create-result-meta {
+  display: flex;
+  gap: 8px;
+}
+
+.meta-tag {
+  padding: 3px 10px;
+  background: rgba(var(--primary-rgb), 0.15);
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--primary-light);
+}
+
+.create-result-body {
+  padding: 16px 18px;
+  font-size: 14px;
+  line-height: 1.9;
+  max-height: 260px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+.create-result-footer {
+  padding: 10px 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .refine-row {
   display: none;
   gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
+  padding: 10px 18px;
   border-top: 1px solid var(--border);
 }
 
@@ -563,8 +969,8 @@ body {
   flex: 1;
   background: var(--bg-input);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: 6px;
+  padding: 7px 12px;
   color: var(--text-primary);
   font-size: 13px;
   outline: none;
@@ -572,48 +978,159 @@ body {
 
 .refine-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.25);
 }
 
-.refine-input::placeholder {
+/* ============================================================
+   六维质量面板
+   ============================================================ */
+.dim-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.dim-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dim-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dim-score {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Consolas', monospace;
+}
+
+.dim-detail {
+  font-size: 12px;
   color: var(--text-muted);
+  margin-top: 6px;
+  line-height: 1.6;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .header { padding: 16px; }
-  .main-container { padding: 16px; }
-  .menu-toggle { display: inline-flex; }
+.dim-suggestion {
+  font-size: 12px;
+  color: var(--success);
+  margin-top: 4px;
+  line-height: 1.6;
+}
 
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    z-index: 160;
-    width: 280px;
-    border-radius: 0;
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-  }
+.total-score-box {
+  text-align: center;
+  padding: 20px;
+  background: var(--bg-input);
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
 
-  .sidebar.open { transform: translateX(0); }
-  .sidebar-scrim.show { display: block; }
+.total-score-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* ============================================================
+   AI率面板
+   ============================================================ */
+.ai-score-section {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px;
+  background: var(--bg-input);
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.ai-score-left {
+  text-align: center;
+  min-width: 120px;
+}
+
+.ai-score-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.gate-status {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.gate-status.pass {
+  background: rgba(var(--success-rgb), 0.15);
+  color: var(--success);
+}
+
+.gate-status.fail {
+  background: rgba(var(--error-rgb), 0.15);
+  color: var(--error);
+}
+
+.phrases-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.phrase-chip {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'Consolas', monospace;
+}
+
+.phrase-chip.high { background: rgba(var(--error-rgb), 0.15); color: var(--error); }
+.phrase-chip.mid { background: rgba(var(--warning-rgb), 0.15); color: var(--warning); }
+
+/* ============================================================
+   通用：空状态
+   ============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ============================================================
+   响应式（最小 1000px，保留基本弹性）
+   ============================================================ */
+@media (max-width: 1100px) {
+  .sidebar { width: 180px; }
+  .main-content { padding: 16px; }
 }
 </style>
 </head>
 <body>
 
+<!-- ============================================================
+     Header
+     ============================================================ -->
 <div class="header">
   <div class="header-left">
-    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="打开创作模式菜单">☰</button>
     <div class="logo">昆</div>
     <div>
       <h1>昆仑创作引擎</h1>
-      <div class="header-sub">Vibe Writing — 不说参数，只说感受</div>
+      <div class="header-sub">桌面创作工作台 · 全管线智能写作</div>
     </div>
   </div>
   <div class="header-right">
+    <span class="version-tag">v0.4.0</span>
     <div class="status-badge">
       <span class="status-dot"></span>
       服务就绪
@@ -621,384 +1138,1529 @@ body {
   </div>
 </div>
 
-<div class="sidebar-scrim" id="sidebarScrim" onclick="toggleSidebar()" aria-hidden="true"></div>
+<!-- ============================================================
+     主体：侧边栏 + 内容区
+     ============================================================ -->
+<div class="workspace">
 
-<div class="main-container">
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-header">创作模式</div>
-    <div class="mode-list">
-      <button type="button" class="mode-item active" data-mode="master" aria-label="切换到总调度模式">
-        <div class="mode-icon">🎯</div>
-        <div>
-          <div class="mode-name">总调度</div>
-          <div class="mode-desc">一句话指挥全部</div>
-        </div>
-      </button>
-      <button type="button" class="mode-item" data-mode="vibe" aria-label="切换到 Vibe 写作模式">
-        <div class="mode-icon">✨</div>
-        <div>
-          <div class="mode-name">Vibe写作</div>
-          <div class="mode-desc">感受驱动创作</div>
-        </div>
-      </button>
-      <button type="button" class="mode-item" data-mode="audit" aria-label="切换到质量审计模式">
-        <div class="mode-icon">🔍</div>
-        <div>
-          <div class="mode-name">质量审计</div>
-          <div class="mode-desc">48维质量检查</div>
-        </div>
-      </button>
-      <button type="button" class="mode-item" data-mode="export" aria-label="切换到导出全书模式">
-        <div class="mode-icon">📦</div>
-        <div>
-          <div class="mode-name">导出全书</div>
-          <div class="mode-desc">多格式输出</div>
-        </div>
-      </button>
+  <!-- 侧边导航 -->
+  <nav class="sidebar" id="sidebar">
+    <div class="nav-item active" data-panel="create">
+      <span class="nav-icon">📝</span>
+      <span class="nav-label">创作</span>
     </div>
-  </div>
+    <div class="nav-item" data-panel="sixdim">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">六维质量</span>
+    </div>
+    <div class="nav-item" data-panel="airate">
+      <span class="nav-icon">🤖</span>
+      <span class="nav-label">AI率</span>
+    </div>
+    <div class="nav-item" data-panel="style">
+      <span class="nav-icon">🎨</span>
+      <span class="nav-label">风格</span>
+    </div>
+    <div class="nav-item" data-panel="memory">
+      <span class="nav-icon">🧠</span>
+      <span class="nav-label">记忆</span>
+    </div>
+    <div class="nav-item" data-panel="debate">
+      <span class="nav-icon">⚔️</span>
+      <span class="nav-label">辩论审校</span>
+    </div>
+    <div class="nav-item" data-panel="export">
+      <span class="nav-icon">📦</span>
+      <span class="nav-label">导出</span>
+    </div>
+    <div class="sidebar-footer">
+      昆仑创作引擎<br>
+      AI 驱动网络文学平台<br>
+      © 2026
+    </div>
+  </nav>
 
-  <!-- Chat Area -->
-  <div class="chat-area">
-    <div class="chat-container">
-      <div class="chat-header">
-        <div class="chat-title">创作对话</div>
-        <div class="chat-actions">
-          <button class="chat-btn" onclick="clearChat()">清空对话</button>
-          <button class="chat-btn" onclick="showHelp()">使用帮助</button>
-        </div>
+  <!-- 主内容区 -->
+  <div class="main-content">
+
+    <!-- ======================================================
+         面板 1：创作（默认）
+         ====================================================== -->
+    <div class="panel active" id="panel-create">
+      <div class="panel-title">📝 创作工作台</div>
+      <div class="panel-desc">对话式创作，支持总调度与 Vibe 写作两种模式</div>
+
+      <!-- 模式标签页 -->
+      <div class="tabs">
+        <div class="tab active" data-create-tab="master">总调度</div>
+        <div class="tab" data-create-tab="vibe">Vibe写作</div>
       </div>
-      <div id="chatBox" class="messages">
-        <div class="msg ai">🎯 说你想写什么，一句话就够了</div>
-        <div class="msg system">
-          示例：我想写一本玄幻小说 | 写第一章，雨夜被追杀 | 检查质量 → 导出全书
+
+      <div class="create-layout">
+        <!-- 聊天容器 -->
+        <div class="chat-container">
+          <div class="chat-header">
+            <div class="chat-title" id="createChatTitle">总调度 · 一句话指挥全部</div>
+            <div class="chat-actions">
+              <button class="btn btn-sm" onclick="createClearChat()">清空对话</button>
+            </div>
+          </div>
+          <div class="messages" id="createMessages">
+            <div class="msg ai">🎯 说你想写什么，一句话就够了</div>
+            <div class="msg system">示例：我想写一本玄幻小说 | 写第一章，雨夜被追杀 | 检查质量 → 导出全书</div>
+          </div>
+        </div>
+
+        <!-- 输入区 -->
+        <div class="input-area">
+          <div class="input-wrapper">
+            <div class="input-box">
+              <textarea id="createInput" placeholder="说出你的创作意图..." rows="1" onkeydown="createHandleKey(event)"></textarea>
+            </div>
+            <button class="send-btn" onclick="createSend()" title="发送">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 2L11 13M22 2l-7 20-4-4-4-4 20-7z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="quick-actions">
+            <button class="quick-btn" onclick="createQuick('我想写一本玄幻小说')">玄幻小说</button>
+            <button class="quick-btn" onclick="createQuick('写第一章')">写第一章</button>
+            <button class="quick-btn" onclick="createQuick('检查质量')">质量检查</button>
+            <button class="quick-btn" onclick="createQuick('导出全书')">导出全书</button>
+          </div>
+        </div>
+
+        <!-- 创作结果面板 -->
+        <div class="create-result" id="createResult">
+          <div class="create-result-header">
+            <div class="create-result-title">创作结果</div>
+            <div class="create-result-meta">
+              <span class="meta-tag" id="createFeelingTag">感受: -</span>
+              <span class="meta-tag" id="createWordTag">字数: -</span>
+            </div>
+          </div>
+          <div class="create-result-body" id="createResultBody"></div>
+          <div class="create-result-footer">
+            <button class="btn btn-sm" onclick="createDoWrite()">继续创作</button>
+            <button class="btn btn-sm" onclick="createToggleRefine()">调整感受</button>
+            <button class="btn btn-sm" onclick="createCopyResult()">复制内容</button>
+          </div>
+          <div class="refine-row" id="createRefineRow">
+            <input id="createRefineInput" class="refine-input" type="text" placeholder="说出你的感受，AI 会据此调整…" onkeydown="if(event.key==='Enter')createSubmitRefine()" />
+            <button class="btn btn-sm" onclick="createSubmitRefine()">提交</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Input Area -->
-    <div class="input-area">
-      <div class="input-wrapper">
-        <div class="input-box">
-          <textarea id="inputText" placeholder="说出你的创作意图..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
+    <!-- ======================================================
+         面板 2：六维质量
+         ====================================================== -->
+    <div class="panel" id="panel-sixdim">
+      <div class="panel-title">📊 六维质量分析</div>
+      <div class="panel-desc">从六个维度对文本进行深度质量评估，给出评分与改进建议</div>
+
+      <div class="card">
+        <div class="card-title">输入文本 <span class="badge">POST /api/v1/workstation/six-dim</span></div>
+        <div class="field-row">
+          <div class="field-group" style="max-width:160px;">
+            <label class="field-label">章节号（可选）</label>
+            <input type="number" id="sixdimChapter" value="0" min="0" placeholder="0">
+          </div>
         </div>
-        <button class="send-btn" onclick="sendMsg()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 2L11 13M22 2l-7 20-4-4-4-4 20-7z"/>
-          </svg>
-        </button>
+        <textarea id="sixdimText" rows="8" placeholder="粘贴待分析的小说文本..."></textarea>
+        <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-primary" id="sixdimBtn" onclick="sixdimAnalyze()">开始分析</button>
+          <span id="sixdimLoading" class="loading-overlay" style="padding:0;">
+            <span class="spinner"></span> 分析中...
+          </span>
+        </div>
       </div>
-      <div class="quick-actions">
-        <button class="quick-btn" onclick="quickInput('我想写一本玄幻小说')">玄幻小说</button>
-        <button class="quick-btn" onclick="quickInput('写第一章')">写第一章</button>
-        <button class="quick-btn" onclick="quickInput('检查质量')">质量检查</button>
-        <button class="quick-btn" onclick="quickInput('导出全书')">导出全书</button>
+
+      <div id="sixdimResult">
+        <div class="result-box empty">尚未分析，粘贴文本后点击"开始分析"</div>
       </div>
     </div>
 
-    <!-- Result Panel -->
-    <div id="resultPanel" class="result-panel">
-      <div class="result-header">
-        <div class="result-title">创作结果</div>
-        <div class="result-meta">
-          <span class="meta-tag" id="feelingTag">感受: -</span>
-          <span class="meta-tag" id="wordCountTag">字数: -</span>
+    <!-- ======================================================
+         面板 3：AI率检测
+         ====================================================== -->
+    <div class="panel" id="panel-airate">
+      <div class="panel-title">🤖 AI率检测</div>
+      <div class="panel-desc">检测文本的 AI 生成概率，识别高风险短语，支持一键去 AI 味</div>
+
+      <div class="card">
+        <div class="card-title">输入文本 <span class="badge">POST /api/v1/workstation/ai-rate</span></div>
+        <textarea id="airateText" rows="6" placeholder="粘贴待检测的文本..."></textarea>
+        <div class="field-row" style="margin-top:12px;">
+          <div class="field-group">
+            <label class="field-label">门禁阈值：<span id="airateThresholdVal">35</span></label>
+            <input type="range" id="airateThreshold" min="20" max="50" value="35" oninput="document.getElementById('airateThresholdVal').textContent=this.value">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-primary" id="airateBtn" onclick="airateDetect()">检测AI率</button>
+          <button class="btn" id="airateHumanizeBtn" onclick="airateHumanize()" disabled>去AI味</button>
+          <span id="airateLoading" class="loading-overlay" style="padding:0;">
+            <span class="spinner"></span> 处理中...
+          </span>
         </div>
       </div>
-      <div class="result-body" id="resultBody"></div>
-      <div class="result-footer" id="resultActions">
-        <button class="result-btn" onclick="doWrite()">继续创作</button>
-        <button class="result-btn" onclick="toggleRefine()">调整感受</button>
-        <button class="result-btn" onclick="copyResult()">复制内容</button>
+
+      <div id="airateResult">
+        <div class="result-box empty">尚未检测，粘贴文本后点击"检测AI率"</div>
       </div>
-      <div class="refine-row" id="refineRow">
-        <input id="refineInput" class="refine-input" type="text" placeholder="说出你的感受，AI 会据此调整…" onkeydown="if(event.key==='Enter')submitRefine()" />
-        <button class="result-btn" onclick="submitRefine()">提交</button>
+
+      <!-- 去AI味对比 -->
+      <div id="airateHumanizeResult" style="display:none;">
+        <div class="card">
+          <div class="card-title">去AI味结果 <span class="badge">POST /api/v1/workstation/ai-rate/humanize</span></div>
+          <div id="airateHumanizeSummary"></div>
+          <div class="compare-view" style="margin-top:12px;">
+            <div class="compare-col">
+              <div class="compare-col-title">修改前</div>
+              <div class="compare-col-body" id="airateBefore"></div>
+            </div>
+            <div class="compare-col">
+              <div class="compare-col-title">修改后</div>
+              <div class="compare-col-body" id="airateAfter"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+
+    <!-- ======================================================
+         面板 4：风格学习
+         ====================================================== -->
+    <div class="panel" id="panel-style">
+      <div class="panel-title">🎨 风格学习</div>
+      <div class="panel-desc">提取风格指纹、浏览预设风格、对比两段文本的风格相似度</div>
+
+      <div class="tabs">
+        <div class="tab active" data-style-tab="extract">提取风格</div>
+        <div class="tab" data-style-tab="presets">预设风格</div>
+        <div class="tab" data-style-tab="compare">风格对比</div>
+      </div>
+
+      <!-- 提取风格 -->
+      <div class="tab-content active" id="style-extract">
+        <div class="card">
+          <div class="card-title">提取风格指纹 <span class="badge">POST /api/v1/workstation/style/extract</span></div>
+          <div class="field-row">
+            <div class="field-group" style="max-width:240px;">
+              <label class="field-label">作者名（可选）</label>
+              <input type="text" id="styleAuthor" placeholder="如：爱潜水的乌贼">
+            </div>
+          </div>
+          <textarea id="styleExtractText" rows="6" placeholder="粘贴具有代表性的文本片段..."></textarea>
+          <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
+            <button class="btn btn-primary" onclick="styleExtract()">提取指纹</button>
+            <span id="styleExtractLoading" class="loading-overlay" style="padding:0;">
+              <span class="spinner"></span> 提取中...
+            </span>
+          </div>
+        </div>
+        <div id="styleExtractResult">
+          <div class="result-box empty">尚未提取，粘贴文本后点击"提取指纹"</div>
+        </div>
+      </div>
+
+      <!-- 预设风格 -->
+      <div class="tab-content" id="style-presets">
+        <div class="card">
+          <div class="card-title">预设风格库 <span class="badge">GET /api/v1/workstation/style/presets</span></div>
+          <div id="stylePresetsLoading" class="loading-overlay show">
+            <span class="spinner"></span> 加载预设风格...
+          </div>
+          <div id="stylePresetsGrid" class="style-grid" style="display:none;"></div>
+          <div id="stylePresetsError" style="display:none; color:var(--error); font-size:13px; padding:10px;"></div>
+        </div>
+      </div>
+
+      <!-- 风格对比 -->
+      <div class="tab-content" id="style-compare">
+        <div class="card">
+          <div class="card-title">风格相似度对比 <span class="badge">POST /api/v1/workstation/style/similarity</span></div>
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">文本 A</label>
+              <textarea id="styleText1" rows="5" placeholder="第一段文本..."></textarea>
+            </div>
+            <div class="field-group">
+              <label class="field-label">文本 B</label>
+              <textarea id="styleText2" rows="5" placeholder="第二段文本..."></textarea>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn btn-primary" onclick="styleCompare()">对比相似度</button>
+            <span id="styleCompareLoading" class="loading-overlay" style="padding:0;">
+              <span class="spinner"></span> 对比中...
+            </span>
+          </div>
+        </div>
+        <div id="styleCompareResult">
+          <div class="result-box empty">尚未对比，输入两段文本后点击"对比相似度"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================
+         面板 5：记忆管理
+         ====================================================== -->
+    <div class="panel" id="panel-memory">
+      <div class="panel-title">🧠 记忆管理</div>
+      <div class="panel-desc">查询和管理书籍的多层记忆系统（工作记忆 / 情景记忆 / 语义记忆 / 程序记忆）</div>
+
+      <div class="card">
+        <div class="card-title">记忆查询 <span class="badge">POST /api/v1/workstation/memory/query</span></div>
+        <div class="field-row">
+          <div class="field-group" style="max-width:240px;">
+            <label class="field-label">Book ID</label>
+            <input type="text" id="memoryBookId" value="default" placeholder="default">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-primary" onclick="memoryQuery()">查询记忆</button>
+          <span id="memoryQueryLoading" class="loading-overlay" style="padding:0;">
+            <span class="spinner"></span> 查询中...
+          </span>
+        </div>
+      </div>
+
+      <div id="memoryQueryResult">
+        <div class="result-box empty">尚未查询，输入 Book ID 后点击"查询记忆"</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">添加记忆 <span class="badge">POST /api/v1/workstation/memory/add</span></div>
+        <div class="field-row">
+          <div class="field-group" style="max-width:200px;">
+            <label class="field-label">记忆层级</label>
+            <select id="memoryLayer">
+              <option value="working">working（工作记忆）</option>
+              <option value="episodic">episodic（情景记忆）</option>
+              <option value="semantic">semantic（语义记忆）</option>
+              <option value="procedural">procedural（程序记忆）</option>
+            </select>
+          </div>
+        </div>
+        <textarea id="memoryContent" rows="3" placeholder="输入要添加的记忆内容..."></textarea>
+        <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-primary" onclick="memoryAdd()">添加记忆</button>
+          <span id="memoryAddLoading" class="loading-overlay" style="padding:0;">
+            <span class="spinner"></span> 添加中...
+          </span>
+          <span id="memoryAddResult" style="font-size:13px;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================
+         面板 6：辩论审校
+         ====================================================== -->
+    <div class="panel" id="panel-debate">
+      <div class="panel-title">⚔️ 辩论审校</div>
+      <div class="panel-desc">多 Agent 辩论式审校，深度挖掘文本问题；支持读者模拟反馈</div>
+
+      <div class="card">
+        <div class="card-title">辩论审校 <span class="badge">POST /api/v1/workstation/debate-review</span></div>
+        <div class="field-row">
+          <div class="field-group" style="max-width:140px;">
+            <label class="field-label">章节号</label>
+            <input type="number" id="debateChapter" value="1" min="0">
+          </div>
+          <div class="field-group" style="max-width:140px;">
+            <label class="field-label">目标分数</label>
+            <input type="number" id="debateTarget" value="85" min="0" max="100">
+          </div>
+        </div>
+        <textarea id="debateText" rows="6" placeholder="粘贴待审校的章节文本..."></textarea>
+        <div style="margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-primary" id="debateBtn" onclick="debateReview()">开始辩论审校</button>
+          <button class="btn" onclick="readerSimulate()">读者模拟</button>
+          <span id="debateLoading" class="loading-overlay" style="padding:0;">
+            <span class="spinner"></span> 审校中...
+          </span>
+        </div>
+      </div>
+
+      <div id="debateResult">
+        <div class="result-box empty">尚未审校，粘贴文本后点击"开始辩论审校"</div>
+      </div>
+
+      <!-- 读者模拟结果 -->
+      <div id="readerResult" style="display:none;">
+        <div class="card">
+          <div class="card-title">读者模拟反馈 <span class="badge">POST /api/v1/workstation/reader-simulate</span></div>
+          <div id="readerContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================
+         面板 7：导出
+         ====================================================== -->
+    <div class="panel" id="panel-export">
+      <div class="panel-title">📦 导出与审计</div>
+      <div class="panel-desc">导出全书为多种格式，或运行全维度质量审计</div>
+
+      <div class="card">
+        <div class="card-title">导出全书 <span class="badge">POST /api/v1/export/book</span></div>
+        <div class="field-row">
+          <div class="field-group" style="max-width:240px;">
+            <label class="field-label">Book ID</label>
+            <input type="text" id="exportBookId" value="vibe_demo">
+          </div>
+          <div class="field-group" style="max-width:240px;">
+            <label class="field-label">导出格式</label>
+            <div class="btn-group" id="exportFormatGroup">
+              <button class="btn active" data-format="txt" onclick="exportSetFormat(this)">TXT</button>
+              <button class="btn" data-format="md" onclick="exportSetFormat(this)">Markdown</button>
+              <button class="btn" data-format="json" onclick="exportSetFormat(this)">JSON</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-primary" onclick="exportBook()">导出全书</button>
+          <span id="exportLoading" class="loading-overlay" style="padding:0;">
+            <span class="spinner"></span> 导出中...
+          </span>
+        </div>
+        <div id="exportResult" style="margin-top:12px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">质量审计 <span class="badge">POST /api/v1/audit/run</span></div>
+        <div class="field-row">
+          <div class="field-group" style="max-width:240px;">
+            <label class="field-label">Book ID</label>
+            <input type="text" id="auditBookId" value="vibe_demo">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-primary" onclick="auditRun()">运行审计</button>
+          <span id="auditLoading" class="loading-overlay" style="padding:0;">
+            <span class="spinner"></span> 审计中...
+          </span>
+        </div>
+        <div id="auditResult" style="margin-top:12px;"></div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /workspace -->
 
 <script>
-var mode = 'master';
-var isLoading = false;
+/* ============================================================
+   全局状态
+   ============================================================ */
+var createMode = 'master';  // 创作面板子模式：master / vibe
+var exportFormat = 'txt';   // 导出格式
+var isCreateLoading = false;
 
-function switchMode(m) {
-  mode = m;
-  document.querySelectorAll('.mode-item').forEach(item => {
-    var isActive = item.getAttribute('data-mode') === m;
-    item.classList.toggle('active', isActive);
-    if (isActive) item.setAttribute('aria-current', 'page');
-    else item.removeAttribute('aria-current');
+/* ============================================================
+   通用工具函数
+   ============================================================ */
+
+/** 安全调用 API，统一错误处理 */
+function apiFetch(url, options) {
+  return fetch(url, Object.assign({
+    headers: { 'Content-Type': 'application/json' }
+  }, options))
+  .then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
   });
-  closeSidebar();
-  clearChat();
-  addMsg('已切换到 ' + getModeName(m) + ' 模式', 'system');
-  hideResult();
-  var row = document.getElementById('refineRow');
-  if (row) row.classList.remove('show');
 }
 
-function toggleSidebar() {
-  var sb = document.querySelector('.sidebar');
-  var scrim = document.getElementById('sidebarScrim');
-  var open = sb.classList.toggle('open');
-  scrim.classList.toggle('show', open);
+/** 转义 HTML，防止 XSS */
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
-function closeSidebar() {
-  var sb = document.querySelector('.sidebar');
-  var scrim = document.getElementById('sidebarScrim');
-  if (sb) sb.classList.remove('open');
-  if (scrim) scrim.classList.remove('show');
+/** 将任意对象渲染为结构化键值对 HTML（灵活解析） */
+function renderKeyValue(obj, indent) {
+  if (obj === null || obj === undefined) return '<span class="kv-val">-</span>';
+  if (typeof obj !== 'object') return '<span class="kv-val">' + esc(obj) + '</span>';
+  if (Array.isArray(obj)) {
+    if (obj.length === 0) return '<span class="kv-val">[]</span>';
+    return '<span class="kv-val">[' + obj.length + ' 项]</span>';
+  }
+  var html = '<div class="kv-list" style="margin-top:4px;">';
+  Object.entries(obj).forEach(function(entry) {
+    var k = entry[0], v = entry[1];
+    html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span>';
+    if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+      html += renderKeyValue(v);
+    } else if (Array.isArray(v)) {
+      html += '<span class="kv-val">[' + v.length + ' 项]</span>';
+    } else {
+      html += '<span class="kv-val">' + esc(v) + '</span>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
 }
 
-function getModeName(m) {
-  return {master:'总调度', vibe:'Vibe写作', audit:'质量审计', export:'导出全书'}[m];
+/** 评分条颜色 */
+function scoreColor(score) {
+  if (score >= 80) return 'var(--success)';
+  if (score >= 60) return 'var(--warning)';
+  return 'var(--error)';
 }
 
-function addMsg(text, type) {
-  var box = document.getElementById('chatBox');
+/** 生成评分条 HTML */
+function scoreBar(label, score, maxScore) {
+  maxScore = maxScore || 100;
+  var pct = Math.min(100, (score / maxScore) * 100);
+  var color = scoreColor(score);
+  return '<div class="score-bar-row">' +
+    '<span class="score-bar-label">' + esc(label) + '</span>' +
+    '<div class="score-bar-track"><div class="score-bar-fill" style="width:' + pct + '%;background:' + color + ';"></div></div>' +
+    '<span class="score-bar-value" style="color:' + color + ';">' + esc(score) + '</span>' +
+    '</div>';
+}
+
+/* ============================================================
+   面板切换
+   ============================================================ */
+document.querySelectorAll('.nav-item').forEach(function(item) {
+  item.addEventListener('click', function() {
+    var panel = item.getAttribute('data-panel');
+    switchPanel(panel);
+  });
+});
+
+function switchPanel(name) {
+  // 导航高亮
+  document.querySelectorAll('.nav-item').forEach(function(n) {
+    n.classList.toggle('active', n.getAttribute('data-panel') === name);
+  });
+  // 面板切换
+  document.querySelectorAll('.panel').forEach(function(p) {
+    p.classList.toggle('active', p.id === 'panel-' + name);
+  });
+  // 特定面板的初始化
+  if (name === 'style') loadStylePresets();
+}
+
+/* ============================================================
+   标签页通用切换
+   ============================================================ */
+function setupTabs(containerSelector, tabAttr, contentPrefix) {
+  document.querySelectorAll(containerSelector + ' .tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var val = tab.getAttribute(tabAttr);
+      tab.parentElement.querySelectorAll('.tab').forEach(function(t) {
+        t.classList.toggle('active', t === tab);
+      });
+      document.querySelectorAll('[id^="' + contentPrefix + '"]').forEach(function(c) {
+        c.classList.toggle('active', c.id === contentPrefix + val);
+      });
+    });
+  });
+}
+
+/* ============================================================
+   面板 1：创作
+   ============================================================ */
+
+// 创作面板子标签切换
+setupTabs('#panel-create .tabs', 'data-create-tab', 'create-tab-');
+document.querySelectorAll('#panel-create .tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    createMode = tab.getAttribute('data-create-tab');
+    var title = createMode === 'master' ? '总调度 · 一句话指挥全部' : 'Vibe写作 · 感受驱动创作';
+    document.getElementById('createChatTitle').textContent = title;
+    createClearChat();
+    hideCreateResult();
+  });
+});
+
+function createAddMsg(text, type) {
+  var box = document.getElementById('createMessages');
   var msg = document.createElement('div');
   msg.className = 'msg ' + type;
-  msg.innerHTML = text.replace(/\n/g, '<br>');
+  msg.innerHTML = esc(text).replace(/\n/g, '<br>');
   box.appendChild(msg);
   box.scrollTop = box.scrollHeight;
 }
 
-function addTyping() {
-  var box = document.getElementById('chatBox');
-  var indicator = document.createElement('div');
-  indicator.className = 'typing-indicator';
-  indicator.id = 'typing';
-  indicator.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
-  box.appendChild(indicator);
+function createAddTyping() {
+  var box = document.getElementById('createMessages');
+  var el = document.createElement('div');
+  el.className = 'typing-indicator';
+  el.id = 'createTyping';
+  el.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  box.appendChild(el);
   box.scrollTop = box.scrollHeight;
 }
 
-function removeTyping() {
-  var typing = document.getElementById('typing');
-  if (typing) typing.remove();
+function createRemoveTyping() {
+  var t = document.getElementById('createTyping');
+  if (t) t.remove();
 }
 
-function clearChat() {
-  document.getElementById('chatBox').innerHTML = '';
+function createClearChat() {
+  document.getElementById('createMessages').innerHTML =
+    '<div class="msg ai">🎯 说你想写什么，一句话就够了</div>' +
+    '<div class="msg system">示例：我想写一本玄幻小说 | 写第一章，雨夜被追杀 | 检查质量 → 导出全书</div>';
+  hideCreateResult();
 }
 
-function showHelp() {
-  addMsg('使用指南：<br>• 总调度：一句话指挥所有功能<br>• Vibe写作：感受驱动，逐步创作<br>• 质量审计：48维度全面检查<br>• 导出全书：TXT/JSON/Markdown', 'ai');
-}
-
-function handleKeyDown(e) {
+function createHandleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
-    sendMsg();
+    createSend();
   }
 }
 
-function quickInput(text) {
-  document.getElementById('inputText').value = text;
-  sendMsg();
+function createQuick(text) {
+  document.getElementById('createInput').value = text;
+  createSend();
 }
 
-function sendMsg() {
-  if (isLoading) return;
-  var input = document.getElementById('inputText');
+function createSend() {
+  if (isCreateLoading) return;
+  var input = document.getElementById('createInput');
   var text = input.value.trim();
   if (!text) return;
   input.value = '';
-  
-  addMsg(text, 'user');
-  isLoading = true;
-  addTyping();
+  createAddMsg(text, 'user');
+  isCreateLoading = true;
+  createAddTyping();
 
-  if (mode === 'master') {
-    callMaster(text);
-  } else if (mode === 'vibe') {
-    callExpress(text);
-  } else if (mode === 'audit') {
-    callAudit(text);
-  } else if (mode === 'export') {
-    callExport(text);
+  if (createMode === 'master') {
+    createCallMaster(text);
+  } else {
+    createCallExpress(text);
   }
 }
 
-function callMaster(text) {
-  fetch('/api/v1/vibe/master?text=' + encodeURIComponent(text), {method: 'POST'})
-    .then(r => r.json())
-    .then(d => {
-      removeTyping();
-      isLoading = false;
+function createCallMaster(text) {
+  apiFetch('/api/v1/vibe/master?text=' + encodeURIComponent(text), { method: 'POST' })
+    .then(function(d) {
+      createRemoveTyping();
+      isCreateLoading = false;
       if (d.success) {
-        addMsg(d.message || '已完成', 'ai');
-        if (d.draft) showResult(d.draft, d.feeling);
+        createAddMsg(d.message || '已完成', 'ai');
+        if (d.draft) showCreateResult(d.draft, d.feeling);
       } else {
-        addMsg('❌ ' + (d.error || '处理失败'), 'ai');
+        createAddMsg('❌ ' + (d.error || '处理失败'), 'ai');
       }
     })
-    .catch(e => {
-      removeTyping();
-      isLoading = false;
-      addMsg('❌ 请求失败: ' + e.message, 'ai');
+    .catch(function(e) {
+      createRemoveTyping();
+      isCreateLoading = false;
+      createAddMsg('❌ 请求失败: ' + e.message, 'ai');
     });
 }
 
-function callExpress(text) {
-  fetch('/api/v1/vibe/express?book_id=vibe_demo&intent=' + encodeURIComponent(text), {method: 'POST'})
-    .then(r => r.json())
-    .then(d => {
-      removeTyping();
-      isLoading = false;
-      addMsg(d.message || d.error || '已理解', 'ai');
-      if (d.success) showResult(d.draft || '', d.feeling);
+function createCallExpress(text) {
+  apiFetch('/api/v1/vibe/express?book_id=vibe_demo&intent=' + encodeURIComponent(text), { method: 'POST' })
+    .then(function(d) {
+      createRemoveTyping();
+      isCreateLoading = false;
+      createAddMsg(d.message || d.error || '已理解', 'ai');
+      if (d.success && d.draft) showCreateResult(d.draft, d.feeling);
     })
-    .catch(e => {
-      removeTyping();
-      isLoading = false;
-      addMsg('❌ 请求失败: ' + e.message, 'ai');
+    .catch(function(e) {
+      createRemoveTyping();
+      isCreateLoading = false;
+      createAddMsg('❌ 请求失败: ' + e.message, 'ai');
     });
 }
 
-function callAudit(text) {
-  addMsg('🔍 正在执行48维质量审计...', 'ai');
-  fetch('/api/v1/audit/run?book_id=vibe_demo', {method: 'POST'})
-    .then(r => r.json())
-    .then(d => {
-      removeTyping();
-      isLoading = false;
+function createDoWrite() {
+  if (isCreateLoading) return;
+  isCreateLoading = true;
+  createAddTyping();
+  createAddMsg('继续创作...', 'user');
+  apiFetch('/api/v1/vibe/write?book_id=vibe_demo', { method: 'POST' })
+    .then(function(d) {
+      createRemoveTyping();
+      isCreateLoading = false;
       if (d.success) {
-        var report = d.report || {};
-        addMsg('审计完成：' + (report.score || '-') + '分', 'ai');
-        showResult(JSON.stringify(report, null, 2), '审计报告');
+        createAddMsg('✅ 创作完成', 'ai');
+        showCreateResult(d.draft || '', d.feeling);
       } else {
-        addMsg('❌ 审计失败', 'ai');
+        createAddMsg('❌ 创作失败', 'ai');
       }
     })
-    .catch(e => {
-      removeTyping();
-      isLoading = false;
-      addMsg('❌ 请求失败: ' + e.message, 'ai');
+    .catch(function() {
+      createRemoveTyping();
+      isCreateLoading = false;
+      createAddMsg('❌ 请求失败', 'ai');
     });
 }
 
-function callExport(text) {
-  addMsg('📦 正在导出...', 'ai');
-  fetch('/api/v1/export/book?book_id=vibe_demo&format=txt', {method: 'POST'})
-    .then(r => r.json())
-    .then(d => {
-      removeTyping();
-      isLoading = false;
-      if (d.success) {
-        addMsg('导出完成！文件已保存', 'ai');
-      } else {
-        addMsg('❌ 导出失败: ' + (d.error || '未知错误'), 'ai');
-      }
-    })
-    .catch(e => {
-      removeTyping();
-      isLoading = false;
-      addMsg('❌ 请求失败: ' + e.message, 'ai');
-    });
-}
-
-function doWrite() {
-  if (isLoading) return;
-  isLoading = true;
-  addTyping();
-  addMsg('继续创作...', 'user');
-  
-  fetch('/api/v1/vibe/write?book_id=vibe_demo', {method: 'POST'})
-    .then(r => r.json())
-    .then(d => {
-      removeTyping();
-      isLoading = false;
-      if (d.success) {
-        addMsg('✅ 创作完成', 'ai');
-        showResult(d.draft || '', d.feeling);
-      } else {
-        addMsg('❌ 创作失败', 'ai');
-      }
-    })
-    .catch(e => {
-      removeTyping();
-      isLoading = false;
-      addMsg('❌ 请求失败', 'ai');
-    });
-}
-
-function toggleRefine() {
-  var row = document.getElementById('refineRow');
+function createToggleRefine() {
+  var row = document.getElementById('createRefineRow');
   var show = row.classList.toggle('show');
-  if (show) document.getElementById('refineInput').focus();
+  if (show) document.getElementById('createRefineInput').focus();
 }
 
-function submitRefine() {
-  var input = document.getElementById('refineInput');
+function createSubmitRefine() {
+  var input = document.getElementById('createRefineInput');
   var fb = (input.value || '').trim();
   if (!fb) { input.focus(); return; }
-
-  if (isLoading) return;
-  isLoading = true;
-  addTyping();
-  addMsg('调整感受: ' + fb, 'user');
+  if (isCreateLoading) return;
+  isCreateLoading = true;
+  createAddTyping();
+  createAddMsg('调整感受: ' + fb, 'user');
   input.value = '';
-  document.getElementById('refineRow').classList.remove('show');
+  document.getElementById('createRefineRow').classList.remove('show');
 
-  fetch('/api/v1/vibe/refine?book_id=vibe_demo&feedback=' + encodeURIComponent(fb), {method: 'POST'})
-    .then(r => r.json())
-    .then(d => {
-      removeTyping();
-      isLoading = false;
+  apiFetch('/api/v1/vibe/refine?book_id=vibe_demo&feedback=' + encodeURIComponent(fb), { method: 'POST' })
+    .then(function(d) {
+      createRemoveTyping();
+      isCreateLoading = false;
       if (d.success) {
-        addMsg('✅ 已调整', 'ai');
-        showResult(d.draft || '', d.feeling);
+        createAddMsg('✅ 已调整', 'ai');
+        showCreateResult(d.draft || '', d.feeling);
       } else {
-        addMsg('❌ 调整失败', 'ai');
+        createAddMsg('❌ 调整失败', 'ai');
       }
     })
-    .catch(e => {
-      removeTyping();
-      isLoading = false;
-      addMsg('❌ 请求失败', 'ai');
+    .catch(function() {
+      createRemoveTyping();
+      isCreateLoading = false;
+      createAddMsg('❌ 请求失败', 'ai');
     });
 }
 
-function showResult(content, feeling) {
-  var panel = document.getElementById('resultPanel');
-  var body = document.getElementById('resultBody');
-  var tag = document.getElementById('feelingTag');
-  var count = document.getElementById('wordCountTag');
-  
-  body.textContent = content;
-  tag.textContent = '感受: ' + (feeling || '-');
-  count.textContent = '字数: ' + (content.length || 0);
+function showCreateResult(content, feeling) {
+  var panel = document.getElementById('createResult');
+  document.getElementById('createResultBody').textContent = content;
+  document.getElementById('createFeelingTag').textContent = '感受: ' + (feeling || '-');
+  document.getElementById('createWordTag').textContent = '字数: ' + (content ? content.length : 0);
   panel.classList.add('show');
 }
 
-function hideResult() {
-  document.getElementById('resultPanel').classList.remove('show');
+function hideCreateResult() {
+  document.getElementById('createResult').classList.remove('show');
+  var row = document.getElementById('createRefineRow');
+  if (row) row.classList.remove('show');
 }
 
-function copyResult() {
-  var text = document.getElementById('resultBody').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    addMsg('✅ 已复制到剪贴板', 'system');
+function createCopyResult() {
+  var text = document.getElementById('createResultBody').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    createAddMsg('✅ 已复制到剪贴板', 'system');
   });
 }
 
-// Wire up mode items (delegated, driven by data-mode)
-document.querySelectorAll('.mode-item').forEach(function(item) {
-  item.addEventListener('click', function() {
-    switchMode(item.getAttribute('data-mode'));
-  });
-});
-
-// Auto-resize textarea
-document.getElementById('inputText').addEventListener('input', function() {
+// 创作输入框自动高度
+document.getElementById('createInput').addEventListener('input', function() {
   this.style.height = 'auto';
-  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
 });
+
+/* ============================================================
+   面板 2：六维质量
+   ============================================================ */
+function sixdimAnalyze() {
+  var text = document.getElementById('sixdimText').value.trim();
+  if (!text) { alert('请先输入待分析文本'); return; }
+  var chapter = parseInt(document.getElementById('sixdimChapter').value) || 0;
+  var btn = document.getElementById('sixdimBtn');
+  var loading = document.getElementById('sixdimLoading');
+  btn.disabled = true;
+  loading.classList.add('show');
+
+  apiFetch('/api/v1/workstation/six-dim', {
+    method: 'POST',
+    body: JSON.stringify({ text: text, chapter: chapter })
+  })
+  .then(function(d) {
+    btn.disabled = false;
+    loading.classList.remove('show');
+    if (d.success && d.report) {
+      renderSixDimResult(d.report);
+    } else {
+      document.getElementById('sixdimResult').innerHTML =
+        '<div class="result-box" style="color:var(--error);">❌ 分析失败: ' + esc(d.error || '未知错误') + '</div>';
+    }
+  })
+  .catch(function(e) {
+    btn.disabled = false;
+    loading.classList.remove('show');
+    document.getElementById('sixdimResult').innerHTML =
+      '<div class="result-box" style="color:var(--error);">❌ 请求失败: ' + esc(e.message) + '</div>';
+  });
+}
+
+function renderSixDimResult(report) {
+  var html = '';
+
+  // 总分
+  var total = report.total_score !== undefined ? report.total_score : (report.score || '-');
+  html += '<div class="total-score-box">' +
+    '<div class="total-score-label">综合评分</div>' +
+    '<div class="big-score" style="color:' + scoreColor(total) + ';">' + esc(total) + '</div>' +
+    '</div>';
+
+  // 各维度（灵活解析 dimensions 列表）
+  var dims = report.dimensions || [];
+  if (dims.length > 0) {
+    dims.forEach(function(dim) {
+      var name = dim.dimension || dim.name || '维度';
+      var score = dim.score !== undefined ? dim.score : '-';
+      var weight = dim.weight !== undefined ? dim.weight : '';
+      var detail = dim.detail || dim.description || '';
+      var suggestion = dim.suggestion || '';
+      var color = typeof score === 'number' ? scoreColor(score) : 'var(--text-secondary)';
+
+      html += '<div class="dim-card">' +
+        '<div class="dim-card-header">' +
+        '<span class="dim-name">' + esc(name) + (weight ? ' <span class="tag tag-blue">权重 ' + esc(weight) + '</span>' : '') + '</span>' +
+        '<span class="dim-score" style="color:' + color + ';">' + esc(score) + '</span>' +
+        '</div>';
+      if (typeof score === 'number') {
+        html += scoreBar('', score, 100);
+      }
+      if (detail) html += '<div class="dim-detail">' + esc(detail) + '</div>';
+      if (suggestion) html += '<div class="dim-suggestion">💡 ' + esc(suggestion) + '</div>';
+      html += '</div>';
+    });
+  }
+
+  // 其他字段（灵活展示 report 中除 dimensions/total_score 外的所有键值）
+  var extraKeys = Object.keys(report).filter(function(k) {
+    return k !== 'dimensions' && k !== 'total_score';
+  });
+  if (extraKeys.length > 0) {
+    html += '<div class="card"><div class="card-title">详细报告</div>';
+    extraKeys.forEach(function(k) {
+      var v = report[k];
+      html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span>';
+      if (v !== null && typeof v === 'object') {
+        html += renderKeyValue(v);
+      } else {
+        html += '<span class="kv-val">' + esc(v) + '</span>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // 原始 JSON
+  html += '<div class="card"><div class="card-title">原始数据</div>' +
+    '<pre class="result-box json-view">' + esc(JSON.stringify(report, null, 2)) + '</pre></div>';
+
+  document.getElementById('sixdimResult').innerHTML = html;
+}
+
+/* ============================================================
+   面板 3：AI率检测
+   ============================================================ */
+function airateDetect() {
+  var text = document.getElementById('airateText').value.trim();
+  if (!text) { alert('请先输入待检测文本'); return; }
+  var threshold = parseInt(document.getElementById('airateThreshold').value);
+  var btn = document.getElementById('airateBtn');
+  var loading = document.getElementById('airateLoading');
+  btn.disabled = true;
+  loading.classList.add('show');
+
+  apiFetch('/api/v1/workstation/ai-rate', {
+    method: 'POST',
+    body: JSON.stringify({ text: text, threshold: threshold })
+  })
+  .then(function(d) {
+    btn.disabled = false;
+    loading.classList.remove('show');
+    if (d.success && d.report) {
+      renderAirateResult(d.report, threshold);
+      document.getElementById('airateHumanizeBtn').disabled = false;
+    } else {
+      document.getElementById('airateResult').innerHTML =
+        '<div class="result-box" style="color:var(--error);">❌ 检测失败: ' + esc(d.error || '未知错误') + '</div>';
+    }
+  })
+  .catch(function(e) {
+    btn.disabled = false;
+    loading.classList.remove('show');
+    document.getElementById('airateResult').innerHTML =
+      '<div class="result-box" style="color:var(--error);">❌ 请求失败: ' + esc(e.message) + '</div>';
+  });
+}
+
+function renderAirateResult(report, threshold) {
+  var score = report.ai_score !== undefined ? report.ai_score : (report.score || report.total_score || 0);
+  var colorClass = score < 35 ? 'green' : (score <= 50 ? 'yellow' : 'red');
+  var passed = score < threshold;
+
+  var html = '<div class="ai-score-section">' +
+    '<div class="ai-score-left">' +
+    '<div class="big-score ' + colorClass + '">' + esc(score) + '</div>' +
+    '<div class="ai-score-label">AI 生成概率</div>' +
+    '<div class="gate-status ' + (passed ? 'pass' : 'fail') + '">' +
+    (passed ? '✓ 通过门禁' : '✗ 未通过门禁') +
+    '</div>' +
+    '</div>' +
+    '<div style="flex:1;">';
+
+  // 各维度得分（灵活解析）
+  var dims = report.dimensions || report.dimension_scores || report.details || [];
+  if (Array.isArray(dims) && dims.length > 0) {
+    dims.forEach(function(dim) {
+      var name = dim.dimension || dim.name || dim.label || '维度';
+      var s = dim.score !== undefined ? dim.score : (dim.value || '-');
+      if (typeof s === 'number') {
+        html += scoreBar(name, s, 100);
+      } else {
+        html += '<div class="kv-row"><span class="kv-key">' + esc(name) + '</span><span class="kv-val">' + esc(s) + '</span></div>';
+      }
+    });
+  } else if (typeof dims === 'object' && dims !== null) {
+    Object.entries(dims).forEach(function(entry) {
+      html += scoreBar(entry[0], typeof entry[1] === 'number' ? entry[1] : 0, 100);
+    });
+  }
+
+  html += '</div></div>';
+
+  // 高风险短语
+  var highRisk = report.high_risk_phrases || report.high_risk || [];
+  var midRisk = report.medium_risk_phrases || report.mid_risk || report.medium_risk || [];
+  if (highRisk.length > 0 || midRisk.length > 0) {
+    html += '<div class="card"><div class="card-title">风险短语</div>';
+    if (highRisk.length > 0) {
+      html += '<div style="margin-bottom:8px;"><span class="tag tag-red">高风险</span><div class="phrases-list">';
+      highRisk.forEach(function(p) {
+        html += '<span class="phrase-chip high">' + esc(typeof p === 'string' ? p : (p.phrase || p.text || JSON.stringify(p))) + '</span>';
+      });
+      html += '</div></div>';
+    }
+    if (midRisk.length > 0) {
+      html += '<div><span class="tag tag-yellow">中风险</span><div class="phrases-list">';
+      midRisk.forEach(function(p) {
+        html += '<span class="phrase-chip mid">' + esc(typeof p === 'string' ? p : (p.phrase || p.text || JSON.stringify(p))) + '</span>';
+      });
+      html += '</div></div>';
+    }
+    html += '</div>';
+  }
+
+  // 其他字段
+  var extraKeys = Object.keys(report).filter(function(k) {
+    return ['ai_score','score','total_score','dimensions','dimension_scores','details',
+            'high_risk_phrases','high_risk','medium_risk_phrases','mid_risk','medium_risk','passed','pass'].indexOf(k) === -1;
+  });
+  if (extraKeys.length > 0) {
+    html += '<div class="card"><div class="card-title">详细信息</div>';
+    extraKeys.forEach(function(k) {
+      var v = report[k];
+      html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span>';
+      html += (v !== null && typeof v === 'object') ? renderKeyValue(v) : '<span class="kv-val">' + esc(v) + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  document.getElementById('airateResult').innerHTML = html;
+}
+
+function airateHumanize() {
+  var text = document.getElementById('airateText').value.trim();
+  if (!text) { alert('请先输入文本'); return; }
+  var btn = document.getElementById('airateHumanizeBtn');
+  var loading = document.getElementById('airateLoading');
+  btn.disabled = true;
+  loading.classList.add('show');
+
+  apiFetch('/api/v1/workstation/ai-rate/humanize', {
+    method: 'POST',
+    body: JSON.stringify({ text: text, aggressive: 0.5 })
+  })
+  .then(function(d) {
+    btn.disabled = false;
+    loading.classList.remove('show');
+    if (d.success && d.result) {
+      renderHumanizeResult(d.result, text);
+    } else {
+      alert('去AI味失败: ' + (d.error || '未知错误'));
+    }
+  })
+  .catch(function(e) {
+    btn.disabled = false;
+    loading.classList.remove('show');
+    alert('请求失败: ' + e.message);
+  });
+}
+
+function renderHumanizeResult(result, originalText) {
+  var box = document.getElementById('airateHumanizeResult');
+  box.style.display = 'block';
+  document.getElementById('airateBefore').textContent = originalText;
+  document.getElementById('airateAfter').textContent = result.humanized_text || result.text || result.modified_text || JSON.stringify(result);
+
+  var beforeScore = result.before_score !== undefined ? result.before_score : (result.original_score || '-');
+  var afterScore = result.after_score !== undefined ? result.after_score : (result.new_score || '-');
+  var summary = '<div class="kv-list">' +
+    '<div class="kv-row"><span class="kv-key">修改前 AI 率</span><span class="kv-val" style="color:var(--warning);">' + esc(beforeScore) + '</span></div>' +
+    '<div class="kv-row"><span class="kv-key">修改后 AI 率</span><span class="kv-val" style="color:var(--success);">' + esc(afterScore) + '</span></div>';
+  if (result.change !== undefined || result.delta !== undefined) {
+    summary += '<div class="kv-row"><span class="kv-key">变化</span><span class="kv-val">' + esc(result.change !== undefined ? result.change : result.delta) + '</span></div>';
+  }
+  summary += '</div>';
+  document.getElementById('airateHumanizeSummary').innerHTML = summary;
+}
+
+/* ============================================================
+   面板 4：风格学习
+   ============================================================ */
+setupTabs('#panel-style .tabs', 'data-style-tab', 'style-');
+
+function styleExtract() {
+  var text = document.getElementById('styleExtractText').value.trim();
+  if (!text) { alert('请先输入文本'); return; }
+  var author = document.getElementById('styleAuthor').value.trim();
+  var loading = document.getElementById('styleExtractLoading');
+  loading.classList.add('show');
+
+  apiFetch('/api/v1/workstation/style/extract', {
+    method: 'POST',
+    body: JSON.stringify({ text: text, author_name: author || undefined })
+  })
+  .then(function(d) {
+    loading.classList.remove('show');
+    if (d.success && d.fingerprint) {
+      renderStyleFingerprint(d.fingerprint);
+    } else {
+      document.getElementById('styleExtractResult').innerHTML =
+        '<div class="result-box" style="color:var(--error);">❌ 提取失败: ' + esc(d.error || '未知错误') + '</div>';
+    }
+  })
+  .catch(function(e) {
+    loading.classList.remove('show');
+    document.getElementById('styleExtractResult').innerHTML =
+      '<div class="result-box" style="color:var(--error);">❌ 请求失败: ' + esc(e.message) + '</div>';
+  });
+}
+
+function renderStyleFingerprint(fp) {
+  var html = '<div class="card"><div class="card-title">风格指纹</div>';
+  // 数值维度
+  var numericKeys = Object.keys(fp).filter(function(k) {
+    return typeof fp[k] === 'number' && k !== 'score';
+  });
+  if (numericKeys.length > 0) {
+    numericKeys.forEach(function(k) {
+      html += scoreBar(k, Math.round(fp[k] * 100) / 100, fp[k] > 1 && fp[k] <= 10 ? 10 : (fp[k] > 10 ? 100 : 1));
+    });
+  }
+  // 其他字段
+  var otherKeys = Object.keys(fp).filter(function(k) { return numericKeys.indexOf(k) === -1; });
+  if (otherKeys.length > 0) {
+    html += '<div style="margin-top:12px;">';
+    otherKeys.forEach(function(k) {
+      var v = fp[k];
+      html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span>';
+      html += (v !== null && typeof v === 'object') ? renderKeyValue(v) : '<span class="kv-val">' + esc(v) + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<div class="card"><div class="card-title">原始数据</div><pre class="result-box json-view">' + esc(JSON.stringify(fp, null, 2)) + '</pre></div>';
+  document.getElementById('styleExtractResult').innerHTML = html;
+}
+
+var stylePresetsLoaded = false;
+function loadStylePresets() {
+  if (stylePresetsLoaded) return;
+  stylePresetsLoaded = true;
+  var loading = document.getElementById('stylePresetsLoading');
+  var grid = document.getElementById('stylePresetsGrid');
+  var error = document.getElementById('stylePresetsError');
+
+  apiFetch('/api/v1/workstation/style/presets', { method: 'GET' })
+  .then(function(d) {
+    loading.classList.remove('show');
+    if (d.success && d.styles) {
+      grid.style.display = 'grid';
+      var styles = Array.isArray(d.styles) ? d.styles : Object.values(d.styles);
+      grid.innerHTML = styles.map(function(s) {
+        var name = s.name || s.title || s.style_name || '未命名';
+        var desc = s.description || s.desc || s.summary || '';
+        return '<div class="style-card" onclick=\'applyStylePreset(' + JSON.stringify(name).replace(/'/g, "\\'") + ')\'>' +
+          '<div class="style-card-name">' + esc(name) + '</div>' +
+          '<div class="style-card-desc">' + esc(desc) + '</div>' +
+          '</div>';
+      }).join('');
+    } else {
+      error.style.display = 'block';
+      error.textContent = '加载失败: ' + (d.error || '未知错误');
+    }
+  })
+  .catch(function(e) {
+    loading.classList.remove('show');
+    error.style.display = 'block';
+    error.textContent = '请求失败: ' + e.message;
+  });
+}
+
+function applyStylePreset(name) {
+  // 切换到提取风格标签，填入预设名作为作者参考
+  document.querySelector('#panel-style .tab[data-style-tab="extract"]').click();
+  document.getElementById('styleAuthor').value = name;
+}
+
+function styleCompare() {
+  var t1 = document.getElementById('styleText1').value.trim();
+  var t2 = document.getElementById('styleText2').value.trim();
+  if (!t1 || !t2) { alert('请输入两段文本'); return; }
+  var loading = document.getElementById('styleCompareLoading');
+  loading.classList.add('show');
+
+  apiFetch('/api/v1/workstation/style/similarity', {
+    method: 'POST',
+    body: JSON.stringify({ text1: t1, text2: t2 })
+  })
+  .then(function(d) {
+    loading.classList.remove('show');
+    if (d.success && d.result) {
+      renderStyleCompare(d.result);
+    } else {
+      document.getElementById('styleCompareResult').innerHTML =
+        '<div class="result-box" style="color:var(--error);">❌ 对比失败: ' + esc(d.error || '未知错误') + '</div>';
+    }
+  })
+  .catch(function(e) {
+    loading.classList.remove('show');
+    document.getElementById('styleCompareResult').innerHTML =
+      '<div class="result-box" style="color:var(--error);">❌ 请求失败: ' + esc(e.message) + '</div>';
+  });
+}
+
+function renderStyleCompare(result) {
+  var sim = result.similarity !== undefined ? result.similarity : (result.score || result.total_similarity || '-');
+  var color = typeof sim === 'number' ? (sim >= 0.7 ? 'var(--success)' : sim >= 0.4 ? 'var(--warning)' : 'var(--error)') : 'var(--text-primary)';
+
+  var html = '<div class="total-score-box">' +
+    '<div class="total-score-label">风格相似度</div>' +
+    '<div class="big-score" style="color:' + color + ';">' + esc(sim) + '</div>' +
+    '</div>';
+
+  // 维度对比（灵活解析）
+  var dims = result.dimensions || result.dimension_scores || result.details || {};
+  if (typeof dims === 'object' && dims !== null && !Array.isArray(dims)) {
+    html += '<div class="card"><div class="card-title">维度对比</div>';
+    Object.entries(dims).forEach(function(entry) {
+      var v = entry[1];
+      if (typeof v === 'number') {
+        html += scoreBar(entry[0], Math.round(v * 100) / 100, v > 1 ? 100 : 1);
+      } else {
+        html += '<div class="kv-row"><span class="kv-key">' + esc(entry[0]) + '</span>' +
+          ((v !== null && typeof v === 'object') ? renderKeyValue(v) : '<span class="kv-val">' + esc(v) + '</span>') + '</div>';
+      }
+    });
+    html += '</div>';
+  } else if (Array.isArray(dims)) {
+    html += '<div class="card"><div class="card-title">维度对比</div>';
+    dims.forEach(function(dim) {
+      var name = dim.dimension || dim.name || '维度';
+      var s = dim.score !== undefined ? dim.score : '-';
+      html += scoreBar(name, typeof s === 'number' ? s : 0, 100);
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="card"><div class="card-title">原始数据</div><pre class="result-box json-view">' + esc(JSON.stringify(result, null, 2)) + '</pre></div>';
+  document.getElementById('styleCompareResult').innerHTML = html;
+}
+
+/* ============================================================
+   面板 5：记忆管理
+   ============================================================ */
+function memoryQuery() {
+  var bookId = document.getElementById('memoryBookId').value.trim() || 'default';
+  var loading = document.getElementById('memoryQueryLoading');
+  loading.classList.add('show');
+
+  apiFetch('/api/v1/workstation/memory/query', {
+    method: 'POST',
+    body: JSON.stringify({ book_id: bookId })
+  })
+  .then(function(d) {
+    loading.classList.remove('show');
+    if (d.success && d.memory) {
+      renderMemoryResult(d.memory);
+    } else {
+      document.getElementById('memoryQueryResult').innerHTML =
+        '<div class="result-box" style="color:var(--error);">❌ 查询失败: ' + esc(d.error || '未知错误') + '</div>';
+    }
+  })
+  .catch(function(e) {
+    loading.classList.remove('show');
+    document.getElementById('memoryQueryResult').innerHTML =
+      '<div class="result-box" style="color:var(--error);">❌ 请求失败: ' + esc(e.message) + '</div>';
+  });
+}
+
+function renderMemoryResult(memory) {
+  var html = '<div class="card"><div class="card-title">记忆系统状态</div>';
+
+  // 如果 memory 本身是 dict，灵活遍历所有键
+  if (typeof memory === 'object' && memory !== null && !Array.isArray(memory)) {
+    // 先展示各层记忆数量
+    var layers = memory.layers || memory.layer_counts || memory.stats || {};
+    if (typeof layers === 'object' && layers !== null) {
+      html += '<div style="margin-bottom:12px;">';
+      Object.entries(layers).forEach(function(entry) {
+        var k = entry[0], v = entry[1];
+        if (typeof v === 'number') {
+          html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span><span class="kv-val">' + esc(v) + ' 条</span></div>';
+        } else if (v !== null && typeof v === 'object') {
+          html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span>' + renderKeyValue(v) + '</div>';
+        } else {
+          html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span><span class="kv-val">' + esc(v) + '</span></div>';
+        }
+      });
+      html += '</div>';
+    }
+
+    // Token 使用
+    var token = memory.token_usage || memory.tokens || memory.token_info;
+    if (token) {
+      html += '<div class="card-title" style="margin-top:8px;">Token 使用</div>';
+      html += renderKeyValue(token);
+    }
+
+    // 其余字段
+    var otherKeys = Object.keys(memory).filter(function(k) {
+      return ['layers','layer_counts','stats','token_usage','tokens','token_info'].indexOf(k) === -1;
+    });
+    if (otherKeys.length > 0) {
+      html += '<div class="card-title" style="margin-top:12px;">其他信息</div>';
+      otherKeys.forEach(function(k) {
+        var v = memory[k];
+        html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span>';
+        html += (v !== null && typeof v === 'object') ? renderKeyValue(v) : '<span class="kv-val">' + esc(v) + '</span>';
+        html += '</div>';
+      });
+    }
+  } else {
+    html += '<pre class="result-box json-view">' + esc(JSON.stringify(memory, null, 2)) + '</pre>';
+  }
+
+  html += '</div>';
+  html += '<div class="card"><div class="card-title">原始数据</div><pre class="result-box json-view">' + esc(JSON.stringify(memory, null, 2)) + '</pre></div>';
+  document.getElementById('memoryQueryResult').innerHTML = html;
+}
+
+function memoryAdd() {
+  var bookId = document.getElementById('memoryBookId').value.trim() || 'default';
+  var content = document.getElementById('memoryContent').value.trim();
+  var layer = document.getElementById('memoryLayer').value;
+  if (!content) { alert('请输入记忆内容'); return; }
+  var loading = document.getElementById('memoryAddLoading');
+  var resultEl = document.getElementById('memoryAddResult');
+  loading.classList.add('show');
+  resultEl.textContent = '';
+
+  apiFetch('/api/v1/workstation/memory/add', {
+    method: 'POST',
+    body: JSON.stringify({ book_id: bookId, content: content, layer: layer })
+  })
+  .then(function(d) {
+    loading.classList.remove('show');
+    if (d.success) {
+      resultEl.innerHTML = '<span style="color:var(--success);">✅ 添加成功 ID: ' + esc(d.id || '-') + '</span>';
+      document.getElementById('memoryContent').value = '';
+    } else {
+      resultEl.innerHTML = '<span style="color:var(--error);">❌ ' + esc(d.error || '添加失败') + '</span>';
+    }
+  })
+  .catch(function(e) {
+    loading.classList.remove('show');
+    resultEl.innerHTML = '<span style="color:var(--error);">❌ 请求失败: ' + esc(e.message) + '</span>';
+  });
+}
+
+/* ============================================================
+   面板 6：辩论审校
+   ============================================================ */
+function debateReview() {
+  var text = document.getElementById('debateText').value.trim();
+  if (!text) { alert('请先输入待审校文本'); return; }
+  var chapter = parseInt(document.getElementById('debateChapter').value) || 1;
+  var target = parseInt(document.getElementById('debateTarget').value) || 85;
+  var btn = document.getElementById('debateBtn');
+  var loading = document.getElementById('debateLoading');
+  btn.disabled = true;
+  loading.classList.add('show');
+
+  apiFetch('/api/v1/workstation/debate-review', {
+    method: 'POST',
+    body: JSON.stringify({ text: text, chapter: chapter, target_score: target })
+  })
+  .then(function(d) {
+    btn.disabled = false;
+    loading.classList.remove('show');
+    if (d.success && d.result) {
+      renderDebateResult(d.result);
+    } else {
+      document.getElementById('debateResult').innerHTML =
+        '<div class="result-box" style="color:var(--error);">❌ 审校失败: ' + esc(d.error || '未知错误') + '</div>';
+    }
+  })
+  .catch(function(e) {
+    btn.disabled = false;
+    loading.classList.remove('show');
+    document.getElementById('debateResult').innerHTML =
+      '<div class="result-box" style="color:var(--error);">❌ 请求失败: ' + esc(e.message) + '</div>';
+  });
+}
+
+function renderDebateResult(result) {
+  var html = '';
+
+  // 总分
+  var total = result.total_score !== undefined ? result.total_score : (result.score || '-');
+  html += '<div class="total-score-box">' +
+    '<div class="total-score-label">审校总分</div>' +
+    '<div class="big-score" style="color:' + scoreColor(total) + ';">' + esc(total) + '</div>' +
+    '</div>';
+
+  // 各维度分数
+  var dims = result.dimension_scores || result.dimensions || result.scores || {};
+  if (typeof dims === 'object' && dims !== null) {
+    html += '<div class="card"><div class="card-title">各维度分数</div>';
+    Object.entries(dims).forEach(function(entry) {
+      var v = entry[1];
+      if (typeof v === 'number') {
+        html += scoreBar(entry[0], v, 100);
+      } else if (v !== null && typeof v === 'object') {
+        var s = v.score !== undefined ? v.score : '-';
+        html += scoreBar(entry[0], typeof s === 'number' ? s : 0, 100);
+        if (v.detail) html += '<div class="dim-detail">' + esc(v.detail) + '</div>';
+      }
+    });
+    html += '</div>';
+  }
+
+  // 问题列表
+  var issues = result.issues || result.problems || result.findings || [];
+  if (issues.length > 0) {
+    html += '<div class="card"><div class="card-title">问题列表（' + issues.length + '）</div>';
+    issues.forEach(function(issue) {
+      var sev = issue.severity || issue.level || 'low';
+      var sevClass = sev === 'high' || sev === '严重' ? 'high' : (sev === 'mid' || sev === 'medium' || sev === '中等' ? 'mid' : 'low');
+      var loc = issue.location || issue.position || issue.chapter || '';
+      var desc = issue.description || issue.desc || issue.problem || '';
+      var sug = issue.suggestion || issue.advice || '';
+      html += '<div class="issue-item severity-' + sevClass + '">' +
+        '<div class="issue-header">' +
+        '<span class="issue-severity ' + sevClass + '">' + esc(sev) + '</span>' +
+        (loc ? '<span class="issue-location">' + esc(loc) + '</span>' : '') +
+        '</div>' +
+        (desc ? '<div class="issue-desc">' + esc(desc) + '</div>' : '') +
+        (sug ? '<div class="issue-suggestion">💡 ' + esc(sug) + '</div>' : '') +
+        '</div>';
+    });
+    html += '</div>';
+  }
+
+  // 辩论轮次摘要
+  var rounds = result.debate_rounds || result.rounds || result.debate_summary;
+  if (rounds) {
+    html += '<div class="card"><div class="card-title">辩论轮次摘要</div>';
+    if (Array.isArray(rounds)) {
+      rounds.forEach(function(r, i) {
+        html += '<div class="kv-row"><span class="kv-key">第 ' + (i + 1) + ' 轮</span>';
+        html += (r !== null && typeof r === 'object') ? renderKeyValue(r) : '<span class="kv-val">' + esc(r) + '</span>';
+        html += '</div>';
+      });
+    } else {
+      html += renderKeyValue(rounds);
+    }
+    html += '</div>';
+  }
+
+  // 其他字段
+  var extraKeys = Object.keys(result).filter(function(k) {
+    return ['total_score','score','dimension_scores','dimensions','scores','issues','problems','findings','debate_rounds','rounds','debate_summary'].indexOf(k) === -1;
+  });
+  if (extraKeys.length > 0) {
+    html += '<div class="card"><div class="card-title">其他信息</div>';
+    extraKeys.forEach(function(k) {
+      var v = result[k];
+      html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span>';
+      html += (v !== null && typeof v === 'object') ? renderKeyValue(v) : '<span class="kv-val">' + esc(v) + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="card"><div class="card-title">原始数据</div><pre class="result-box json-view">' + esc(JSON.stringify(result, null, 2)) + '</pre></div>';
+  document.getElementById('debateResult').innerHTML = html;
+}
+
+function readerSimulate() {
+  var text = document.getElementById('debateText').value.trim();
+  if (!text) { alert('请先输入文本'); return; }
+  var chapter = parseInt(document.getElementById('debateChapter').value) || 1;
+  var loading = document.getElementById('debateLoading');
+  loading.classList.add('show');
+
+  apiFetch('/api/v1/workstation/reader-simulate', {
+    method: 'POST',
+    body: JSON.stringify({ text: text, chapter: chapter })
+  })
+  .then(function(d) {
+    loading.classList.remove('show');
+    if (d.success && d.result) {
+      renderReaderResult(d.result);
+    } else {
+      alert('读者模拟失败: ' + (d.error || '未知错误'));
+    }
+  })
+  .catch(function(e) {
+    loading.classList.remove('show');
+    alert('请求失败: ' + e.message);
+  });
+}
+
+function renderReaderResult(result) {
+  var box = document.getElementById('readerResult');
+  box.style.display = 'block';
+  var html = '';
+
+  // 核心指标
+  var avg = result.average_score !== undefined ? result.average_score : (result.avg_score || '-');
+  var retain = result.retention_rate !== undefined ? result.retention_rate : (result.read_rate || '-');
+  var satisfy = result.satisfaction !== undefined ? result.satisfaction : (result.climax_satisfaction || '-');
+
+  html += '<div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">';
+  html += '<div class="total-score-box" style="flex:1; min-width:140px;"><div class="total-score-label">平均分</div><div class="big-score" style="color:' + scoreColor(avg) + ';">' + esc(avg) + '</div></div>';
+  html += '<div class="total-score-box" style="flex:1; min-width:140px;"><div class="total-score-label">追读率</div><div class="big-score" style="color:' + scoreColor(retain) + ';">' + esc(retain) + '</div></div>';
+  html += '<div class="total-score-box" style="flex:1; min-width:140px;"><div class="total-score-label">爽点满意度</div><div class="big-score" style="color:' + scoreColor(satisfy) + ';">' + esc(satisfy) + '</div></div>';
+  html += '</div>';
+
+  // 好评 / 差评
+  var good = result.positive_comments || result.good_comments || result.common_praise || [];
+  var bad = result.negative_comments || result.bad_comments || result.common_criticism || [];
+  if (good.length > 0) {
+    html += '<div class="card"><div class="card-title">常见好评</div>';
+    good.forEach(function(c) {
+      html += '<div class="issue-item severity-low"><div class="issue-desc" style="color:var(--success);">👍 ' + esc(typeof c === 'string' ? c : (c.comment || c.text || JSON.stringify(c))) + '</div></div>';
+    });
+    html += '</div>';
+  }
+  if (bad.length > 0) {
+    html += '<div class="card"><div class="card-title">常见差评</div>';
+    bad.forEach(function(c) {
+      html += '<div class="issue-item severity-high"><div class="issue-desc" style="color:var(--error);">👎 ' + esc(typeof c === 'string' ? c : (c.comment || c.text || JSON.stringify(c))) + '</div></div>';
+    });
+    html += '</div>';
+  }
+
+  // 其他字段
+  var extraKeys = Object.keys(result).filter(function(k) {
+    return ['average_score','avg_score','retention_rate','read_rate','satisfaction','climax_satisfaction',
+            'positive_comments','good_comments','common_praise','negative_comments','bad_comments','common_criticism'].indexOf(k) === -1;
+  });
+  if (extraKeys.length > 0) {
+    html += '<div class="card"><div class="card-title">详细反馈</div>';
+    extraKeys.forEach(function(k) {
+      var v = result[k];
+      html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span>';
+      html += (v !== null && typeof v === 'object') ? renderKeyValue(v) : '<span class="kv-val">' + esc(v) + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  document.getElementById('readerContent').innerHTML = html;
+}
+
+/* ============================================================
+   面板 7：导出
+   ============================================================ */
+function exportSetFormat(btn) {
+  document.querySelectorAll('#exportFormatGroup .btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  exportFormat = btn.getAttribute('data-format');
+}
+
+function exportBook() {
+  var bookId = document.getElementById('exportBookId').value.trim() || 'vibe_demo';
+  var loading = document.getElementById('exportLoading');
+  var resultEl = document.getElementById('exportResult');
+  loading.classList.add('show');
+  resultEl.innerHTML = '';
+
+  apiFetch('/api/v1/export/book?book_id=' + encodeURIComponent(bookId) + '&format=' + exportFormat, { method: 'POST' })
+  .then(function(d) {
+    loading.classList.remove('show');
+    if (d.success) {
+      resultEl.innerHTML = '<div class="result-box" style="color:var(--success);">✅ 导出成功！格式: ' + esc(exportFormat.toUpperCase()) + '<br>' +
+        (d.file_path ? '文件路径: ' + esc(d.file_path) : '') +
+        (d.message ? '<br>' + esc(d.message) : '') + '</div>';
+    } else {
+      resultEl.innerHTML = '<div class="result-box" style="color:var(--error);">❌ 导出失败: ' + esc(d.error || '未知错误') + '</div>';
+    }
+  })
+  .catch(function(e) {
+    loading.classList.remove('show');
+    resultEl.innerHTML = '<div class="result-box" style="color:var(--error);">❌ 请求失败: ' + esc(e.message) + '</div>';
+  });
+}
+
+function auditRun() {
+  var bookId = document.getElementById('auditBookId').value.trim() || 'vibe_demo';
+  var loading = document.getElementById('auditLoading');
+  var resultEl = document.getElementById('auditResult');
+  loading.classList.add('show');
+  resultEl.innerHTML = '';
+
+  apiFetch('/api/v1/audit/run?book_id=' + encodeURIComponent(bookId), { method: 'POST' })
+  .then(function(d) {
+    loading.classList.remove('show');
+    if (d.success && d.report) {
+      var report = d.report;
+      var score = report.score !== undefined ? report.score : (report.total_score || '-');
+      var html = '<div class="total-score-box">' +
+        '<div class="total-score-label">审计总分</div>' +
+        '<div class="big-score" style="color:' + scoreColor(score) + ';">' + esc(score) + '</div>' +
+        '</div>';
+      // 灵活展示所有字段
+      html += '<div class="card"><div class="card-title">审计报告</div>';
+      Object.entries(report).forEach(function(entry) {
+        var k = entry[0], v = entry[1];
+        if (k === 'score' || k === 'total_score') return;
+        html += '<div class="kv-row"><span class="kv-key">' + esc(k) + '</span>';
+        html += (v !== null && typeof v === 'object') ? renderKeyValue(v) : '<span class="kv-val">' + esc(v) + '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+      html += '<div class="card"><div class="card-title">原始数据</div><pre class="result-box json-view">' + esc(JSON.stringify(report, null, 2)) + '</pre></div>';
+      resultEl.innerHTML = html;
+    } else {
+      resultEl.innerHTML = '<div class="result-box" style="color:var(--error);">❌ 审计失败: ' + esc(d.error || '未知错误') + '</div>';
+    }
+  })
+  .catch(function(e) {
+    loading.classList.remove('show');
+    resultEl.innerHTML = '<div class="result-box" style="color:var(--error);">❌ 请求失败: ' + esc(e.message) + '</div>';
+  });
+}
+
+/* ============================================================
+   初始化
+   ============================================================ */
+console.log('[昆仑创作引擎] 桌面工作台已加载，7 个面板就绪');
 </script>
 
 </body>
