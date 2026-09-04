@@ -279,6 +279,9 @@ class LongTextGenerator:
                 previous_text=full_text,
             )
 
+            # 段落温度自适应（微笑曲线：开篇稳→发展升→高潮放→结尾收）
+            seg_temp = self._get_segment_temperature(i, total_segments, temperature)
+
             messages = [{"role": "user", "content": segment_prompt}]
 
             import time
@@ -287,7 +290,7 @@ class LongTextGenerator:
                 result = await self.engine.chat(
                     messages=messages,
                     model=model,
-                    temperature=temperature or cfg.temperature_long,
+                    temperature=seg_temp,
                     max_tokens=int(cfg.segment_chars * 2),  # token≈字*2
                 )
                 elapsed = time.time() - start
@@ -345,6 +348,27 @@ class LongTextGenerator:
             dedup_removed=total_removed,
             dedup_details=details,
         )
+
+    @staticmethod
+    def _get_segment_temperature(index: int, total: int, base_temp: float | None = None) -> float:
+        """段落温度自适应（微笑曲线）
+
+        开篇/设定段: 0.70（保逻辑、锚定人设）
+        过渡段: 0.75（稳推进）
+        高潮/中段: 0.85（放开创作张力）
+        结尾段: 0.75（保闭环）
+        """
+        if total <= 1:
+            return base_temp if base_temp is not None else 0.78
+        ratio = index / (total - 1)
+        if ratio < 0.25:
+            return 0.70
+        elif ratio < 0.5:
+            return 0.75
+        elif ratio < 0.75:
+            return 0.85
+        else:
+            return 0.75
 
     @staticmethod
     def _clean_segment(text: str) -> str:

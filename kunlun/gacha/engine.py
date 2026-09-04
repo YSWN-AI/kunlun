@@ -46,6 +46,48 @@ from kunlun.gacha.circuit_breaker import (
 )
 from kunlun.gacha.param_variator import ParamVariator
 
+# ── Agent 温度映射（微笑曲线：创作端放开，质检端收紧）──
+# 原则: 任务约束越多温度越低，模型能力越弱温度越保守
+# 初稿0.75(稳) → 审计0.45(严) → 定稿0.85(放)
+AGENT_TEMPERATURES: dict[str, float] = {
+    # 创作类（中高温，保留创意张力）
+    "writer": 0.75,        # 初稿生成：稳，按章纲执行
+    "architect": 0.70,     # 大纲规划：中低温保逻辑
+    "editor": 0.85,        # 重写定稿：放，文采优化
+    "vibe_writer": 0.78,   # Vibe对话创作：中温
+    "plot": 0.72,          # 情节生成：稳推进
+    "character": 0.75,     # 人物描写：中温
+    "world": 0.70,         # 世界观设定：低温保一致
+    # 质检类（低温，严谨客观）
+    "auditor": 0.45,       # 审计门禁：严苛
+    "critic": 0.45,        # 批评Agent：最低温，纯分析
+    "reader": 0.50,        # 读者模拟：中低温，客观反馈
+    "debate": 0.45,        # 辩论审校：严苛
+    "reflector": 0.45,     # 反思Agent：低温分析
+    "sociologist": 0.50,   # 社会推演：中低温
+    "observer": 0.50,      # 观察Agent：中低温
+    "scheduler": 0.55,     # 调度Agent：中低温
+    "publisher": 0.60,     # 发布Agent：中温
+    # 默认
+    "default": 0.70,
+}
+
+DEFAULT_TEMPERATURE = 0.70
+
+
+def get_agent_temperature(agent: str) -> float:
+    """根据Agent名称获取推荐温度（微笑曲线策略）"""
+    if not agent:
+        return DEFAULT_TEMPERATURE
+    # 精确匹配
+    if agent in AGENT_TEMPERATURES:
+        return AGENT_TEMPERATURES[agent]
+    # 模糊匹配（如 "writer_agent" → "writer"）
+    for key, temp in AGENT_TEMPERATURES.items():
+        if key in agent.lower():
+            return temp
+    return DEFAULT_TEMPERATURE
+
 # ── 模型候选 ─────────────────────────────────────────
 
 
@@ -562,7 +604,7 @@ class GachaEngine:
             result = await self._call_llm(
                 candidate=candidate,
                 messages=messages,
-                temperature=params.get("temperature", 0.7),
+                temperature=params.get("temperature", get_agent_temperature(agent)),
                 max_tokens=params.get("max_tokens", 4096),
             )
             text = result.get("content", "")
@@ -599,7 +641,7 @@ class GachaEngine:
                 self._call_llm(
                     candidate=c,
                     messages=[{"role": "user", "content": prompt}],
-                    temperature=params.get("temperature", 0.7),
+                    temperature=params.get("temperature", get_agent_temperature(agent)),
                     max_tokens=params.get("max_tokens", 4096),
                 )
             )
