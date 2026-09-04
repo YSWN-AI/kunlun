@@ -74,3 +74,9 @@ frontend/dist/
 
 # Cleanup backups
 .cleanup_backups/
+
+# 小说原文数据（根目录，用户导入的训练语料，体积大不入库）
+/*.txt
+/*.epub
+/*.mobi
+/*.docx
