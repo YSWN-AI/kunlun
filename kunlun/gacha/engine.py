@@ -489,6 +489,60 @@ class GachaEngine:
         """为特定 Agent 生成 — generate() 的别名，保持向后兼容。"""
         return await self.generate(prompt, mode=mode, agent=agent, chapter_type=chapter_type)
 
+    async def generate_long_text(
+        self,
+        prompt: str,
+        model: str = "",
+        target_chars: int = 3000,
+        temperature: float | None = None,
+        segment_chars: int = 900,
+    ) -> dict:
+        """生成长文本（分段生成 + 去重后处理）
+
+        解决单次生成长文本时的重复问题：
+        1. 分段生成：每段约 segment_chars 字，传入前文摘要
+        2. 去重后处理：检测重复段落、重复n-gram并删除
+        3. 参数自适应：长文本时使用 repetition_penalty=1.05, top_p=0.9
+
+        Args:
+            prompt: 基础prompt
+            model: 模型名称（空则用默认）
+            target_chars: 目标总字数
+            temperature: 温度（None则用默认0.8）
+            segment_chars: 每段目标字数
+
+        Returns:
+            dict: 包含text/total_chars/segments/total_elapsed/dedup_removed/dedup_details
+        """
+        from kunlun.gacha.long_text import LongTextGenerator, LongTextConfig
+
+        config = LongTextConfig(segment_chars=segment_chars)
+        generator = LongTextGenerator(self, config)
+
+        result = await generator.generate(
+            prompt=prompt,
+            model=model,
+            target_chars=target_chars,
+            temperature=temperature,
+        )
+
+        return {
+            "text": result.text,
+            "total_chars": result.total_chars,
+            "segments": [
+                {
+                    "index": s.index,
+                    "text": s.text,
+                    "word_count": s.word_count,
+                    "elapsed": s.elapsed,
+                }
+                for s in result.segments
+            ],
+            "total_elapsed": result.total_elapsed,
+            "dedup_removed": result.dedup_removed,
+            "dedup_details": result.dedup_details,
+        }
+
     # ── 内部方法 ──────────────────────────────────────
 
     async def _generate_single(

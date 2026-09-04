@@ -360,25 +360,43 @@ class VibeOrchestrator:
         prompt = f"写{self._project.genre}小说《{self._project.title}》第{chapter}章。{text}"
 
         if self.use_local_model:
-            # 本地模型模式：使用single_chat直接调用本地适配器
-            logger.info(f"VibeOrchestrator: 使用本地模型 {self.local_model_name} 生成第{chapter}章")
-            messages = [{"role": "user", "content": prompt}]
-            chat_result = await gacha_engine.chat(
-                messages=messages,
+            # 本地模型模式：分段生成长文本，避免重复
+            logger.info(f"VibeOrchestrator: 使用本地模型 {self.local_model_name} 分段生成第{chapter}章")
+            long_result = await gacha_engine.generate_long_text(
+                prompt=prompt,
                 model=self.local_model_name,
+                target_chars=2500,
                 temperature=0.8,
-                max_tokens=2048,
+                segment_chars=900,
             )
-            draft = chat_result.get("content", "")
+            draft = long_result.get("text", "")
+            dedup_removed = long_result.get("dedup_removed", 0)
+            logger.info(f"VibeOrchestrator: 分段生成完成，{len(draft)}字，去重删除{dedup_removed}处")
             result = {
                 "best_text": draft,
                 "best_model": f"local:{self.local_model_name}",
                 "best_score": 1.0,
+                "segments": long_result.get("segments", []),
+                "dedup_removed": dedup_removed,
             }
         else:
-            # API模型模式：多模型级联抽卡
-            result = await gacha_engine.generate(prompt, mode="gacha_cascade")
-            draft = result.get("best_text", "")
+            # API模型模式：多模型级联抽卡（长文本也用分段生成）
+            logger.info(f"VibeOrchestrator: 使用API模型分段生成第{chapter}章")
+            long_result = await gacha_engine.generate_long_text(
+                prompt=prompt,
+                target_chars=2500,
+                temperature=0.8,
+                segment_chars=900,
+            )
+            draft = long_result.get("text", "")
+            dedup_removed = long_result.get("dedup_removed", 0)
+            result = {
+                "best_text": draft,
+                "best_model": "gacha_long_text",
+                "best_score": 1.0,
+                "segments": long_result.get("segments", []),
+                "dedup_removed": dedup_removed,
+            }
 
         # 保存章节文件
         ch_file = self._project.data_dir / "chapters" / f"ch{chapter:04d}.md"
