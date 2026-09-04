@@ -91,6 +91,20 @@ class VibeOrchestrator:
         self._project: BookProject | None = None
         self._conversation: list[dict] = []  # 完整对话历史
         self._last_suggestion: str = ""
+        # 本地模型配置
+        self.use_local_model: bool = False
+        self.local_model_name: str = "novel_style_qwen7b"
+
+    def set_local_model(self, enabled: bool = True, model_name: str = "novel_style_qwen7b") -> None:
+        """启用/禁用本地模型生成
+
+        Args:
+            enabled: 是否启用本地模型
+            model_name: 本地模型名称（gacha中注册的适配器名）
+        """
+        self.use_local_model = enabled
+        self.local_model_name = model_name
+        logger.info(f"VibeOrchestrator: 本地模型 {'启用' if enabled else '禁用'} (model={model_name})")
 
     # ═══════════════════════════════════════════════════════
     # 核心接口 — 你只需要说一句话
@@ -340,13 +354,31 @@ class VibeOrchestrator:
             )
         )
 
-        # 通过 gacha 生成
+        # 通过 gacha 生成（支持本地模型）
         from kunlun.gacha.engine import gacha_engine
 
         prompt = f"写{self._project.genre}小说《{self._project.title}》第{chapter}章。{text}"
-        result = await gacha_engine.generate(prompt, mode="gacha_cascade")
 
-        draft = result.get("best_text", "")
+        if self.use_local_model:
+            # 本地模型模式：使用single_chat直接调用本地适配器
+            logger.info(f"VibeOrchestrator: 使用本地模型 {self.local_model_name} 生成第{chapter}章")
+            messages = [{"role": "user", "content": prompt}]
+            chat_result = await gacha_engine.chat(
+                messages=messages,
+                model=self.local_model_name,
+                temperature=0.8,
+                max_tokens=2048,
+            )
+            draft = chat_result.get("content", "")
+            result = {
+                "best_text": draft,
+                "best_model": f"local:{self.local_model_name}",
+                "best_score": 1.0,
+            }
+        else:
+            # API模型模式：多模型级联抽卡
+            result = await gacha_engine.generate(prompt, mode="gacha_cascade")
+            draft = result.get("best_text", "")
 
         # 保存章节文件
         ch_file = self._project.data_dir / "chapters" / f"ch{chapter:04d}.md"
