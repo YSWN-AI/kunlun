@@ -76,6 +76,18 @@ DEFAULT_MODELS: list[dict] = [
         "base_url": "",
         "api_key_env": "OPENAI_API_KEY",
     },
+    {
+        "provider": "local",
+        "model": "novel_style_qwen05b",
+        "base_url": "",
+        "api_key_env": "",
+    },
+    {
+        "provider": "local",
+        "model": "novel_style_qwen7b",
+        "base_url": "",
+        "api_key_env": "",
+    },
 ]
 
 
@@ -203,13 +215,25 @@ class GachaEngine:
     def _init_models(self) -> None:
         """初始化模型候选列表"""
         for cfg in DEFAULT_MODELS:
+            provider = cfg.get("provider", "openai_compat")
+            # 本地模型不需要 api_key，直接添加
+            if provider == "local":
+                self._models.append(
+                    ModelCandidate(
+                        provider=provider,
+                        model=cfg["model"],
+                        base_url=cfg.get("base_url", ""),
+                        api_key="",
+                    )
+                )
+                continue
             attr_name = cfg["api_key_env"].lower()
             api_key = getattr(settings, attr_name, "") or ""
             if api_key:
                 base_url = cfg.get("base_url", "") or getattr(settings, "openai_base_url", "")
                 self._models.append(
                     ModelCandidate(
-                        provider=cfg["provider"],
+                        provider=provider,
                         model=cfg["model"],
                         base_url=base_url,
                         api_key=api_key,
@@ -592,6 +616,15 @@ class GachaEngine:
         """
         import httpx
 
+        # 本地模型分支：provider == "local" 时走 LocalInferenceEngine
+        if candidate.provider == "local":
+            return await self._call_local_llm(
+                candidate=candidate,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+
         url = f"{candidate.base_url}/chat/completions"
         breaker = self._get_breaker(candidate.base_url)
 
@@ -691,6 +724,81 @@ class GachaEngine:
 
         # async with 块之后（__aexit__ 返回 False 不吞异常，理论上不可达）
         raise RuntimeError(f"{candidate.model} 调用失败（熔断器异常退出）")
+
+
+    async def _call_local_llm(
+        self,
+        candidate: ModelCandidate,
+        messages: list[dict],
+        temperature: float = 0.7,
+        max_tokens: int = 4096,
+    ) -> dict:
+        """调用本地 LoRA 模型（通过 LocalInferenceEngine）
+
+        通过 AdapterManager 查找适配器元数据（基座模型路径 + 适配器路径），
+        加载模型后生成。模型加载是懒加载单例，首次调用较慢，后续复用。
+
+        Args:
+            candidate: 模型候选（model 字段为适配器名称）
+            messages: OpenAI 格式消息列表
+            temperature: 温度
+            max_tokens: 最大生成 token 数
+
+        Returns:
+            {"content": str, "model": str, "usage": dict}
+        """
+        from kunlun.finetune.local_inference import get_local_engine
+        from kunlun.finetune.adapter_manager import AdapterManager
+
+        adapter_name = candidate.model
+        engine = get_local_engine()
+
+        # 如果模型未加载或适配器不匹配，加载适配器
+        if not engine.is_loaded() or engine.current_adapter != adapter_name:
+            mgr = AdapterManager("data/adapters")
+            info = mgr.load_adapter(adapter_name)
+            if info is None:
+                raise RuntimeError(
+                    f"本地适配器 {adapter_name} 未注册，"
+                    f"请先在 data/adapters/ 下注册"
+                )
+
+            # 从 metadata 中获取基座模型路径和适配器路径
+            import json
+            from pathlib import Path
+
+            meta_path = Path(info.path) / "metadata.json"
+            base_model_path = ""
+            if meta_path.exists():
+                with open(meta_path, "r", encoding="utf-8") as f:
+                    meta = json.load(f)
+                base_model_path = meta.get("base_model_path", "")
+
+            if not base_model_path:
+                raise RuntimeError(
+                    f"适配器 {adapter_name} 的 metadata.json 中缺少 base_model_path"
+                )
+
+            # 从metadata读取是否需要4bit量化
+            load_in_4bit = meta.get("load_in_4bit", False) if meta_path.exists() else False
+
+            # 在线程中加载模型（避免阻塞事件循环）
+            import asyncio
+
+            await asyncio.to_thread(
+                engine.load_adapter,
+                adapter_name=adapter_name,
+                base_model_path=base_model_path,
+                adapter_path=info.path,
+                load_in_4bit=load_in_4bit,
+            )
+
+        # 生成
+        return await engine.chat(
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
 
     async def _make_http_call(
         self,
