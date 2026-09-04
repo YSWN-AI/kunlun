@@ -146,7 +146,7 @@ class DashboardEngine:
 
         word_counts = list(chapters.values())
         return {
-            "total_chapters": len(word_counts),
+            "chapter_count": len(word_counts),
             "total_words": sum(word_counts),
             "avg_words_per_chapter": int(sum(word_counts) / max(len(word_counts), 1)),
             "min_chapter_words": min(word_counts) if word_counts else 0,
