@@ -793,11 +793,13 @@ class GachaEngine:
                 load_in_4bit=load_in_4bit,
             )
 
-        # 生成
+        # 生成（本地模型使用更低的 repetition_penalty 避免提前停止，限制 max_tokens 上限）
+        local_max_tokens = min(max_tokens, 2048)
         return await engine.chat(
             messages=messages,
             temperature=temperature,
-            max_tokens=max_tokens,
+            max_tokens=local_max_tokens,
+            repetition_penalty=1.02,
         )
 
     async def _make_http_call(
