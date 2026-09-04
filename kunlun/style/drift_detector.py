@@ -89,9 +89,7 @@ class StyleDriftDetector:
             return 0.0
 
         similarity = self._calc_similarity(fp, self.target_fingerprint)
-        logger.info(
-            f"[StyleDriftDetector] 第{chapter}章记录完成，相似度: {similarity:.3f}"
-        )
+        logger.info(f"[StyleDriftDetector] 第{chapter}章记录完成，相似度: {similarity:.3f}")
         return similarity
 
     def check_drift(self, chapter: int, text: str) -> DriftReport:
@@ -108,8 +106,12 @@ class StyleDriftDetector:
 
         if self.target_fingerprint is None:
             logger.warning("[StyleDriftDetector] 未设置目标风格，返回空报告")
-            return DriftReport(chapter=chapter, similarity=0.0, drifted=False,
-                                suggestion="未设置目标风格指纹，请先调用set_target()")
+            return DriftReport(
+                chapter=chapter,
+                similarity=0.0,
+                drifted=False,
+                suggestion="未设置目标风格指纹，请先调用set_target()",
+            )
 
         similarity = self._calc_similarity(fp, self.target_fingerprint)
         drifted = similarity < self.drift_threshold
@@ -130,9 +132,7 @@ class StyleDriftDetector:
                 f"相似度={similarity:.3f} < 阈值={self.drift_threshold}"
             )
         else:
-            logger.info(
-                f"[StyleDriftDetector] 第{chapter}章风格一致，相似度: {similarity:.3f}"
-            )
+            logger.info(f"[StyleDriftDetector] 第{chapter}章风格一致，相似度: {similarity:.3f}")
 
         return report
 
@@ -148,11 +148,13 @@ class StyleDriftDetector:
                 sim = self._calc_similarity(fp, self.target_fingerprint)
             else:
                 sim = 0.0
-            trend.append({
-                "chapter": chapter,
-                "similarity": round(sim, 4),
-                "drifted": sim < self.drift_threshold,
-            })
+            trend.append(
+                {
+                    "chapter": chapter,
+                    "similarity": round(sim, 4),
+                    "drifted": sim < self.drift_threshold,
+                }
+            )
         return trend
 
     def get_drift_dimensions(self, chapter_fp: StyleFingerprint) -> dict[str, float]:
@@ -221,7 +223,9 @@ class StyleDriftDetector:
         sorted_dims = sorted(dimensions.items(), key=lambda x: x[1], reverse=True)
         top_dims = sorted_dims[:3]
 
-        suggestions = [f"风格漂移（相似度{similarity:.2f} < 阈值{self.drift_threshold}），主要差异:"]
+        suggestions = [
+            f"风格漂移（相似度{similarity:.2f} < 阈值{self.drift_threshold}），主要差异:"
+        ]
         for dim_name, diff in top_dims:
             if diff > 0.01:
                 suggestions.append(f"  - {dim_name}: 偏差{diff:.2f}，建议向目标风格靠拢")

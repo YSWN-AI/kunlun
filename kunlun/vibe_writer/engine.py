@@ -88,7 +88,9 @@ class VibeResponse:
             "suggestions_count": len(self.suggestions),
             "alternatives_count": len(self.alternatives),
             "mood": self.mood.value if self.mood else None,
-            "quality_score": self.quality_feedback.get("overall_score", 0) if self.quality_feedback else 0,
+            "quality_score": self.quality_feedback.get("overall_score", 0)
+            if self.quality_feedback
+            else 0,
             "ai_rate": self.quality_feedback.get("ai_rate", 0) if self.quality_feedback else 0,
         }
 
@@ -287,19 +289,54 @@ class VibeWriter(BaseExtensionModule):
         intent, _confidence = self._router.detect_intent(user_input, self._context)
         # 场景类型关键词
         scene_map = {
-            "打": "战斗", "战": "战斗", "斗": "战斗", "追": "追逐", "逃": "追逐",
-            "说": "对话", "谈": "对话", "问": "对话", "想": "内心", "回忆": "回忆",
-            "描写": "环境", "景": "环境", "修炼": "修炼", "突破": "修炼", "交易": "交易",
+            "打": "战斗",
+            "战": "战斗",
+            "斗": "战斗",
+            "追": "追逐",
+            "逃": "追逐",
+            "说": "对话",
+            "谈": "对话",
+            "问": "对话",
+            "想": "内心",
+            "回忆": "回忆",
+            "描写": "环境",
+            "景": "环境",
+            "修炼": "修炼",
+            "突破": "修炼",
+            "交易": "交易",
         }
         # 情感基调关键词
         emo_map = {
-            "怒": "愤怒", "激": "兴奋", "激动": "兴奋", "紧张": "紧张", "危急": "紧张",
-            "悲": "悲伤", "伤心": "悲伤", "甜": "甜蜜", "暖": "温馨", "开心": "喜悦", "平静": "平静",
+            "怒": "愤怒",
+            "激": "兴奋",
+            "激动": "兴奋",
+            "紧张": "紧张",
+            "危急": "紧张",
+            "悲": "悲伤",
+            "伤心": "悲伤",
+            "甜": "甜蜜",
+            "暖": "温馨",
+            "开心": "喜悦",
+            "平静": "平静",
         }
         # 节奏关键词
-        pace_map = {"快": "快速", "紧凑": "紧凑", "急": "急促", "慢": "舒缓", "悠闲": "舒缓", "稳": "稳健"}
+        pace_map = {
+            "快": "快速",
+            "紧凑": "紧凑",
+            "急": "急促",
+            "慢": "舒缓",
+            "悠闲": "舒缓",
+            "稳": "稳健",
+        }
         # 强度关键词
-        inten_map = {"激烈": "高", "惨烈": "高", "生死": "高", "高": "强", "轻松": "低", "日常": "低"}
+        inten_map = {
+            "激烈": "高",
+            "惨烈": "高",
+            "生死": "高",
+            "高": "强",
+            "轻松": "低",
+            "日常": "低",
+        }
 
         scene = next((v for k, v in scene_map.items() if k in user_input), "")
         emotion = next((v for k, v in emo_map.items() if k in user_input), "")
@@ -366,6 +403,7 @@ class VibeWriter(BaseExtensionModule):
         if generated_text and len(generated_text) > 50:
             try:
                 from kunlun.vibe_writer.quality_feedback import vibe_quality_feedback
+
                 qf = vibe_quality_feedback.analyze(generated_text, chapter=0)
                 quality_fb = qf.to_dict()
             except Exception as e:
@@ -397,6 +435,7 @@ class VibeWriter(BaseExtensionModule):
             return None
         try:
             from kunlun.vibe_writer.quality_feedback import vibe_quality_feedback
+
             qf = vibe_quality_feedback.analyze(target_text, chapter)
             return qf.to_dict()
         except Exception as e:

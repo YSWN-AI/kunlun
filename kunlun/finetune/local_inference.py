@@ -16,15 +16,14 @@ from __future__ import annotations
 
 import asyncio
 import gc
-import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import torch
 from loguru import logger
 
 # 全局单例
-_engine: "LocalInferenceEngine | None" = None
+_engine: LocalInferenceEngine | None = None
 
 
 class LocalInferenceEngine:
@@ -37,15 +36,15 @@ class LocalInferenceEngine:
     """
 
     def __init__(self) -> None:
-        self.model: Optional[Any] = None
-        self.tokenizer: Optional[Any] = None
+        self.model: Any | None = None
+        self.tokenizer: Any | None = None
         self.current_adapter: str = ""
         self.current_base_model: str = ""
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self._load_lock = asyncio.Lock()
 
     @classmethod
-    def get_instance(cls) -> "LocalInferenceEngine":
+    def get_instance(cls) -> LocalInferenceEngine:
         """获取全局单例"""
         global _engine
         if _engine is None:
@@ -76,8 +75,8 @@ class LocalInferenceEngine:
         Returns:
             True 表示成功
         """
-        from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
         from peft import PeftModel
+        from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
         # 如果已加载相同适配器，跳过
         if self.is_loaded() and self.current_adapter == adapter_name:
@@ -90,9 +89,7 @@ class LocalInferenceEngine:
         logger.info(f"LocalInference: 加载基座模型 {base_model_path} (4bit={load_in_4bit})")
         torch_dtype = getattr(torch, dtype, torch.float16)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            base_model_path, trust_remote_code=True
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained(base_model_path, trust_remote_code=True)
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
@@ -131,7 +128,7 @@ class LocalInferenceEngine:
         params = sum(p.numel() for p in self.model.parameters())
         logger.info(
             f"LocalInference: 模型加载完成，适配器={adapter_name}，"
-            f"参数={params/1e6:.1f}M，设备={self.device}"
+            f"参数={params / 1e6:.1f}M，设备={self.device}"
         )
         return True
 

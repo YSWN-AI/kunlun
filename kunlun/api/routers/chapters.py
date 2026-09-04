@@ -95,7 +95,10 @@ class GenerateChapterRequest(BaseModel):
 @router.post("/books/{book_id}/chapters/{chapter}/generate", summary="章节生成（全流程）")
 @_gen_rate_limit
 async def generate_chapter(
-    book_id: str, chapter: int, req: GenerateChapterRequest, request: Request = None  # type: ignore[assignment]
+    book_id: str,
+    chapter: int,
+    req: GenerateChapterRequest,
+    request: Request = None,  # type: ignore[assignment]
 ) -> dict:
     """触发完整的20步章节生成流水线，支持 WS 进度广播和 Learner 偏好学习"""
     import time as _time

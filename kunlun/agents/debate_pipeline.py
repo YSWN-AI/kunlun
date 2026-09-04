@@ -110,8 +110,7 @@ class DebatePipelineIntegration:
             or character_count > self.BLUEPRINT_COMPLEXITY_CHARACTER_THRESHOLD
         )
         is_low_quality = (
-            quality_score is not None
-            and quality_score < self.BLUEPRINT_QUALITY_THRESHOLD
+            quality_score is not None and quality_score < self.BLUEPRINT_QUALITY_THRESHOLD
         )
 
         return is_complex or is_low_quality
@@ -124,8 +123,7 @@ class DebatePipelineIntegration:
         规则: 质量分<80或检测到严重问题（毒点/逻辑硬伤）
         """
         is_low_quality = (
-            quality_score is not None
-            and quality_score < self.CHAPTER_QUALITY_THRESHOLD
+            quality_score is not None and quality_score < self.CHAPTER_QUALITY_THRESHOLD
         )
 
         # 检测严重问题
@@ -254,9 +252,7 @@ class DebatePipelineIntegration:
             record_id = self.debate_store.save_record(record)
 
         # 7. 返回结果
-        result_dict = (
-            debate_result.to_dict() if hasattr(debate_result, "to_dict") else {}
-        )
+        result_dict = debate_result.to_dict() if hasattr(debate_result, "to_dict") else {}
         return {
             "triggered": True,
             "debate_result": result_dict,
@@ -402,9 +398,7 @@ class DebatePipelineIntegration:
 
         # 问题统计
         high_priority_count = sum(
-            1
-            for s in suggestions
-            if isinstance(s, dict) and s.get("priority", 3) <= 2
+            1 for s in suggestions if isinstance(s, dict) and s.get("priority", 3) <= 2
         )
 
         decision_text = (
@@ -421,9 +415,7 @@ class DebatePipelineIntegration:
 
     # ── 修订优先级提取 ──────────────────────────────────
 
-    def get_revision_priority(
-        self, debate_result: Any, top_k: int = 5
-    ) -> list[dict[str, Any]]:
+    def get_revision_priority(self, debate_result: Any, top_k: int = 5) -> list[dict[str, Any]]:
         """从辩论结果中提取优先级最高的修订建议
 
         按priority排序，去重（按issue文本）。

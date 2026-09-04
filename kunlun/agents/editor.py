@@ -392,7 +392,9 @@ class EditorInChief:
         if not draft:
             return {"success": False, "error": "请提供待审计的正文"}
 
-        audit_result = await self._audit_chapter(chapter, draft, ctx.get("blueprint", {}) if ctx else {})
+        audit_result = await self._audit_chapter(
+            chapter, draft, ctx.get("blueprint", {}) if ctx else {}
+        )
         return {"success": True, "audit": audit_result}
 
     async def _handle_style(self, message: str, _ctx: dict | None = None) -> dict:

@@ -303,12 +303,7 @@ class ReaderAgent(BaseAgent):
 
         # 5. 综合评分（0-10）
         base_score = 7.0
-        score = (
-            base_score
-            + cool_satisfaction * 1.5
-            + pacing_satisfaction * 1.0
-            - issue_penalty
-        )
+        score = base_score + cool_satisfaction * 1.5 + pacing_satisfaction * 1.0 - issue_penalty
         score = max(1.0, min(10.0, score))
 
         # 6. 是否继续阅读
@@ -477,9 +472,7 @@ class ReaderAgent(BaseAgent):
         if issue_penalty > 1.0:
             return "问题出现处", f"存在{len(severe_issues)}个严重问题，影响阅读体验"
         # 检查情绪时间线中是否有持续低情绪段
-        low_emotion_count = sum(
-            1 for e in emotional_timeline if e["intensity"] < 0.2
-        )
+        low_emotion_count = sum(1 for e in emotional_timeline if e["intensity"] < 0.2)
         if low_emotion_count > len(emotional_timeline) * 0.5:
             return "中段", "情绪持续平淡，缺乏起伏"
         return "章末", "整体质量一般，没有继续阅读的动力"

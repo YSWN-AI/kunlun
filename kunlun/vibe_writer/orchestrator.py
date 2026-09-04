@@ -104,7 +104,9 @@ class VibeOrchestrator:
         """
         self.use_local_model = enabled
         self.local_model_name = model_name
-        logger.info(f"VibeOrchestrator: 本地模型 {'启用' if enabled else '禁用'} (model={model_name})")
+        logger.info(
+            f"VibeOrchestrator: 本地模型 {'启用' if enabled else '禁用'} (model={model_name})"
+        )
 
     # ═══════════════════════════════════════════════════════
     # 核心接口 — 你只需要说一句话
@@ -361,7 +363,9 @@ class VibeOrchestrator:
 
         if self.use_local_model:
             # 本地模型模式：分段生成长文本，避免重复
-            logger.info(f"VibeOrchestrator: 使用本地模型 {self.local_model_name} 分段生成第{chapter}章")
+            logger.info(
+                f"VibeOrchestrator: 使用本地模型 {self.local_model_name} 分段生成第{chapter}章"
+            )
             long_result = await gacha_engine.generate_long_text(
                 prompt=prompt,
                 model=self.local_model_name,
@@ -371,7 +375,9 @@ class VibeOrchestrator:
             )
             draft = long_result.get("text", "")
             dedup_removed = long_result.get("dedup_removed", 0)
-            logger.info(f"VibeOrchestrator: 分段生成完成，{len(draft)}字，去重删除{dedup_removed}处")
+            logger.info(
+                f"VibeOrchestrator: 分段生成完成，{len(draft)}字，去重删除{dedup_removed}处"
+            )
             result = {
                 "best_text": draft,
                 "best_model": f"local:{self.local_model_name}",

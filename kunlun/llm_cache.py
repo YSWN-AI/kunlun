@@ -592,7 +592,9 @@ class LLMCache:
             return None
 
         # 在 Qdrant 中搜索最近邻（search 为 async，用 asyncio.run 在同步上下文执行）
-        vector_list = query_vector.tolist() if hasattr(query_vector, "tolist") else list(query_vector)
+        vector_list = (
+            query_vector.tolist() if hasattr(query_vector, "tolist") else list(query_vector)
+        )
         try:
             results = asyncio.run(self._qdrant_repo.search(vector=vector_list, top_k=5))
         except RuntimeError:

@@ -14,6 +14,7 @@ def _read_profile_file(p: Path) -> str:
     """同步读取配置文件内容（用于 asyncio.to_thread）"""
     return p.read_text(encoding="utf-8")
 
+
 import asyncio
 import json as _json
 from typing import Any

@@ -401,8 +401,6 @@ class PipelineRunner(BaseExtensionModule):
         else:
             state.status = NodeStatus.PENDING
 
-
-
     # ── 辩论阶段集成（可插拔，不影响现有执行流程） ──────
 
     def register_debate_stage(self, debate_type: str, position: int) -> bool:
@@ -439,14 +437,10 @@ class PipelineRunner(BaseExtensionModule):
             )
             insert_pos = min(position, len(state.nodes))
             state.nodes.insert(insert_pos, debate_node)
-            logger.info(
-                f"[PipelineRunner] 注册辩论节点 {node_id} 到位置 {insert_pos}"
-            )
+            logger.info(f"[PipelineRunner] 注册辩论节点 {node_id} 到位置 {insert_pos}")
         return True
 
-    def enable_debate(
-        self, blueprint_review: bool = True, chapter_final: bool = True
-    ) -> None:
+    def enable_debate(self, blueprint_review: bool = True, chapter_final: bool = True) -> None:
         """启用辩论阶段
 
         Args:
@@ -476,9 +470,7 @@ class PipelineRunner(BaseExtensionModule):
         removed = 0
         for state in self._pipelines.values():
             before = len(state.nodes)
-            state.nodes = [
-                n for n in state.nodes if not n.node_id.startswith("debate_")
-            ]
+            state.nodes = [n for n in state.nodes if not n.node_id.startswith("debate_")]
             removed += before - len(state.nodes)
         logger.info(f"[PipelineRunner] 辩论已禁用，移除 {removed} 个辩论节点")
 

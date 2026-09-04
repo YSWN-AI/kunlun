@@ -23,6 +23,7 @@ from kunlun.quality.engine import QualityEvaluator
 @dataclass
 class DimensionScore:
     """单维度评分"""
+
     name: str
     name_cn: str
     score: float
@@ -48,6 +49,7 @@ class DimensionScore:
 @dataclass
 class SixDimensionReport:
     """六维质量报告"""
+
     overall_score: float = 0.0
     overall_level: str = "fair"
     dimensions: dict[str, DimensionScore] = field(default_factory=dict)
@@ -155,7 +157,7 @@ class SixDimensionDashboard:
                 cliche_penalty = _detect_cliche_penalty(text)
                 weighted_score = max(0.0, weighted_score - cliche_penalty)
                 if cliche_penalty > 0.1:
-                    issues.append(f"套路词密度偏高，惩罚{cliche_penalty*100:.0f}分")
+                    issues.append(f"套路词密度偏高，惩罚{cliche_penalty * 100:.0f}分")
 
             # 逻辑维度增强：战力/时间/状态/数字冲突检测
             if dim_key == "logic":
@@ -183,27 +185,45 @@ class SixDimensionDashboard:
 
         sorted_dims = sorted(report.dimensions.values(), key=lambda d: d.score, reverse=True)
         report.strengths = [
-            f"{d.name_cn}({d.score*100:.0f}分): {_strength_comment(d.name)}"
-            for d in sorted_dims[:3] if d.score >= 0.70
+            f"{d.name_cn}({d.score * 100:.0f}分): {_strength_comment(d.name)}"
+            for d in sorted_dims[:3]
+            if d.score >= 0.70
         ]
         report.weaknesses = [
-            f"{d.name_cn}({d.score*100:.0f}分): {_weakness_comment(d.name)}"
-            for d in sorted_dims[-3:] if d.score < 0.70
+            f"{d.name_cn}({d.score * 100:.0f}分): {_weakness_comment(d.name)}"
+            for d in sorted_dims[-3:]
+            if d.score < 0.70
         ]
         report.improvement_priority = [
-            d.name_cn for d in sorted(
-                report.dimensions.values(), key=lambda d: 0.85 - d.score, reverse=True
-            ) if d.score < 0.85
+            d.name_cn
+            for d in sorted(report.dimensions.values(), key=lambda d: 0.85 - d.score, reverse=True)
+            if d.score < 0.85
         ][:3]
 
         return report
 
 
 CLICHE_WORDS = [
-    "微微一怔", "眼中闪过", "缓缓开口", "淡淡说道", "仿佛时间",
-    "不由自主", "心中暗道", "嘴角微微", "轻轻摇头", "深深看了",
-    "赫然发现", "气势暴涨", "天地变色", "风云际会", "雷霆万钧",
-    "不可思议", "难以置信", "原来如此", "恍然大悟", "不出所料",
+    "微微一怔",
+    "眼中闪过",
+    "缓缓开口",
+    "淡淡说道",
+    "仿佛时间",
+    "不由自主",
+    "心中暗道",
+    "嘴角微微",
+    "轻轻摇头",
+    "深深看了",
+    "赫然发现",
+    "气势暴涨",
+    "天地变色",
+    "风云际会",
+    "雷霆万钧",
+    "不可思议",
+    "难以置信",
+    "原来如此",
+    "恍然大悟",
+    "不出所料",
 ]
 
 
@@ -291,6 +311,7 @@ def _detect_logic_issues(text: str) -> tuple[float, list[str]]:
 
     # 4. 数字矛盾检测（简单检测：同一数量词出现不同数字）
     import re
+
     number_patterns = [
         (r"(\d+)人", "人数"),
         (r"(\d+)天", "天数"),
@@ -305,7 +326,9 @@ def _detect_logic_issues(text: str) -> tuple[float, list[str]]:
             unique_nums = set(matches)
             if len(unique_nums) >= 2:
                 # 多个不同数字可能是正常的（不同场景），但需要提醒
-                issues.append(f"文本中出现{label}的多个不同数值({', '.join(sorted(unique_nums))})，需确认一致性")
+                issues.append(
+                    f"文本中出现{label}的多个不同数值({', '.join(sorted(unique_nums))})，需确认一致性"
+                )
                 penalty += 0.03
                 break
 

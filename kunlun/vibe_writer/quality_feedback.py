@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 @dataclass
 class QualityFeedback:
     """即时质量反馈结果"""
+
     overall_score: float = 0.0
     overall_level: str = "fair"
     six_dim_scores: dict[str, float] = field(default_factory=dict)
@@ -53,7 +54,7 @@ class QualityFeedback:
 
     def summary(self) -> str:
         """简短摘要（用于实时显示）"""
-        parts = [f"质量{self.overall_score*100:.0f}分"]
+        parts = [f"质量{self.overall_score * 100:.0f}分"]
         if self.target_85:
             parts.append("已达85分目标")
         else:
@@ -69,12 +70,12 @@ class VibeQualityFeedback:
 
     # 卡文检测阈值
     STUCK_NO_DIALOGUE_CHARS = 800  # 超过800字无对话
-    STUCK_NO_ACTION_CHARS = 1000   # 超过1000字无动作
-    STUCK_REPEAT_PARAGRAPH = 3     # 连续3段结构相似
+    STUCK_NO_ACTION_CHARS = 1000  # 超过1000字无动作
+    STUCK_REPEAT_PARAGRAPH = 3  # 连续3段结构相似
 
     # 弃书点检测
-    DROP_OFF_LONG_DESC = 500       # 超过500字纯描写
-    DROP_OFF_NO_CONFLICT = 1500    # 超过1500字无冲突
+    DROP_OFF_LONG_DESC = 500  # 超过500字纯描写
+    DROP_OFF_NO_CONFLICT = 1500  # 超过1500字无冲突
 
     @classmethod
     def analyze(cls, text: str, chapter: int = 0) -> QualityFeedback:
@@ -91,6 +92,7 @@ class VibeQualityFeedback:
         # 1. 六维质量评分
         try:
             from kunlun.quality.six_dim_dashboard import six_dim_dashboard
+
             report = six_dim_dashboard.analyze(text, chapter)
             fb.overall_score = report.overall_score
             fb.overall_level = report.overall_level
@@ -108,6 +110,7 @@ class VibeQualityFeedback:
         # 2. AI率检测
         try:
             from kunlun.ai_rate import detect_ai_rate
+
             ai_report = detect_ai_rate(text)
             fb.ai_rate = ai_report.total_score
             if fb.ai_rate <= 35:
@@ -122,7 +125,7 @@ class VibeQualityFeedback:
             fb.ai_rate = 0.0
 
         # 3. 对话占比
-        dialogues = re.findall(r"[""「『]([^""」』]+)[""」』]", text)
+        dialogues = re.findall(r"[" "「『]([^" "」』]+)[" "」』]", text)
         dialogue_chars = sum(len(d) for d in dialogues)
         fb.dialogue_ratio = dialogue_chars / max(fb.word_count, 1)
 
@@ -225,7 +228,20 @@ class VibeQualityFeedback:
             return True, "长时间无对话"
 
         # 无动作
-        action_words = ["走", "跑", "跳", "打", "砍", "刺", "拳", "掌", "指", "转身", "迈步", "跃起"]
+        action_words = [
+            "走",
+            "跑",
+            "跳",
+            "打",
+            "砍",
+            "刺",
+            "拳",
+            "掌",
+            "指",
+            "转身",
+            "迈步",
+            "跃起",
+        ]
         action_count = sum(text.count(w) for w in action_words)
         if fb.word_count > cls.STUCK_NO_ACTION_CHARS and action_count < 3:
             return True, "长时间无动作"
@@ -255,21 +271,45 @@ class VibeQualityFeedback:
         paragraphs = [p for p in text.split("\n") if p.strip()]
         for i, p in enumerate(paragraphs):
             if len(p) > cls.DROP_OFF_LONG_DESC:
-                has_dialogue = bool(re.search(r"[""「『]", p))
+                has_dialogue = bool(re.search(r"[" "「『]", p))
                 has_action = any(w in p for w in ["说", "道", "喊", "叫", "走", "跑", "打"])
                 if not has_dialogue and not has_action:
-                    points.append(f"第{i+1}段超过{len(p)}字纯描写")
+                    points.append(f"第{i + 1}段超过{len(p)}字纯描写")
 
         # 开头无冲突
         if fb.word_count > 300:
             first_300 = text[:300]
-            conflict_words = ["不", "别", "滚", "杀", "打", "战", "敌", "仇", "恨", "怒", "惊", "恐"]
+            conflict_words = [
+                "不",
+                "别",
+                "滚",
+                "杀",
+                "打",
+                "战",
+                "敌",
+                "仇",
+                "恨",
+                "怒",
+                "惊",
+                "恐",
+            ]
             if not any(w in first_300 for w in conflict_words):
                 points.append("开头300字无冲突信号")
 
         # 无爽点
         if fb.word_count > cls.DROP_OFF_NO_CONFLICT:
-            pleasure_words = ["突破", "升级", "获得", "得到", "赢", "胜", "秒杀", "碾压", "震惊", "不敢相信"]
+            pleasure_words = [
+                "突破",
+                "升级",
+                "获得",
+                "得到",
+                "赢",
+                "胜",
+                "秒杀",
+                "碾压",
+                "震惊",
+                "不敢相信",
+            ]
             if not any(w in text for w in pleasure_words):
                 points.append("超过1500字无爽点")
 

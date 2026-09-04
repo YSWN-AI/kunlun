@@ -52,16 +52,57 @@ _ADJECTIVE_KEYWORDS = set(
 
 # ── AI套话列表（用于ai_taste_score计算）──
 _AI_CLICHES = [
-    "突然", "仿佛", "似乎", "好像", "总的来说", "值得一提的是",
-    "不仅如此", "与此同时", "综上所述", "由此可见", "显而易见",
-    "毫无疑问", "不可否认", "众所周知", "不言而喻", "毋庸置疑",
-    "总而言之", "概括来说", "简而言之", "换句话说", "也就是说",
-    "正是因为", "正是由于", "正是这个", "正是这种", "正是这样",
-    "不禁", "不由得", "忍不住", "情不自禁", "不由自主",
-    "心中一紧", "心中一动", "心中一凛", "心中一惊", "心中一喜",
-    "眼中闪过", "眼中露出", "眼中浮现", "眼中泛起", "眼中掠过",
-    "嘴角微微", "嘴角勾起", "嘴角上扬", "嘴角露出", "嘴角浮现",
-    "脸上露出", "脸上浮现", "脸上泛起", "脸上闪过", "脸上掠过",
+    "突然",
+    "仿佛",
+    "似乎",
+    "好像",
+    "总的来说",
+    "值得一提的是",
+    "不仅如此",
+    "与此同时",
+    "综上所述",
+    "由此可见",
+    "显而易见",
+    "毫无疑问",
+    "不可否认",
+    "众所周知",
+    "不言而喻",
+    "毋庸置疑",
+    "总而言之",
+    "概括来说",
+    "简而言之",
+    "换句话说",
+    "也就是说",
+    "正是因为",
+    "正是由于",
+    "正是这个",
+    "正是这种",
+    "正是这样",
+    "不禁",
+    "不由得",
+    "忍不住",
+    "情不自禁",
+    "不由自主",
+    "心中一紧",
+    "心中一动",
+    "心中一凛",
+    "心中一惊",
+    "心中一喜",
+    "眼中闪过",
+    "眼中露出",
+    "眼中浮现",
+    "眼中泛起",
+    "眼中掠过",
+    "嘴角微微",
+    "嘴角勾起",
+    "嘴角上扬",
+    "嘴角露出",
+    "嘴角浮现",
+    "脸上露出",
+    "脸上浮现",
+    "脸上泛起",
+    "脸上闪过",
+    "脸上掠过",
 ]
 
 # ── 比喻词列表 ──
@@ -69,13 +110,47 @@ _METAPHOR_WORDS = ["宛如", "仿佛", "犹如", "如同", "好似", "好像", "
 
 # ── 夸张词列表 ──
 _EXAGGERATION_WORDS = [
-    "万丈", "滔天", "无尽", "永恒", "不朽", "灭世", "毁天", "灭地",
-    "惊天", "动地", "震天", "撼地", "吞天", "噬地", "开天", "辟地",
-    "破碎", "崩裂", "崩塌", "毁灭", "湮灭", "消散", "灰飞", "烟灭",
+    "万丈",
+    "滔天",
+    "无尽",
+    "永恒",
+    "不朽",
+    "灭世",
+    "毁天",
+    "灭地",
+    "惊天",
+    "动地",
+    "震天",
+    "撼地",
+    "吞天",
+    "噬地",
+    "开天",
+    "辟地",
+    "破碎",
+    "崩裂",
+    "崩塌",
+    "毁灭",
+    "湮灭",
+    "消散",
+    "灰飞",
+    "烟灭",
 ]
 
 # ── 心理描写触发词 ──
-_PSYCH_WORDS = ["心想", "暗道", "觉得", "感到", "感觉", "认为", "以为", "暗自", "心中", "心里", "心底", "内心"]
+_PSYCH_WORDS = [
+    "心想",
+    "暗道",
+    "觉得",
+    "感到",
+    "感觉",
+    "认为",
+    "以为",
+    "暗自",
+    "心中",
+    "心里",
+    "心底",
+    "内心",
+]
 
 
 @dataclass
@@ -175,7 +250,9 @@ class StyleFingerprint:
                 f"长句占比{self.long_sentence_ratio:.0%}"
             )
             if self.exclamation_ratio > 0:
-                parts.append(f"- 语气: 感叹号/句号比{self.exclamation_ratio:.2f}，问号/句号比{self.question_ratio:.2f}")
+                parts.append(
+                    f"- 语气: 感叹号/句号比{self.exclamation_ratio:.2f}，问号/句号比{self.question_ratio:.2f}"
+                )
 
         # 词汇
         if self.word_diversity > 0:
@@ -184,7 +261,9 @@ class StyleFingerprint:
                 f"平均词长{self.avg_word_length:.1f}，"
                 f"生僻词占比{self.rare_word_ratio:.1%}"
             )
-            parts.append(f"- 词密度: 动词{self.verb_density:.1f}/千字，形容词{self.adjective_density:.1f}/千字")
+            parts.append(
+                f"- 词密度: 动词{self.verb_density:.1f}/千字，形容词{self.adjective_density:.1f}/千字"
+            )
             if self.signature_words:
                 parts.append(f"- 标志性词: {', '.join(self.signature_words[:10])}")
 
@@ -208,7 +287,9 @@ class StyleFingerprint:
 
         # 对话
         if self.dialogue_ratio > 0:
-            parts.append(f"- 对话: 占比{self.dialogue_ratio:.0%}，平均长度{self.avg_dialogue_length:.1f}字")
+            parts.append(
+                f"- 对话: 占比{self.dialogue_ratio:.0%}，平均长度{self.avg_dialogue_length:.1f}字"
+            )
 
         # AI味
         if self.ai_taste_score > 0:
@@ -319,9 +400,12 @@ class StyleAnalyzer:
 
             # ── 新增：标志性词top20（高频且非通用词）──
             # 过滤掉单字通用词和极高频功能词
-            stop_chars = set("的一是了我不人在他有这个上们来到时大地为子中你说生国年着就那和要她出也得里后自以会家可下而过天去能对小多然于心学么之都好看起发当没成只如事把还用第样道想作种开")
+            stop_chars = set(
+                "的一是了我不人在他有这个上们来到时大地为子中你说生国年着就那和要她出也得里后自以会家可下而过天去能对小多然于心学么之都好看起发当没成只如事把还用第样道想作种开"
+            )
             signature = [
-                w for w, c in word_counts.most_common(100)
+                w
+                for w, c in word_counts.most_common(100)
                 if len(w) >= 2 and w not in stop_chars and c >= 2
             ]
             fp.signature_words = signature[:20]
@@ -377,9 +461,15 @@ class StyleAnalyzer:
         fp.punctuation_distribution = {p: text.count(p) for p in puncts}
 
         # ── 新增：感叹号/问号与句号比 ──
-        period_count = fp.punctuation_distribution.get("。", 0) + fp.punctuation_distribution.get(".", 0)
-        exclam_count = fp.punctuation_distribution.get("！", 0) + fp.punctuation_distribution.get("!", 0)
-        question_count = fp.punctuation_distribution.get("？", 0) + fp.punctuation_distribution.get("?", 0)
+        period_count = fp.punctuation_distribution.get("。", 0) + fp.punctuation_distribution.get(
+            ".", 0
+        )
+        exclam_count = fp.punctuation_distribution.get("！", 0) + fp.punctuation_distribution.get(
+            "!", 0
+        )
+        question_count = fp.punctuation_distribution.get("？", 0) + fp.punctuation_distribution.get(
+            "?", 0
+        )
         if period_count > 0:
             fp.exclamation_ratio = exclam_count / period_count
             fp.question_ratio = question_count / period_count
@@ -420,11 +510,47 @@ class StyleAnalyzer:
             env_chars = 0
             psych_chars = 0
             # 环境描写触发词
-            env_words = ["天空", "大地", "山川", "河流", "森林", "草原", "沙漠", "海洋",
-                         "山峰", "山谷", "悬崖", "峭壁", "瀑布", "湖泊", "月亮", "太阳",
-                         "星辰", "云雾", "风雨", "雷电", "雪花", "阳光", "月光", "星光",
-                         "景色", "风景", "景象", "景物", "氛围", "气氛", "环境", "四周",
-                         "周围", "远处", "近处", "前方", "后方", "上方", "下方"]
+            env_words = [
+                "天空",
+                "大地",
+                "山川",
+                "河流",
+                "森林",
+                "草原",
+                "沙漠",
+                "海洋",
+                "山峰",
+                "山谷",
+                "悬崖",
+                "峭壁",
+                "瀑布",
+                "湖泊",
+                "月亮",
+                "太阳",
+                "星辰",
+                "云雾",
+                "风雨",
+                "雷电",
+                "雪花",
+                "阳光",
+                "月光",
+                "星光",
+                "景色",
+                "风景",
+                "景象",
+                "景物",
+                "氛围",
+                "气氛",
+                "环境",
+                "四周",
+                "周围",
+                "远处",
+                "近处",
+                "前方",
+                "后方",
+                "上方",
+                "下方",
+            ]
             for p in paragraphs:
                 p_len = len(p)
                 # 动作描写：动词密集段

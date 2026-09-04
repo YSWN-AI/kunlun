@@ -1,4 +1,4 @@
-﻿"""
+"""
 vibe_writer 扩展模块 — Vibe Writing 对话式创作
 """
 

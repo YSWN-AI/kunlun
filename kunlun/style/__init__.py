@@ -10,6 +10,7 @@ Phase 6 实现: 消AI味 + 语感优化 + 文风指纹
   - StyleDriftDetector: 风格漂移检测（章节一致性监控）
 """
 
+from .drift_detector import DriftReport, StyleDriftDetector, drift_detector
 from .fingerprint import (
     StyleAnalyzer,
     StyleFingerprint,
@@ -18,7 +19,7 @@ from .fingerprint import (
     style_injector,
 )
 from .library import StyleLibrary, style_library
-from .drift_detector import DriftReport, StyleDriftDetector, drift_detector
+
 
 # StyleEngineer 延迟导入：避免循环依赖
 # (engineer 继承 BaseAgent -> agents.__init__ -> editor -> style.engineer)
@@ -31,13 +32,13 @@ def __getattr__(name: str):
 
 
 __all__ = [
+    "DriftReport",
     "StyleAnalyzer",
     "StyleDriftDetector",
     "StyleEngineer",
     "StyleFingerprint",
     "StyleInjector",
     "StyleLibrary",
-    "DriftReport",
     "drift_detector",
     "style_analyzer",
     "style_injector",

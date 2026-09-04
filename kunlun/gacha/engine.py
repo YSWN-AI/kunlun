@@ -51,23 +51,23 @@ from kunlun.gacha.param_variator import ParamVariator
 # 初稿0.75(稳) → 审计0.45(严) → 定稿0.85(放)
 AGENT_TEMPERATURES: dict[str, float] = {
     # 创作类（中高温，保留创意张力）
-    "writer": 0.75,        # 初稿生成：稳，按章纲执行
-    "architect": 0.70,     # 大纲规划：中低温保逻辑
-    "editor": 0.85,        # 重写定稿：放，文采优化
-    "vibe_writer": 0.78,   # Vibe对话创作：中温
-    "plot": 0.72,          # 情节生成：稳推进
-    "character": 0.75,     # 人物描写：中温
-    "world": 0.70,         # 世界观设定：低温保一致
+    "writer": 0.75,  # 初稿生成：稳，按章纲执行
+    "architect": 0.70,  # 大纲规划：中低温保逻辑
+    "editor": 0.85,  # 重写定稿：放，文采优化
+    "vibe_writer": 0.78,  # Vibe对话创作：中温
+    "plot": 0.72,  # 情节生成：稳推进
+    "character": 0.75,  # 人物描写：中温
+    "world": 0.70,  # 世界观设定：低温保一致
     # 质检类（低温，严谨客观）
-    "auditor": 0.45,       # 审计门禁：严苛
-    "critic": 0.45,        # 批评Agent：最低温，纯分析
-    "reader": 0.50,        # 读者模拟：中低温，客观反馈
-    "debate": 0.45,        # 辩论审校：严苛
-    "reflector": 0.45,     # 反思Agent：低温分析
-    "sociologist": 0.50,   # 社会推演：中低温
-    "observer": 0.50,      # 观察Agent：中低温
-    "scheduler": 0.55,     # 调度Agent：中低温
-    "publisher": 0.60,     # 发布Agent：中温
+    "auditor": 0.45,  # 审计门禁：严苛
+    "critic": 0.45,  # 批评Agent：最低温，纯分析
+    "reader": 0.50,  # 读者模拟：中低温，客观反馈
+    "debate": 0.45,  # 辩论审校：严苛
+    "reflector": 0.45,  # 反思Agent：低温分析
+    "sociologist": 0.50,  # 社会推演：中低温
+    "observer": 0.50,  # 观察Agent：中低温
+    "scheduler": 0.55,  # 调度Agent：中低温
+    "publisher": 0.60,  # 发布Agent：中温
     # 默认
     "default": 0.70,
 }
@@ -87,6 +87,7 @@ def get_agent_temperature(agent: str) -> float:
         if key in agent.lower():
             return temp
     return DEFAULT_TEMPERATURE
+
 
 # ── 模型候选 ─────────────────────────────────────────
 
@@ -556,7 +557,7 @@ class GachaEngine:
         Returns:
             dict: 包含text/total_chars/segments/total_elapsed/dedup_removed/dedup_details
         """
-        from kunlun.gacha.long_text import LongTextGenerator, LongTextConfig
+        from kunlun.gacha.long_text import LongTextConfig, LongTextGenerator
 
         config = LongTextConfig(segment_chars=segment_chars)
         generator = LongTextGenerator(self, config)
@@ -827,7 +828,6 @@ class GachaEngine:
         # async with 块之后（__aexit__ 返回 False 不吞异常，理论上不可达）
         raise RuntimeError(f"{candidate.model} 调用失败（熔断器异常退出）")
 
-
     async def _call_local_llm(
         self,
         candidate: ModelCandidate,
@@ -849,8 +849,8 @@ class GachaEngine:
         Returns:
             {"content": str, "model": str, "usage": dict}
         """
-        from kunlun.finetune.local_inference import get_local_engine
         from kunlun.finetune.adapter_manager import AdapterManager
+        from kunlun.finetune.local_inference import get_local_engine
 
         adapter_name = candidate.model
         engine = get_local_engine()
@@ -861,8 +861,7 @@ class GachaEngine:
             info = mgr.load_adapter(adapter_name)
             if info is None:
                 raise RuntimeError(
-                    f"本地适配器 {adapter_name} 未注册，"
-                    f"请先在 data/adapters/ 下注册"
+                    f"本地适配器 {adapter_name} 未注册，请先在 data/adapters/ 下注册"
                 )
 
             # 从 metadata 中获取基座模型路径和适配器路径
@@ -872,14 +871,12 @@ class GachaEngine:
             meta_path = Path(info.path) / "metadata.json"
             base_model_path = ""
             if meta_path.exists():
-                with open(meta_path, "r", encoding="utf-8") as f:
+                with open(meta_path, encoding="utf-8") as f:
                     meta = json.load(f)
                 base_model_path = meta.get("base_model_path", "")
 
             if not base_model_path:
-                raise RuntimeError(
-                    f"适配器 {adapter_name} 的 metadata.json 中缺少 base_model_path"
-                )
+                raise RuntimeError(f"适配器 {adapter_name} 的 metadata.json 中缺少 base_model_path")
 
             # 从metadata读取是否需要4bit量化
             load_in_4bit = meta.get("load_in_4bit", False) if meta_path.exists() else False
@@ -1211,6 +1208,7 @@ class GachaEngine:
         if self.target_style_fingerprint is not None:
             try:
                 from kunlun.style.fingerprint import style_analyzer
+
                 current_fp = style_analyzer.analyze(text, name="gacha_candidate")
                 sim = current_fp.cosine_similarity(self.target_style_fingerprint)
                 return round(min(1.0, max(0.0, sim)), 4)

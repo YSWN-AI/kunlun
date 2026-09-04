@@ -629,9 +629,7 @@ PARAMETER repeat_penalty 1.1
         return {
             "base_models": len(self._base_models),
             "adapters": len(self._adapters),
-            "active_adapter": (
-                _active.name if (_active := self.get_active_adapter()) else None
-            ),
+            "active_adapter": (_active.name if (_active := self.get_active_adapter()) else None),
             "total_training_steps": sum(a.trained_steps for a in self._adapters.values()),
             "evaluations": len(self._eval_results),
             "model_families": list({m.family for m in self._base_models.values()}),
@@ -665,21 +663,21 @@ except ImportError:
 def create_dataset_builder(
     books_dir: str = "data/books",
     output_dir: str = "data/finetune_datasets",
-) -> "DatasetBuilder | None":
+) -> DatasetBuilder | None:
     """创建数据集构建器"""
     if DatasetBuilder is None:
         return None
     return DatasetBuilder(books_dir=books_dir, output_dir=output_dir)
 
 
-def create_lora_trainer(config: TrainConfig) -> "LoRATrainer | None":
+def create_lora_trainer(config: TrainConfig) -> LoRATrainer | None:
     """创建 LoRA 训练器"""
     if LoRATrainer is None:
         return None
     return LoRATrainer(config)
 
 
-def create_adapter_manager(adapters_dir: str = "data/adapters") -> "AdapterManager | None":
+def create_adapter_manager(adapters_dir: str = "data/adapters") -> AdapterManager | None:
     """创建适配器管理器"""
     if AdapterManager is None:
         return None

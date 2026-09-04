@@ -639,7 +639,6 @@ class BranchPlotEngine:
         except Exception:
             logger.warning("分支树数据加载失败，使用空状态")
 
-
     # ─── 分支对比与合并 (委托给 BranchComparator) ──
 
     def get_comparator(self):

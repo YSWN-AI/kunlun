@@ -130,9 +130,7 @@ class CriticAgent(BaseAgent):
 
     # ── 核心批判方法 ────────────────────────────────────
 
-    async def critique(
-        self, text: str, chapter: int = 0, context: str = ""
-    ) -> CriticReport:
+    async def critique(self, text: str, chapter: int = 0, context: str = "") -> CriticReport:
         """对文本进行批判：规则初筛 → LLM 深度批判 → 回退规则
 
         Args:
@@ -173,7 +171,7 @@ class CriticAgent(BaseAgent):
             poison_points=["文本为空"],
             suggestions=["请提供有效文本"],
             market_potential="无法评估",
-            dimension_scores={d: 0.0 for d in CRITIC_DIMENSIONS},
+            dimension_scores=dict.fromkeys(CRITIC_DIMENSIONS, 0.0),
             chapter=chapter,
             critique_source="rule",
         )
@@ -255,9 +253,7 @@ class CriticAgent(BaseAgent):
                 raw_scores.get("consistency", 85.0),
                 raw_scores.get("writing", 85.0),
             ),
-            "与同类爆款差距": (
-                sum(raw_scores.values()) / len(raw_scores) if raw_scores else 85.0
-            ),
+            "与同类爆款差距": (sum(raw_scores.values()) / len(raw_scores) if raw_scores else 85.0),
         }
         return {k: round(v, 1) for k, v in mapping.items()}
 
@@ -286,10 +282,13 @@ class CriticAgent(BaseAgent):
         from kunlun.gacha.engine import gacha_engine
 
         # 构建规则问题摘要
-        issues_summary = "\n".join(
-            f"- [{i.dimension.value}][严重度{i.severity}] {i.description}"
-            for i in rule_issues[:10]
-        ) or "无规则检测问题"
+        issues_summary = (
+            "\n".join(
+                f"- [{i.dimension.value}][严重度{i.severity}] {i.description}"
+                for i in rule_issues[:10]
+            )
+            or "无规则检测问题"
+        )
 
         prompt = (
             "你是一位资深网文市场评论家，请对以下小说章节进行深度市场批判。\n\n"
@@ -307,7 +306,7 @@ class CriticAgent(BaseAgent):
             "5. 毒点检测\n"
             "6. 与同类爆款差距\n\n"
             "请严格以JSON格式输出，不要输出其他内容：\n"
-            '{\n'
+            "{\n"
             '  "overall_score": 0-100的整数,\n'
             '  "would_continue": true/false,\n'
             '  "poison_points": ["毒点1", "毒点2"],\n'
@@ -320,8 +319,8 @@ class CriticAgent(BaseAgent):
             '    "章尾钩子": 0-100,\n'
             '    "毒点检测": 0-100,\n'
             '    "与同类爆款差距": 0-100\n'
-            '  }\n'
-            '}'
+            "  }\n"
+            "}"
         )
 
         result = await gacha_engine.generate(prompt, mode="single_fix", agent="critic")

@@ -165,9 +165,7 @@ class DebateStore:
         try:
             with filepath.open("w", encoding="utf-8") as f:
                 json.dump(record.to_dict(), f, ensure_ascii=False, indent=2)
-            logger.debug(
-                f"[DebateStore] 保存记录 {record.record_id} -> {filepath}"
-            )
+            logger.debug(f"[DebateStore] 保存记录 {record.record_id} -> {filepath}")
         except OSError as e:
             logger.error(f"[DebateStore] 保存记录失败: {e}")
             raise
@@ -414,7 +412,5 @@ class DebateStore:
                 except OSError as e:
                     logger.warning(f"[DebateStore] 归档失败 {filepath.name}: {e}")
 
-        logger.info(
-            f"[DebateStore] 归档完成: {archived_count}条记录 (章节<{before_chapter})"
-        )
+        logger.info(f"[DebateStore] 归档完成: {archived_count}条记录 (章节<{before_chapter})")
         return archived_count

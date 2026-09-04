@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 长文本分段生成与去重后处理
 
@@ -7,10 +6,11 @@
 2. 去重后处理：检测重复段落、重复n-gram并删除
 3. 参数自适应：长文本时自动调整repetition_penalty和top_p
 """
+
 from __future__ import annotations
 
-import re
 import hashlib
+import re
 from collections import Counter
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
@@ -24,20 +24,22 @@ if TYPE_CHECKING:
 @dataclass
 class LongTextConfig:
     """长文本生成配置"""
-    segment_chars: int = 900          # 每段目标字数
-    segment_overlap: int = 100         # 段间重叠字数（用于上下文衔接）
-    max_segments: int = 6              # 最大分段数
-    summary_chars: int = 300           # 前文摘要字数
+
+    segment_chars: int = 900  # 每段目标字数
+    segment_overlap: int = 100  # 段间重叠字数（用于上下文衔接）
+    max_segments: int = 6  # 最大分段数
+    summary_chars: int = 300  # 前文摘要字数
     repetition_penalty_long: float = 1.05  # 长文本重复惩罚
-    top_p_long: float = 0.9            # 长文本top_p
-    temperature_long: float = 0.8      # 长文本温度
-    dedup_threshold: float = 0.7       # 段落去重相似度阈值
-    min_paragraph_chars: int = 20      # 最短段落地字数
+    top_p_long: float = 0.9  # 长文本top_p
+    temperature_long: float = 0.8  # 长文本温度
+    dedup_threshold: float = 0.7  # 段落去重相似度阈值
+    min_paragraph_chars: int = 20  # 最短段落地字数
 
 
 @dataclass
 class SegmentResult:
     """单段生成结果"""
+
     index: int
     text: str
     word_count: int
@@ -48,6 +50,7 @@ class SegmentResult:
 @dataclass
 class LongTextResult:
     """长文本生成完整结果"""
+
     text: str
     segments: list[SegmentResult] = field(default_factory=list)
     total_chars: int = 0
@@ -62,8 +65,8 @@ class TextDeduplicator:
     @staticmethod
     def _normalize(text: str) -> str:
         """标准化文本用于比较"""
-        text = re.sub(r'\s+', '', text)
-        text = re.sub(r'[，。！？、；：""''（）【】《》]', '', text)
+        text = re.sub(r"\s+", "", text)
+        text = re.sub(r'[，。！？、；：""' "（）【】《》]", "", text)
         return text
 
     @staticmethod
@@ -72,11 +75,11 @@ class TextDeduplicator:
         normalized = TextDeduplicator._normalize(text)
         if len(normalized) < n:
             return hashlib.md5(normalized.encode()).hexdigest()
-        ngrams = [normalized[i:i+n] for i in range(len(normalized)-n+1)]
+        ngrams = [normalized[i : i + n] for i in range(len(normalized) - n + 1)]
         counter = Counter(ngrams)
         # 取top 10的n-gram拼接作为hash
         top = sorted(counter.items(), key=lambda x: -x[1])[:10]
-        key = ''.join(ng for ng, _ in top)
+        key = "".join(ng for ng, _ in top)
         return hashlib.md5(key.encode()).hexdigest()
 
     @staticmethod
@@ -86,8 +89,8 @@ class TextDeduplicator:
         norm2 = TextDeduplicator._normalize(text2)
         if len(norm1) < n or len(norm2) < n:
             return 0.0
-        set1 = set(norm1[i:i+n] for i in range(len(norm1)-n+1))
-        set2 = set(norm2[i:i+n] for i in range(len(norm2)-n+1))
+        set1 = set(norm1[i : i + n] for i in range(len(norm1) - n + 1))
+        set2 = set(norm2[i : i + n] for i in range(len(norm2) - n + 1))
         if not set1 or not set2:
             return 0.0
         intersection = len(set1 & set2)
@@ -110,7 +113,7 @@ class TextDeduplicator:
         Returns:
             (去重后文本, 删除段落数, 删除详情列表)
         """
-        paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
+        paragraphs = [p.strip() for p in text.split("\n") if p.strip()]
         if len(paragraphs) <= 1:
             return text, 0, []
 
@@ -131,15 +134,13 @@ class TextDeduplicator:
                 if sim >= threshold:
                     is_duplicate = True
                     removed_count += 1
-                    details.append(
-                        f"删除段落(相似度{sim:.2f}): {para[:50]}..."
-                    )
+                    details.append(f"删除段落(相似度{sim:.2f}): {para[:50]}...")
                     break
 
             if not is_duplicate:
                 kept.append(para)
 
-        result = '\n'.join(kept)
+        result = "\n".join(kept)
         return result, removed_count, details
 
     @staticmethod
@@ -163,11 +164,11 @@ class TextDeduplicator:
 
         while i < len(text):
             if i + n <= len(text):
-                current = text[i:i+n]
+                current = text[i : i + n]
                 # 检查接下来是否有重复
                 repeat_count = 0
                 j = i + n
-                while j + n <= len(text) and text[j:j+n] == current:
+                while j + n <= len(text) and text[j : j + n] == current:
                     repeat_count += 1
                     j += n
 
@@ -181,7 +182,7 @@ class TextDeduplicator:
             result.append(text[i])
             i += 1
 
-        return ''.join(result), removed
+        return "".join(result), removed
 
 
 class LongTextGenerator:
@@ -193,7 +194,7 @@ class LongTextGenerator:
 
     def _build_summary(self, text: str, max_chars: int = 300) -> str:
         """构建前文摘要（简化版：取最后几段的关键句）"""
-        paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
+        paragraphs = [p.strip() for p in text.split("\n") if p.strip()]
         if not paragraphs:
             return ""
 
@@ -285,6 +286,7 @@ class LongTextGenerator:
             messages = [{"role": "user", "content": segment_prompt}]
 
             import time
+
             start = time.time()
             try:
                 result = await self.engine.chat(
@@ -299,30 +301,33 @@ class LongTextGenerator:
                 # 清理可能的标题和说明
                 segment_text = self._clean_segment(segment_text)
 
-                segments.append(SegmentResult(
-                    index=i,
-                    text=segment_text,
-                    word_count=len(segment_text),
-                    elapsed=elapsed,
-                    summary=self._build_summary(segment_text, 100),
-                ))
+                segments.append(
+                    SegmentResult(
+                        index=i,
+                        text=segment_text,
+                        word_count=len(segment_text),
+                        elapsed=elapsed,
+                        summary=self._build_summary(segment_text, 100),
+                    )
+                )
 
                 full_text += "\n" + segment_text if full_text else segment_text
                 total_elapsed += elapsed
 
                 logger.info(
-                    f"  第{i+1}/{total_segments}段完成: "
-                    f"{len(segment_text)}字, {elapsed:.1f}秒"
+                    f"  第{i + 1}/{total_segments}段完成: {len(segment_text)}字, {elapsed:.1f}秒"
                 )
 
             except Exception as e:
-                logger.error(f"  第{i+1}段生成失败: {e}")
-                segments.append(SegmentResult(
-                    index=i,
-                    text=f"[第{i+1}段生成失败: {e}]",
-                    word_count=0,
-                    elapsed=time.time() - start,
-                ))
+                logger.error(f"  第{i + 1}段生成失败: {e}")
+                segments.append(
+                    SegmentResult(
+                        index=i,
+                        text=f"[第{i + 1}段生成失败: {e}]",
+                        word_count=0,
+                        elapsed=time.time() - start,
+                    )
+                )
 
         # 后处理去重
         logger.info("LongTextGenerator: 执行后处理去重...")
@@ -336,9 +341,7 @@ class LongTextGenerator:
         dedup_text, ngram_removed = TextDeduplicator.deduplicate_ngrams(dedup_text)
         total_removed = removed_count + ngram_removed
 
-        logger.info(
-            f"LongTextGenerator: 去重完成，删除{total_removed}处重复"
-        )
+        logger.info(f"LongTextGenerator: 去重完成，删除{total_removed}处重复")
 
         return LongTextResult(
             text=dedup_text,
@@ -363,27 +366,26 @@ class LongTextGenerator:
         ratio = index / (total - 1)
         if ratio < 0.25:
             return 0.70
-        elif ratio < 0.5:
+        if ratio < 0.5:
             return 0.75
-        elif ratio < 0.75:
+        if ratio < 0.75:
             return 0.85
-        else:
-            return 0.75
+        return 0.75
 
     @staticmethod
     def _clean_segment(text: str) -> str:
         """清理分段文本（去除标题、说明等）"""
-        lines = text.split('\n')
+        lines = text.split("\n")
         cleaned = []
         for line in lines:
             stripped = line.strip()
             # 跳过标题行（以"第X章"、"###"开头）
-            if re.match(r'^第[一二三四五六七八九十\d]+[章节]', stripped):
+            if re.match(r"^第[一二三四五六七八九十\d]+[章节]", stripped):
                 continue
-            if stripped.startswith('#') or stripped.startswith('【'):
+            if stripped.startswith("#") or stripped.startswith("【"):
                 continue
             # 跳过说明性文字
-            if any(kw in stripped for kw in ['以下是', '继续写作', '正文如下', '字数统计']):
+            if any(kw in stripped for kw in ["以下是", "继续写作", "正文如下", "字数统计"]):
                 continue
             cleaned.append(line)
-        return '\n'.join(cleaned).strip()
+        return "\n".join(cleaned).strip()

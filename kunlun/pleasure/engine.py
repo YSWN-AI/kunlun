@@ -1,4 +1,4 @@
-﻿"""
+"""
 pleasure 爽点引擎 — 网文爽点识别、节奏控制、疲劳度管理
 
 核心能力:
@@ -341,7 +341,6 @@ class PleasureEngine(BaseExtensionModule):
         except Exception as e:
             logger.debug(f"PleasureEngine.detect_events 跳过: {e}")
             return {"events": [], "rhythm": 0.0, "chapter": chapter}
-
 
 
 # ============================================================================

@@ -1,4 +1,4 @@
-﻿"""
+"""
 truth 真相文件引擎 — 写作"底牌"管理+角色关系矩阵+信息揭露计划
 
 核心能力:
@@ -422,12 +422,14 @@ class TruthFileManager(BaseExtensionModule):
         """更新角色情感弧"""
         if character not in self._emotional_arcs:
             self._emotional_arcs[character] = []
-        self._emotional_arcs[character].append({
-            "chapter": chapter,
-            "emotion": emotion,
-            "intensity": intensity,
-            "scene_title": scene_title,
-        })
+        self._emotional_arcs[character].append(
+            {
+                "chapter": chapter,
+                "emotion": emotion,
+                "intensity": intensity,
+                "scene_title": scene_title,
+            }
+        )
         logger.debug(f"情感弧已更新: {character} 第{chapter}章 {emotion}")
 
     def get_emotional_arc(self, character: str) -> list[dict[str, Any]]:
@@ -470,15 +472,11 @@ class TruthFileManager(BaseExtensionModule):
         """检查逾期未揭示的伏笔"""
         overdue = []
         for hook_data in self._hooks.values():
-            if (
-                not hook_data["revealed"]
-                and chapter > hook_data["reveal_chapter"]
-            ):
+            if not hook_data["revealed"] and chapter > hook_data["reveal_chapter"]:
                 overdue.append(hook_data)
         if overdue:
             logger.debug(f"发现 {len(overdue)} 个逾期伏笔")
         return overdue
-
 
 
 _managers: dict[str, TruthFileManager] = {}

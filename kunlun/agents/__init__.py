@@ -33,9 +33,9 @@ from kunlun.agents.observer import (
 )
 from kunlun.agents.publisher import PublishAction, PublisherAgent, PublisherResult, PublisherTask
 from kunlun.agents.reader import (
+    EXTENDED_READER_PROFILES,
     EnhancedReaderFeedback,
     ExtendedReaderType,
-    EXTENDED_READER_PROFILES,
     ReaderAgent,
 )
 from kunlun.agents.reflector_agent import Reflector, ReflectorResult, SnapshotVersion
@@ -52,17 +52,18 @@ from kunlun.agents.sociologist import SocietyRequest, SocietyResult, Sociologist
 from kunlun.agents.writer import Writer
 
 __all__ = [
+    "CRITIC_DIMENSIONS",
+    "EXTENDED_READER_PROFILES",
     "AgentCluster",
     "AgentMessage",
     "AgentStatus",
     "Architect",
     "Auditor",
     "BaseAgent",
+    "CRITICVerification",
     "ChapterIntent",
     "CharacterStateChange",
     "CreativeBrief",
-    "CRITIC_DIMENSIONS",
-    "CRITICVerification",
     "CriticAgent",
     "CriticReport",
     "DebateOrchestrator",
@@ -72,7 +73,6 @@ __all__ = [
     "EnhancedReaderFeedback",
     "EventExtracted",
     "ExtendedReaderType",
-    "EXTENDED_READER_PROFILES",
     "ForeshadowingDelta",
     "InProcessMessageBus",
     "Makefile",

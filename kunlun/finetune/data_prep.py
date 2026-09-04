@@ -492,9 +492,7 @@ class DatasetBuilder:
         dialogue_ratio = round(dialogue_chars / max(1, char_count), 3)
 
         # 描写比例：含描写性用词的句子比例
-        desc_sentences = sum(
-            1 for s in sentences if any(w in s for w in _DESCRIPTION_WORDS)
-        )
+        desc_sentences = sum(1 for s in sentences if any(w in s for w in _DESCRIPTION_WORDS))
         description_ratio = round(desc_sentences / sentence_count, 3)
 
         # 词汇丰富度（不同字符数 / 总字符数）
@@ -502,16 +500,22 @@ class DatasetBuilder:
         vocabulary_richness = round(unique_chars / max(1, char_count), 3)
 
         # 节奏指标：短句比例（句长 < 平均句长的 0.6）
-        short_sentences = sum(
-            1 for s in sentences if len(s) < avg_sentence_length * 0.6
-        )
+        short_sentences = sum(1 for s in sentences if len(s) < avg_sentence_length * 0.6)
         pace_indicator = round(short_sentences / sentence_count, 3)
 
         # 高频用词（排除标点和常见虚词）
         words = re.findall(r"[\u4e00-\u9fff]{2,4}", text)
         stop_words = {
-            "的了", "着的", "是的", "不是", "没有", "一个",
-            "这个", "那个", "我们", "你们",
+            "的了",
+            "着的",
+            "是的",
+            "不是",
+            "没有",
+            "一个",
+            "这个",
+            "那个",
+            "我们",
+            "你们",
         }
         filtered = [w for w in words if w not in stop_words]
         top_words = [w for w, _ in Counter(filtered).most_common(10)]

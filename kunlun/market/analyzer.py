@@ -134,9 +134,7 @@ class MarketAnalyzer:
 
     def list_hot_genres(self, limit: int = 10, min_heat: float = 0) -> list[GenreHeat]:
         """列出热门题材 (按热度排序)"""
-        genres = [
-            g for g in self._genre_heat.values() if g.heat_score >= min_heat
-        ]
+        genres = [g for g in self._genre_heat.values() if g.heat_score >= min_heat]
         genres.sort(key=lambda g: g.heat_score, reverse=True)
         return genres[:limit]
 
@@ -167,11 +165,7 @@ class MarketAnalyzer:
 
         # 加权移动平均: 最近权重最高
         if len(recent_heats) >= 3:
-            predicted = (
-                recent_heats[-1] * 0.5
-                + recent_heats[-2] * 0.3
-                + recent_heats[-3] * 0.2
-            )
+            predicted = recent_heats[-1] * 0.5 + recent_heats[-2] * 0.3 + recent_heats[-3] * 0.2
         else:
             predicted = recent_heats[-1] * 0.6 + recent_heats[-2] * 0.4
 
@@ -271,9 +265,7 @@ class MarketAnalyzer:
                 "frequency": count,
                 "opportunity": f"多数竞品存在'{w}'短板，可作为差异化切入点",
             }
-            for w, count in sorted(
-                weakness_freq.items(), key=lambda x: x[1], reverse=True
-            )[:5]
+            for w, count in sorted(weakness_freq.items(), key=lambda x: x[1], reverse=True)[:5]
         ]
 
         # 平台分布
@@ -404,8 +396,7 @@ class MarketAnalyzer:
                     "type": "completion_improvement",
                     "title": "题材平均完读率偏低，优质内容可脱颖而出",
                     "description": (
-                        f"该题材平均完读率仅 {comp_pct:.1f}%，"
-                        "提升节奏和爽点密度可获得竞争优势"
+                        f"该题材平均完读率仅 {comp_pct:.1f}%，提升节奏和爽点密度可获得竞争优势"
                     ),
                     "priority": "medium",
                 }
@@ -517,28 +508,20 @@ class MarketAnalyzer:
                 "避免连续超过2章的铺垫期，战斗/对话/描写比例控制在4:3:3"
             ),
             "pleasure_point_density": (
-                "提升爽点密度：每章至少1个明确爽点（打脸/升级/揭秘/收获），"
-                "爽点间隔不超过2000字"
+                "提升爽点密度：每章至少1个明确爽点（打脸/升级/揭秘/收获），爽点间隔不超过2000字"
             ),
             "cliffhanger_density": (
-                "强化章末钩子：每章结尾使用悬念/反转/危机中断，"
-                "避免章节平稳收尾"
+                "强化章末钩子：每章结尾使用悬念/反转/危机中断，避免章节平稳收尾"
             ),
             "character_depth": (
-                "深化角色塑造：为主角设置明确的内在矛盾和成长弧线，"
-                "配角赋予独特动机和口头禅"
+                "深化角色塑造：为主角设置明确的内在矛盾和成长弧线，配角赋予独特动机和口头禅"
             ),
             "plot_uniqueness": (
-                "增强情节独特性：在经典套路中加入反套路设定，"
-                "设计至少1个读者难以预测的中期反转"
+                "增强情节独特性：在经典套路中加入反套路设定，设计至少1个读者难以预测的中期反转"
             ),
-            "update_frequency": (
-                "稳定更新频率：建议日更4000字以上，"
-                "固定更新时间培养读者阅读习惯"
-            ),
+            "update_frequency": ("稳定更新频率：建议日更4000字以上，固定更新时间培养读者阅读习惯"),
             "dialogue_description_ratio": (
-                "优化对话描写比例：对话占比提升至30%-50%，"
-                "减少大段环境描写，用动作和对话推进剧情"
+                "优化对话描写比例：对话占比提升至30%-50%，减少大段环境描写，用动作和对话推进剧情"
             ),
         }
 
@@ -581,16 +564,12 @@ class MarketAnalyzer:
                 # 误差越大，权重提升越多 (最多+0.05)
                 adjustment = min(0.05, avg_error * 0.1)
                 adjustments[dim] = round(adjustment, 4)
-                self._model_weights[dim] = min(
-                    0.4, self._model_weights.get(dim, 0) + adjustment
-                )
+                self._model_weights[dim] = min(0.4, self._model_weights.get(dim, 0) + adjustment)
 
         # 归一化权重
         total = sum(self._model_weights.values())
         if total > 0:
-            self._model_weights = {
-                k: round(v / total, 4) for k, v in self._model_weights.items()
-            }
+            self._model_weights = {k: round(v / total, 4) for k, v in self._model_weights.items()}
 
         return {
             "status": "calibrated",
@@ -620,9 +599,7 @@ class MarketAnalyzer:
         )
 
         comp_data = [asdict(c) for c in self._competitors]
-        comp_file.write_text(
-            json.dumps(comp_data, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
+        comp_file.write_text(json.dumps(comp_data, ensure_ascii=False, indent=2), encoding="utf-8")
 
     def load_market_data(self) -> None:
         """加载市场数据"""

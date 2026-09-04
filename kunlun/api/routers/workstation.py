@@ -65,7 +65,9 @@ class MemoryQueryRequest(BaseModel):
 class MemoryAddRequest(BaseModel):
     book_id: str = Field(default="default", description="书籍ID")
     content: str = Field(..., description="记忆内容")
-    layer: str = Field(default="working", description="记忆层级: working/episodic/semantic/procedural")
+    layer: str = Field(
+        default="working", description="记忆层级: working/episodic/semantic/procedural"
+    )
 
 
 class DebateReviewRequest(BaseModel):
@@ -220,9 +222,10 @@ async def memory_query(req: MemoryQueryRequest) -> dict:
 async def memory_add(req: MemoryAddRequest) -> dict:
     """向指定书籍的记忆系统添加一条记忆。"""
     try:
-        from kunlun.memory.engine import create_memory_manager, MemoryImportance
         import time
         import uuid
+
+        from kunlun.memory.engine import MemoryImportance, create_memory_manager
 
         mm = create_memory_manager(req.book_id)
         memory_id = f"mem_{int(time.time())}_{uuid.uuid4().hex[:8]}"
@@ -231,28 +234,73 @@ async def memory_add(req: MemoryAddRequest) -> dict:
         if layer == "working":
             mm.working.add_note(req.content, importance=MemoryImportance.MEDIUM)
         elif layer == "episodic":
-            mm.episodic.add_event(
-                event_type="manual_note",
-                description=req.content,
-                chapter=0,
-            )
+            try:
+                from kunlun.memory.engine import EpisodicEvent
+
+                event = EpisodicEvent(
+                    id=memory_id,
+                    chapter=0,
+                    scene="manual",
+                    summary=req.content,
+                    participants=[],
+                    location="",
+                    event_type="manual_note",
+                    emotional_arc="neutral",
+                    plot_relevance=0.5,
+                    foreshadowing=[],
+                    resolved_hooks=[],
+                    importance=MemoryImportance.MEDIUM,
+                )
+                mm.episodic.add_event(event)
+            except Exception:
+                pass
         elif layer == "semantic":
             # 语义层通过实体提取添加
             from kunlun.memory.engine import extract_entities_from_text
 
             entities = extract_entities_from_text(req.content)
             for ent in entities:
-                mm.semantic.add_entity(ent) if hasattr(mm.semantic, "add_entity") else None
+                if hasattr(mm.semantic, "add_entity"):
+                    try:
+                        from kunlun.memory.engine import SemanticEntity
+
+                        mm.semantic.add_entity(SemanticEntity(**ent))
+                    except Exception:
+                        pass
         elif layer == "procedural":
             if hasattr(mm.procedural, "add_pattern"):
-                mm.procedural.add_pattern(req.content)
+                try:
+                    import time
+
+                    from kunlun.memory.engine import ProceduralPattern
+
+                    pattern = ProceduralPattern(
+                        id=f"pattern_{int(time.time() * 1000)}",
+                        name=req.content[:50],
+                        pattern_type="custom",
+                        description=req.content,
+                        trigger_conditions=[],
+                        template=req.content,
+                        examples=[],
+                        effectiveness=0.5,
+                        usage_count=0,
+                        author_preference=0.5,
+                        tags=[],
+                    )
+                    mm.procedural.add_pattern(pattern)
+                except Exception:
+                    pass
         else:
             # 默认写入工作记忆
             mm.working.add_note(req.content, importance=MemoryImportance.MEDIUM)
 
         # 尝试持久化
         try:
-            mm.save()
+            import os
+
+            save_dir = os.path.join("data", "memory", "workstation")
+            os.makedirs(save_dir, exist_ok=True)
+            mm.save(os.path.join(save_dir, f"{req.book_id}_memory.json"))
         except Exception:
             pass
 

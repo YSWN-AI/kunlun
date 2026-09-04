@@ -117,9 +117,12 @@ class BranchComparator:
         node_a = t.nodes.get(branch_a_id)
         node_b = t.nodes.get(branch_b_id)
         if not node_a or not node_b:
-            return {"error": "branch_not_found", "missing": [
-                bid for bid, n in [(branch_a_id, node_a), (branch_b_id, node_b)] if n is None
-            ]}
+            return {
+                "error": "branch_not_found",
+                "missing": [
+                    bid for bid, n in [(branch_a_id, node_a), (branch_b_id, node_b)] if n is None
+                ],
+            }
 
         metrics_a = self._get_node_metrics(node_a, t)
         metrics_b = self._get_node_metrics(node_b, t)
@@ -332,7 +335,7 @@ class BranchComparator:
         factors["character_overlap"] = {
             "score": round(char_overlap, 3),
             "shared_characters": list(intersection_chars),
-            "detail": f"角色重叠率 {char_overlap*100:.1f}%",
+            "detail": f"角色重叠率 {char_overlap * 100:.1f}%",
         }
 
         # 3. 冲突兼容性 (是否有互斥冲突)
@@ -380,9 +383,7 @@ class BranchComparator:
             "type_compatibility": 0.15,
             "canon_status": 0.15,
         }
-        feasibility_score = sum(
-            factors[k]["score"] * weights[k] for k in weights
-        )
+        feasibility_score = sum(factors[k]["score"] * weights[k] for k in weights)
 
         feasible = feasibility_score >= 0.5
 
@@ -485,9 +486,7 @@ class BranchComparator:
             )
         return f"不建议合并「{names}」：保留独立分支发展，避免剧情冲突和逻辑混乱。"
 
-    def _identify_merge_risks(
-        self, strategy: str, feasibility: dict
-    ) -> list[str]:
+    def _identify_merge_risks(self, strategy: str, feasibility: dict) -> list[str]:
         """识别合并风险"""
         risks: list[str] = []
 
@@ -519,9 +518,7 @@ class BranchComparator:
 
         return risks
 
-    def _build_merge_reason(
-        self, nodes: list[BranchNode], strategy: str, feasibility: dict
-    ) -> str:
+    def _build_merge_reason(self, nodes: list[BranchNode], strategy: str, feasibility: dict) -> str:
         """构建合并理由"""
         names = "、".join(n.name for n in nodes)
         score = feasibility.get("feasibility_score", 0)
@@ -600,9 +597,7 @@ class BranchComparator:
                 if cfid not in canon_node.conflict_ids:
                     canon_node.conflict_ids.append(cfid)
             # 合并条件
-            existing_cond_keys = {
-                (c.condition_type, c.key) for c in canon_node.conditions
-            }
+            existing_cond_keys = {(c.condition_type, c.key) for c in canon_node.conditions}
             for cond in node.conditions:
                 key = (cond.condition_type, cond.key)
                 if key not in existing_cond_keys:
@@ -645,12 +640,8 @@ class BranchComparator:
             chapter=avg_chapter + 1,
             branch_type=BranchPointType.EVENT_OUTCOME,
             parent_id="",  # 多父节点，通过children关联
-            character_ids=list(
-                set().union(*[set(n.character_ids) for n in nodes])
-            ),
-            conflict_ids=list(
-                set().union(*[set(n.conflict_ids) for n in nodes])
-            ),
+            character_ids=list(set().union(*[set(n.character_ids) for n in nodes])),
+            conflict_ids=list(set().union(*[set(n.conflict_ids) for n in nodes])),
             quality_score=sum(n.quality_score for n in nodes) / len(nodes),
             popularity_score=sum(n.popularity_score for n in nodes) / len(nodes),
         )
@@ -680,10 +671,10 @@ class BranchComparator:
 
         for i, node in enumerate(nodes):
             # 使用 description 追加时间线标记 (不新增字段，保持向后兼容)
-            timeline_tag = f"[时间线{i+1}]"
+            timeline_tag = f"[时间线{i + 1}]"
             if timeline_tag not in node.description:
                 node.description = f"{timeline_tag} {node.description}"
-            changes.append(f"「{node.name}」标记为时间线{i+1} (第{node.chapter}章)")
+            changes.append(f"「{node.name}」标记为时间线{i + 1} (第{node.chapter}章)")
 
         return {
             "success": True,
@@ -766,9 +757,7 @@ class BranchComparator:
                         "chapter": child.chapter,
                         "is_canon": child.is_canon,
                         "composite_score": round(child.composite_score, 3),
-                        "children": self._collect_children(
-                            cid, tree, max_depth, current_depth + 1
-                        ),
+                        "children": self._collect_children(cid, tree, max_depth, current_depth + 1),
                     }
                 )
         return result
@@ -856,16 +845,12 @@ class BranchComparator:
                 )
 
         # 如果分支总数超过上限，额外建议修剪得分最低的
-        non_canon_nodes = [
-            n for n in t.nodes.values() if not n.is_canon and n.id != t.root_id
-        ]
+        non_canon_nodes = [n for n in t.nodes.values() if not n.is_canon and n.id != t.root_id]
         if len(non_canon_nodes) > max_branches:
             sorted_nodes = sorted(non_canon_nodes, key=lambda n: n.composite_score)
             excess = len(non_canon_nodes) - max_branches
             existing_ids = {s["branch_id"] for s in suggestions}
-            excess_reason = (
-                f"分支总数超限({len(non_canon_nodes)} > {max_branches})，综合得分最低"
-            )
+            excess_reason = f"分支总数超限({len(non_canon_nodes)} > {max_branches})，综合得分最低"
             suggestions.extend(
                 {
                     "branch_id": node.id,

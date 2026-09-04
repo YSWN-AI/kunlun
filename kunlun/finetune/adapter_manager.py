@@ -128,9 +128,7 @@ class AdapterManager:
 
     # ── 列出 ──────────────────────────────────────
 
-    def list_adapters(
-        self, adapter_type: AdapterType | None = None
-    ) -> list[AdapterInfo]:
+    def list_adapters(self, adapter_type: AdapterType | None = None) -> list[AdapterInfo]:
         """列出所有适配器
 
         Args:
@@ -277,12 +275,8 @@ class AdapterManager:
         merged_dir.mkdir(parents=True, exist_ok=True)
 
         # 加权平均训练步数和 loss
-        avg_steps = sum(
-            info.trained_steps * w for info, w in zip(infos, weights, strict=False)
-        )
-        avg_loss = sum(
-            info.training_loss * w for info, w in zip(infos, weights, strict=False)
-        )
+        avg_steps = sum(info.trained_steps * w for info, w in zip(infos, weights, strict=False))
+        avg_loss = sum(info.training_loss * w for info, w in zip(infos, weights, strict=False))
 
         merged_info = AdapterInfo(
             name=merged_name,
@@ -338,9 +332,7 @@ class AdapterManager:
         shutil.copytree(adapter_dir, out_path)
         return str(out_path)
 
-    def import_adapter(
-        self, source_dir: str, name: str | None = None
-    ) -> AdapterInfo | None:
+    def import_adapter(self, source_dir: str, name: str | None = None) -> AdapterInfo | None:
         """导入适配器
 
         Args:

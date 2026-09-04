@@ -1142,7 +1142,10 @@ class KGClient:
 
     def _do_health_check(self) -> dict:
         result: dict[str, bool | str] = {
-            "neo4j": False, "qdrant": False, "sqlite": False, "sqlite_graph": False,
+            "neo4j": False,
+            "qdrant": False,
+            "sqlite": False,
+            "sqlite_graph": False,
         }
         try:
             self.neo4j.verify_connectivity()

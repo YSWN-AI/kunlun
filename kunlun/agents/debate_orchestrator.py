@@ -304,8 +304,13 @@ class DebateOrchestrator:
 
             # 构建辩论 prompt
             prompt = self._build_debate_prompt(
-                text, chapter, context, round_num, round_issues,
-                critic_report, reader_feedback,
+                text,
+                chapter,
+                context,
+                round_num,
+                round_issues,
+                critic_report,
+                reader_feedback,
             )
 
             result = await gacha_engine.generate(prompt, mode="single_fix", agent="debate")
@@ -346,7 +351,9 @@ class DebateOrchestrator:
 
         # 最终裁决
         final_verdict = self._generate_final_verdict(all_agreed, all_unresolved, critic_report)
-        total_score = self._calculate_debate_score(critic_report, reader_feedback, len(all_agreed), len(all_unresolved))
+        total_score = self._calculate_debate_score(
+            critic_report, reader_feedback, len(all_agreed), len(all_unresolved)
+        )
 
         return DebateResult(
             rounds=rounds,
@@ -372,7 +379,7 @@ class DebateOrchestrator:
     ) -> str:
         """构建 LLM 辩论 prompt"""
         issues_text = "\n".join(
-            f"  问题{i+1}: [{issue.dimension.value}][严重度{issue.severity}] "
+            f"  问题{i + 1}: [{issue.dimension.value}][严重度{issue.severity}] "
             f"{issue.description}（位置: {issue.location}）"
             f"{' 建议: ' + issue.suggestion if issue.suggestion else ''}"
             for i, issue in enumerate(issues)
@@ -473,9 +480,7 @@ class DebateOrchestrator:
                 focus_issues=focus,
                 critic_argument=dr.critic_argument,
                 defender_argument=dr.defender_argument,
-                reader_vote=(
-                    "读者认同问题存在" if is_resolved else "读者认为问题影响较小"
-                ),
+                reader_vote=("读者认同问题存在" if is_resolved else "读者认为问题影响较小"),
                 resolution=dr.resolution,
                 issues_resolved=resolved_list,
                 issues_unresolved=unresolved_list,
@@ -567,15 +572,48 @@ class DebateOrchestrator:
             CRITICVerification 验证结果
         """
         # 检查是否具体
-        action_words = ["增加", "删除", "修改", "替换", "调整", "优化", "拆分", "合并", "强化", "弱化"]
+        action_words = [
+            "增加",
+            "删除",
+            "修改",
+            "替换",
+            "调整",
+            "优化",
+            "拆分",
+            "合并",
+            "强化",
+            "弱化",
+        ]
         is_specific = len(suggestion) > 10 and any(w in suggestion for w in action_words)
 
         # 检查是否有明确位置
-        location_words = ["开头", "结尾", "中段", "前1/3", "后1/3", "章末", "开篇", "对话", "段落", "场景"]
+        location_words = [
+            "开头",
+            "结尾",
+            "中段",
+            "前1/3",
+            "后1/3",
+            "章末",
+            "开篇",
+            "对话",
+            "段落",
+            "场景",
+        ]
         has_location = any(w in suggestion for w in location_words)
 
         # 检查是否可量化
-        quantifiable_words = ["个", "处", "字", "次", "比例", "密度", "3-5", "2-3", "至少", "不超过"]
+        quantifiable_words = [
+            "个",
+            "处",
+            "字",
+            "次",
+            "比例",
+            "密度",
+            "3-5",
+            "2-3",
+            "至少",
+            "不超过",
+        ]
         import re
 
         has_number = bool(re.search(r"\d", suggestion))
@@ -816,9 +854,7 @@ class DebateOrchestrator:
             duration_ms=round(duration, 2),
         )
 
-    async def _stage1_debate(
-        self, text: str, chapter: int, outline: str
-    ) -> PipelineStage:
+    async def _stage1_debate(self, text: str, chapter: int, outline: str) -> PipelineStage:
         """Stage1: 蓝图评审辩论（核心）"""
         start = time.monotonic()
         try:
@@ -952,7 +988,9 @@ class DebateOrchestrator:
         reflexion_count = stage4.result.get("unresolved_count", 0)
 
         # 终评分数 = 辩论分数 * 0.7 + 可执行率 * 20 * 0.2 + (10 - 反思数) * 0.1
-        final_score = total_score * 0.7 + actionable_rate * 20 * 0.2 + max(0, 10 - reflexion_count) * 0.1
+        final_score = (
+            total_score * 0.7 + actionable_rate * 20 * 0.2 + max(0, 10 - reflexion_count) * 0.1
+        )
         final_score = round(max(0.0, min(100.0, final_score)), 1)
 
         if final_score >= 85:
@@ -980,9 +1018,7 @@ class DebateOrchestrator:
             duration_ms=round(duration, 2),
         )
 
-    def _stage6_polish_suggestion(
-        self, text: str, stage5: PipelineStage
-    ) -> PipelineStage:
+    def _stage6_polish_suggestion(self, text: str, stage5: PipelineStage) -> PipelineStage:
         """Stage6: 润色建议（输出建议，不实际执行）"""
         start = time.monotonic()
         final_score = stage5.result.get("final_score", 50.0)

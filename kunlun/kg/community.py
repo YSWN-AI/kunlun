@@ -59,9 +59,7 @@ class CommunityDetector:
         """
         conn = kg_client._get_graph_conn()
         # 查询指定类型的节点
-        cursor = conn.execute(
-            "SELECT id, name FROM nodes WHERE type = ?", (entity_type,)
-        )
+        cursor = conn.execute("SELECT id, name FROM nodes WHERE type = ?", (entity_type,))
         node_ids = {row["id"] for row in cursor.fetchall()}
 
         adjacency: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -240,10 +238,9 @@ class CommunityDetector:
 
         two_m = 2.0 * m
         # 移入目标社区后的 Q 贡献
-        q_after = (
-            (sigma_in_target + 2 * k_i_in_target) / two_m
-            - resolution * ((sigma_tot_target + k_i) / two_m) ** 2
-        )
+        q_after = (sigma_in_target + 2 * k_i_in_target) / two_m - resolution * (
+            (sigma_tot_target + k_i) / two_m
+        ) ** 2
         # 移出当前社区前的 Q 贡献
         q_before = (
             sigma_in_target / two_m
@@ -372,9 +369,7 @@ class CommunityDetector:
             sub_adj: dict[str, dict[str, float]] = {}
             member_set = set(members)
             for node in members:
-                sub_adj[node] = {
-                    nb: w for nb, w in adj.get(node, {}).items() if nb in member_set
-                }
+                sub_adj[node] = {nb: w for nb, w in adj.get(node, {}).items() if nb in member_set}
             # 对子图运行一次局部移动
             sub_community = {n: i for i, n in enumerate(members)}
             m = self._total_weight(sub_adj)
@@ -464,9 +459,7 @@ class CommunityDetector:
         return q / two_m
 
     @staticmethod
-    def get_community_members(
-        community_id: int, communities: dict[str, int]
-    ) -> list[str]:
+    def get_community_members(community_id: int, communities: dict[str, int]) -> list[str]:
         """获取指定社区的成员列表"""
         return [node for node, cid in communities.items() if cid == community_id]
 

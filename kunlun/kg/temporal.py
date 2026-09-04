@@ -112,8 +112,7 @@ class TemporalRelationManager:
         """
         conn = self._get_graph_conn()
         cursor = conn.execute(
-            "SELECT id, properties FROM edges "
-            "WHERE source_id = ? AND target_id = ? AND type = ?",
+            "SELECT id, properties FROM edges WHERE source_id = ? AND target_id = ? AND type = ?",
             (source_id, target_id, rel_type),
         )
         rows = cursor.fetchall()
@@ -138,9 +137,7 @@ class TemporalRelationManager:
 
     # ─── 查询操作 ────────────────────────────────────
 
-    def get_relations_at_chapter(
-        self, source_id: str, chapter: int
-    ) -> list[dict[str, Any]]:
+    def get_relations_at_chapter(self, source_id: str, chapter: int) -> list[dict[str, Any]]:
         """获取指定章节时有效的所有关系（出边）
 
         有效条件：valid_from_chapter <= chapter < valid_to_chapter
@@ -160,9 +157,7 @@ class TemporalRelationManager:
                 results.append(rel)
         return results
 
-    def get_relation_history(
-        self, source_id: str, target_id: str
-    ) -> list[dict[str, Any]]:
+    def get_relation_history(self, source_id: str, target_id: str) -> list[dict[str, Any]]:
         """获取两实体间关系的完整历史（含过期关系，按起始章节排序）"""
         conn = self._get_graph_conn()
         cursor = conn.execute(
@@ -172,9 +167,7 @@ class TemporalRelationManager:
         )
         return [self._row_to_relation(row) for row in cursor.fetchall()]
 
-    def get_active_relations(
-        self, source_id: str, current_chapter: int
-    ) -> list[dict[str, Any]]:
+    def get_active_relations(self, source_id: str, current_chapter: int) -> list[dict[str, Any]]:
         """获取当前活跃关系（出边 + 入边）"""
         conn = self._get_graph_conn()
         cursor = conn.execute(
