@@ -737,5 +737,27 @@ class LLMCache:
             return 0
 
 
-# 全局单例
-llm_cache = LLMCache()
+# 全局单例（懒加载，避免导入时初始化Qdrant/Redis/SQLite连接）
+_llm_cache_instance: LLMCache | None = None
+
+
+def get_llm_cache() -> LLMCache:
+    """获取全局单例（懒加载，首次调用时才初始化连接）"""
+    global _llm_cache_instance
+    if _llm_cache_instance is None:
+        _llm_cache_instance = LLMCache()
+    return _llm_cache_instance
+
+
+class _LazyLLMCacheProxy:
+    """懒加载代理，兼容旧的 llm_cache.xxx 访问方式"""
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(get_llm_cache(), name)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        setattr(get_llm_cache(), name, value)
+
+
+# 兼容旧代码：llm_cache 现在是懒加载代理
+llm_cache = _LazyLLMCacheProxy()
