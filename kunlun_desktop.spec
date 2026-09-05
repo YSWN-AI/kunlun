@@ -343,7 +343,6 @@ excluded_modules = [
     "setuptools",
     "pip",
     "wheel",
-    "distutils",
     "pkg_resources",
 ]
 
