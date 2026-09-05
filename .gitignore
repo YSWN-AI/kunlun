@@ -80,3 +80,10 @@ frontend/dist/
 /*.epub
 /*.mobi
 /*.docx
+
+# 临时构建目录
+dist_app/
+
+# UPX工具（本地构建用）
+tools/upx/
+
