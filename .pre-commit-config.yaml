@@ -9,7 +9,7 @@ repos:
     rev: v0.11.0
     hooks:
       - id: ruff
-        args: ["check", "--fix", "--exit-non-zero-on-fix"]
+        args: ["--fix", "--exit-non-zero-on-fix"]
         types_or: [python, pyi]
 
   # 2. Ruff — Formatter（格式化代码）

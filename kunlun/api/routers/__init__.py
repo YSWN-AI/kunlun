@@ -51,6 +51,12 @@
         write_routes.py   # 创作辅助 (1 route) — v2 新增
         stats.py          # 全书统计 (1 route) — v2 新增
         learn.py          # 偏好学习 (2 routes) — v2 新增
+        constitution.py   # KUNLUN.md项目宪法 (8 routes) — v3 新增
+        mode.py           # 规划/行动双模式 (5 routes) — v3 新增
+        writing_packs.py  # Rule/Workflow/Skill插件 (10 routes) — v3 新增
+        image_gen.py      # 图像生成 (4 routes) — v2 新增
+        local_marketplace.py  # 本地技能包市场 (7 routes) — v3 新增
+        smart_learn.py    # 智能学习 (6 routes) — v3 新增
 
 使用方式:
     from kunlun.api.routers import api_router
@@ -69,6 +75,7 @@ from kunlun.api.routers.chapters import router as chapters_router
 from kunlun.api.routers.chat import router as chat_router
 from kunlun.api.routers.compliance import router as compliance_router
 from kunlun.api.routers.config_routes import router as config_router
+from kunlun.api.routers.constitution import router as constitution_router
 from kunlun.api.routers.continuity import router as continuity_router
 from kunlun.api.routers.cover import router as cover_router
 from kunlun.api.routers.daemon import router as daemon_router
@@ -80,10 +87,13 @@ from kunlun.api.routers.genres import router as genres_router
 from kunlun.api.routers.genres_v2 import router as genres_v2_router
 from kunlun.api.routers.golden_triple import router as golden_triple_router
 from kunlun.api.routers.humanize import router as humanize_router
+from kunlun.api.routers.image_gen import router as image_gen_router
 from kunlun.api.routers.interactive import router as interactive_router
 from kunlun.api.routers.kg import router as kg_router
 from kunlun.api.routers.learn import router as learn_router
+from kunlun.api.routers.local_marketplace import router as local_marketplace_router
 from kunlun.api.routers.marginal_efficiency import router as marginal_router
+from kunlun.api.routers.mode import router as mode_router
 from kunlun.api.routers.model_routing import router as model_routing_router
 from kunlun.api.routers.notify import router as notify_router
 from kunlun.api.routers.optimization import router as optimization_router
@@ -97,6 +107,7 @@ from kunlun.api.routers.quality_v2 import router as quality_v2_router
 from kunlun.api.routers.retention import router as retention_router
 from kunlun.api.routers.rules import router as rules_router
 from kunlun.api.routers.search import router as search_router
+from kunlun.api.routers.smart_learn import router as smart_learn_router
 from kunlun.api.routers.stats import router as stats_router
 
 # v2 新增路由模块
@@ -106,6 +117,7 @@ from kunlun.api.routers.usage_routes import router as usage_router
 from kunlun.api.routers.vibe import router as vibe_router
 from kunlun.api.routers.write_routes import router as write_router
 from kunlun.api.routers.writer_context import router as writer_context_router
+from kunlun.api.routers.writing_packs import router as writing_packs_router
 from kunlun.api.routers.ws import router as ws_router
 
 api_router = APIRouter()
@@ -151,11 +163,17 @@ api_router.include_router(retention_router)
 api_router.include_router(write_router)
 api_router.include_router(stats_router)
 api_router.include_router(learn_router)
+api_router.include_router(image_gen_router)
+api_router.include_router(local_marketplace_router)
+api_router.include_router(smart_learn_router)
 api_router.include_router(golden_triple_router)
 api_router.include_router(branch_plot_router)
 api_router.include_router(interactive_router)
 api_router.include_router(optimization_router)
 api_router.include_router(orchestrator_router)
+api_router.include_router(writing_packs_router)
+api_router.include_router(constitution_router)
+api_router.include_router(mode_router)
 
 __all__ = [
     "admin_router",
@@ -169,6 +187,7 @@ __all__ = [
     "chat_router",
     "compliance_router",
     "config_router",
+    "constitution_router",
     "continuity_router",
     "cover_router",
     "daemon_router",
@@ -180,9 +199,12 @@ __all__ = [
     "genres_v2_router",
     "golden_triple_router",
     "humanize_router",
+    "image_gen_router",
     "kg_router",
     "learn_router",
+    "local_marketplace_router",
     "marginal_router",
+    "mode_router",
     "model_routing_router",
     "notify_router",
     "optimization_router",
@@ -196,6 +218,7 @@ __all__ = [
     "retention_router",
     "rules_router",
     "search_router",
+    "smart_learn_router",
     "stats_router",
     "story_bible_router",
     "stream_router",
@@ -203,5 +226,6 @@ __all__ = [
     "vibe_router",
     "write_router",
     "writer_context_router",
+    "writing_packs_router",
     "ws_router",
 ]

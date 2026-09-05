@@ -2266,6 +2266,24 @@ input[type="range"]::-webkit-slider-thumb {
   to { transform: rotate(360deg); }
 }
 
+
+/* ===== 新增：模式选择器 ===== */
+.mode-selector { display:flex; align-items:center; gap:6px; margin-right:auto; padding:0 12px; }
+.mode-label { font-size:11px; color:var(--text-muted); }
+.mode-btn { padding:3px 10px; font-size:11px; border:1px solid var(--border); background:transparent; color:var(--text-muted); border-radius:4px; cursor:pointer; transition:all 0.2s; }
+.mode-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.mode-btn:hover { border-color:var(--accent); }
+/* ===== 新增：侧边栏新面板通用样式 ===== */
+.sidebar-content .input, .sidebar-content .textarea, .sidebar-content .select {
+  width:100%; padding:4px 8px; font-size:11px; border:1px solid var(--border);
+  background:var(--bg-secondary, #1e1e1e); color:var(--text, #ccc); border-radius:3px; box-sizing:border-box;
+}
+.sidebar-content .textarea { resize:vertical; min-height:40px; }
+.sidebar-content .field-group { margin-bottom:8px; }
+.sidebar-content .field-label { display:block; font-size:10px; color:var(--text-muted); margin-bottom:3px; }
+.sidebar-content .field-row { display:flex; gap:8px; }
+.sidebar-content .field-row .field-group { flex:1; }
+
 </style>
 </head>
 <body>
@@ -2293,6 +2311,10 @@ input[type="range"]::-webkit-slider-thumb {
     <div class="activity-item" data-view="versions" onclick="IDE.switchView('versions')">🕐<span class="tooltip">版本历史</span></div>
     <div class="activity-item" data-view="style" onclick="IDE.switchView('style')">🎨<span class="tooltip">风格学习</span></div>
     <div class="activity-item" data-view="memory" onclick="IDE.switchView('memory')">🧠<span class="tooltip">记忆管理</span></div>
+    <div class="activity-item" data-view="constitution" onclick="IDE.switchView('constitution')">📜<span class="tooltip">KUNLUN宪法</span></div>
+    <div class="activity-item" data-view="writing-packs" onclick="IDE.switchView('writing-packs')">🧩<span class="tooltip">插件管理</span></div>
+    <div class="activity-item" data-view="marketplace" onclick="IDE.switchView('marketplace')">🛒<span class="tooltip">技能市场</span></div>
+    <div class="activity-item" data-view="smart-learn" onclick="IDE.switchView('smart-learn')">📚<span class="tooltip">智能学习</span></div>
     <div class="activity-item" data-view="ai" onclick="IDE.toggleBottomPanel('ai')">🤖<span class="tooltip">AI对话</span></div>
     <div class="activity-item bottom" data-view="settings" onclick="IDE.openCommandPalette()">⚙️<span class="tooltip">设置/命令</span></div>
   </div>
@@ -2465,6 +2487,52 @@ input[type="range"]::-webkit-slider-thumb {
         </div>
       </div>
     </div>
+    <!-- KUNLUN.md 宪法 -->
+    <div class="sidebar-view" id="view-constitution">
+      <div class="sidebar-title"><span>KUNLUN.md 宪法</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="ConstitutionManager.generate()" title="生成宪法">＋</button>
+          <button class="icon-btn" onclick="ConstitutionManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" id="constitutionContent">
+        <div class="panel-placeholder"><div class="loader"></div><span>点击加载宪法管理</span></div>
+      </div>
+    </div>
+    <!-- 插件管理 -->
+    <div class="sidebar-view" id="view-writing-packs">
+      <div class="sidebar-title"><span>插件管理</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="WritingPacksManager.openCreate()" title="新建插件">＋</button>
+          <button class="icon-btn" onclick="WritingPacksManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" id="writingPacksContent">
+        <div class="panel-placeholder"><div class="loader"></div><span>点击加载插件管理</span></div>
+      </div>
+    </div>
+    <!-- 技能市场 -->
+    <div class="sidebar-view" id="view-marketplace">
+      <div class="sidebar-title"><span>技能市场</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="MarketplaceManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" id="marketplaceContent">
+        <div class="panel-placeholder"><div class="loader"></div><span>点击加载技能市场</span></div>
+      </div>
+    </div>
+    <!-- 智能学习 -->
+    <div class="sidebar-view" id="view-smart-learn">
+      <div class="sidebar-title"><span>智能学习</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="SmartLearnManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" id="smartLearnContent">
+        <div class="panel-placeholder"><div class="loader"></div><span>点击加载智能学习</span></div>
+      </div>
+    </div>
   </div>
 
   <div class="resizer-v" id="sidebarResizer"></div>
@@ -2526,6 +2594,11 @@ input[type="range"]::-webkit-slider-thumb {
           <div class="bottom-tab active" data-bottom-tab="ai" onclick="IDE.switchBottomTab('ai')">🤖 AI对话</div>
           <div class="bottom-tab" data-bottom-tab="review" onclick="IDE.switchBottomTab('review')">📊 审校结果</div>
           <div class="bottom-tab" data-bottom-tab="log" onclick="IDE.switchBottomTab('log')">📝 输出日志</div>
+        </div>
+        <div class="mode-selector" id="modeSelector">
+          <span class="mode-label">模式:</span>
+          <button class="mode-btn active" id="modeActionBtn" onclick="ModeManager.switch('action')">⚡ 行动</button>
+          <button class="mode-btn" id="modePlanBtn" onclick="ModeManager.switch('planning')">📋 规划</button>
         </div>
         <div class="bottom-panel-actions">
           <button class="icon-btn" onclick="IDE.toggleBottomPanel()" title="折叠/展开 Ctrl+J">—</button>
@@ -2911,6 +2984,10 @@ function createSend() {
   createAddMsg(text, 'user');
   isCreateLoading = true;
   createAddTyping();
+  // 规划模式：附加提示
+  if (typeof ModeManager !== 'undefined' && ModeManager.getCurrentMode() === 'planning') {
+    text = text + '\n【规划模式】请只输出执行计划，不要实际执行或修改文件。';
+  }
   if (createMode === 'master') { createCallMaster(text); }
   else { createCallExpress(text); }
 }
@@ -3757,6 +3834,7 @@ var CharacterManager = (function() {
         '<div class="char-actions">' +
           '<button class="btn btn-sm btn-primary" onclick="CharacterManager.openEdit(\'' + c.id + '\')">编辑</button>' +
           '<button class="btn btn-sm" onclick="CharacterManager.deleteChar(\'' + c.id + '\')">删除</button>' +
+          '<button class="btn btn-sm" onclick="ImageGenManager.showImageModal(\'character\')">🎨 生成头像</button>' +
         '</div>' +
       '</div>';
   }
@@ -4360,6 +4438,1218 @@ var BibleManager = (function() {
 })();
 
 /* ============================================================
+   新增：KUNLUN.md 宪法管理器
+   ============================================================ */
+var ConstitutionManager = (function() {
+  var state = {
+    loaded: false,
+    bookId: 'default',
+    sections: [],
+    expanded: {},
+    promptContext: '',
+  };
+
+  var SECTION_NAMES = [
+    '项目DNA', '世界系统', '角色', '情节与结构',
+    '风格指南', '关键笔记与软约束', '活跃写作状态', '版本历史'
+  ];
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    refresh();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('constitutionContent');
+    var html =
+      '<div style="padding:10px;border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;">' +
+        '<input class="input" id="constBookId" value="' + esc(state.bookId) + '" placeholder="book_id" style="flex:1;min-width:0;font-size:11px;">' +
+        '<button class="btn btn-primary btn-sm" onclick="ConstitutionManager.generate()">生成宪法</button>' +
+        '<button class="btn btn-sm" onclick="ConstitutionManager.refresh()">刷新</button>' +
+      '</div>' +
+      '<div id="constSections" style="padding:8px;"></div>' +
+      '<div style="padding:10px;border-top:1px solid var(--border);">' +
+        '<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">Prompt 摘要</div>' +
+        '<div id="constPromptCtx" class="result-box" style="font-size:11px;max-height:120px;overflow-y:auto;white-space:pre-wrap;">点击"刷新"加载...</div>' +
+      '</div>';
+    panel.innerHTML = html;
+    document.getElementById('constBookId').addEventListener('change', function() {
+      state.bookId = this.value.trim() || 'default';
+    });
+  }
+
+  function _renderSections() {
+    var container = document.getElementById('constSections');
+    if (!container) return;
+    var html = '';
+    for (var i = 0; i < 8; i++) {
+      var idx = i + 1;
+      var isExp = state.expanded[idx] !== false;
+      var content = state.sections[i] || '';
+      html +=
+        '<div class="card" style="margin-bottom:6px;">' +
+          '<div class="card-title" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="ConstitutionManager.toggleSection(' + idx + ')">' +
+            '<span>' + (isExp ? '▼' : '▶') + ' ' + idx + '. ' + esc(SECTION_NAMES[i]) + '</span>' +
+          '</div>' +
+          (isExp ? '<div class="card-body">' +
+            '<textarea class="textarea" id="constSec' + idx + '" rows="4" style="width:100%;font-size:11px;">' + esc(content) + '</textarea>' +
+            '<div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;">' +
+              '<button class="btn btn-primary btn-sm" onclick="ConstitutionManager.saveSection(' + idx + ')">保存</button>' +
+              (idx === 6 ? '<input class="input" id="constConstraintInput" placeholder="添加软约束..." style="flex:1;min-width:100px;font-size:11px;"><button class="btn btn-sm" onclick="ConstitutionManager.addConstraint()">添加约束</button>' : '') +
+              (idx === 7 ? '<button class="btn btn-sm" onclick="ConstitutionManager.updateActiveState()">自动更新</button>' : '') +
+            '</div>' +
+          '</div>' : '') +
+        '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  function toggleSection(idx) {
+    state.expanded[idx] = state.expanded[idx] === false ? true : false;
+    _renderSections();
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    var bid = state.bookId;
+    // 读取完整宪法
+    apiFetch('/api/v2/constitution/read?book_id=' + encodeURIComponent(bid), { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.content) {
+          _parseConstitution(d.content);
+          _renderSections();
+        } else {
+          state.sections = [];
+          _renderSections();
+        }
+      })
+      .catch(function() { state.sections = []; _renderSections(); });
+    // 加载 Prompt 摘要
+    apiFetch('/api/v2/constitution/prompt-context?book_id=' + encodeURIComponent(bid), { method: 'GET' })
+      .then(function(d) {
+        var el = document.getElementById('constPromptCtx');
+        if (el) el.textContent = (d.success && d.context) ? d.context + '\n（长度: ' + (d.length || 0) + '）' : '暂无';
+      })
+      .catch(function() {});
+  }
+
+  function _parseConstitution(content) {
+    // 按 ## 标题切分8个部分
+    state.sections = [];
+    var parts = content.split(/^##\s+/m);
+    for (var i = 1; i <= 8; i++) {
+      state.sections.push(parts[i] ? parts[i].replace(/^[^\n]*\n/, '').trim() : '');
+    }
+  }
+
+  function generate() {
+    var bid = state.bookId;
+    IDE.toast('正在生成宪法...', 'info');
+    apiFetch('/api/v2/constitution/generate', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: bid, metadata: {} })
+    })
+      .then(function(d) {
+        if (d.success) {
+          IDE.toast('宪法生成成功: ' + (d.path || ''), 'success');
+          refresh();
+        } else {
+          IDE.toast('生成失败: ' + (d.message || ''), 'error');
+        }
+      })
+      .catch(function(e) { IDE.toast('生成失败: ' + e.message, 'error'); });
+  }
+
+  function saveSection(idx) {
+    var el = document.getElementById('constSec' + idx);
+    if (!el) return;
+    var content = el.value;
+    apiFetch('/api/v2/constitution/section', {
+      method: 'PUT',
+      body: JSON.stringify({ book_id: state.bookId, section: idx, content: content })
+    })
+      .then(function(d) {
+        if (d.success) {
+          IDE.toast('第' + idx + '部分已保存', 'success');
+          state.sections[idx - 1] = content;
+        } else {
+          IDE.toast('保存失败', 'error');
+        }
+      })
+      .catch(function() { IDE.toast('保存失败', 'error'); });
+  }
+
+  function updateActiveState() {
+    var chapter = prompt('当前章节:', '1');
+    var plot = prompt('最近情节:', '');
+    var threads = prompt('待处理伏笔(逗号分隔):', '');
+    apiFetch('/api/v2/constitution/active-state', {
+      method: 'POST',
+      body: JSON.stringify({
+        book_id: state.bookId,
+        state: {
+          current_chapter: chapter,
+          recent_plot: plot,
+          pending_threads: threads ? threads.split(',') : []
+        }
+      })
+    })
+      .then(function(d) {
+        if (d.success) { IDE.toast('活跃状态已更新', 'success'); refresh(); }
+        else { IDE.toast('更新失败', 'error'); }
+      })
+      .catch(function() { IDE.toast('更新失败', 'error'); });
+  }
+
+  function addConstraint() {
+    var input = document.getElementById('constConstraintInput');
+    if (!input || !input.value.trim()) { IDE.toast('请输入约束内容', 'error'); return; }
+    apiFetch('/api/v2/constitution/constraint', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: state.bookId, constraint: input.value.trim(), source: 'manual' })
+    })
+      .then(function(d) {
+        if (d.success) { IDE.toast('约束已添加', 'success'); input.value = ''; refresh(); }
+        else { IDE.toast('添加失败', 'error'); }
+      })
+      .catch(function() { IDE.toast('添加失败', 'error'); });
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    generate: generate,
+    saveSection: saveSection,
+    toggleSection: toggleSection,
+    updateActiveState: updateActiveState,
+    addConstraint: addConstraint,
+  };
+})();
+
+/* ============================================================
+   新增：插件管理器（Writing Packs）
+   ============================================================ */
+var WritingPacksManager = (function() {
+  var state = {
+    loaded: false,
+    bookId: 'default',
+    filterType: 'all',
+    packs: [],
+    activeRules: [],
+  };
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    refresh();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('writingPacksContent');
+    var html =
+      '<div style="padding:10px;border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
+        '<input class="input" id="wpBookId" value="' + esc(state.bookId) + '" placeholder="book_id" style="flex:1;min-width:80px;font-size:11px;">' +
+        '<button class="btn btn-primary btn-sm" onclick="WritingPacksManager.openCreate()">新建插件</button>' +
+        '<button class="btn btn-sm" onclick="WritingPacksManager.refresh()">刷新</button>' +
+      '</div>' +
+      '<div class="tabs" style="padding:6px 10px;border-bottom:1px solid var(--border);">' +
+        '<div class="tab ' + (state.filterType === 'all' ? 'active' : '') + '" onclick="WritingPacksManager.setFilter(\'all\')">全部</div>' +
+        '<div class="tab ' + (state.filterType === 'rule' ? 'active' : '') + '" onclick="WritingPacksManager.setFilter(\'rule\')">Rule</div>' +
+        '<div class="tab ' + (state.filterType === 'workflow' ? 'active' : '') + '" onclick="WritingPacksManager.setFilter(\'workflow\')">Workflow</div>' +
+        '<div class="tab ' + (state.filterType === 'skill' ? 'active' : '') + '" onclick="WritingPacksManager.setFilter(\'skill\')">Skill</div>' +
+      '</div>' +
+      '<div id="wpList" style="padding:8px;max-height:400px;overflow-y:auto;"></div>' +
+      '<div style="padding:10px;border-top:1px solid var(--border);">' +
+        '<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">活跃 Rule 预览（当前注入）</div>' +
+        '<div id="wpActiveRules" class="result-box" style="font-size:11px;max-height:100px;overflow-y:auto;">加载中...</div>' +
+      '</div>';
+    panel.innerHTML = html;
+    document.getElementById('wpBookId').addEventListener('change', function() {
+      state.bookId = this.value.trim() || 'default';
+    });
+  }
+
+  function setFilter(type) {
+    state.filterType = type;
+    _renderList();
+    _updateTabs();
+  }
+
+  function _updateTabs() {
+    var panel = document.getElementById('writingPacksContent');
+    if (!panel) return;
+    panel.querySelectorAll('.tab').forEach(function(t) {
+      var txt = t.textContent.trim();
+      var map = { '全部': 'all', 'Rule': 'rule', 'Workflow': 'workflow', 'Skill': 'skill' };
+      t.classList.toggle('active', map[txt] === state.filterType);
+    });
+  }
+
+  function _renderList() {
+    var container = document.getElementById('wpList');
+    if (!container) return;
+    var filtered = state.packs.filter(function(p) {
+      return state.filterType === 'all' || p.type === state.filterType;
+    });
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty-state">暂无插件</div>';
+      return;
+    }
+    var html = '';
+    filtered.forEach(function(p) {
+      var typeColor = p.type === 'rule' ? '#4CAF50' : (p.type === 'workflow' ? '#2196F3' : '#FF9800');
+      html +=
+        '<div class="list-item" style="padding:8px;margin-bottom:6px;border:1px solid var(--border);border-radius:4px;">' +
+          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+            '<span class="list-item-title" style="flex:1;font-size:12px;font-weight:600;">' + esc(p.name) + '</span>' +
+            '<span class="badge" style="background:' + typeColor + ';color:#fff;font-size:9px;">' + esc(p.type) + '</span>' +
+            (p.builtin ? '<span class="badge" style="background:#9E9E9E;color:#fff;font-size:9px;">官方</span>' : '') +
+          '</div>' +
+          '<div class="list-item-desc" style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">' + esc(p.description || '') + '</div>' +
+          '<div style="display:flex;align-items:center;gap:6px;">' +
+            '<label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;">' +
+              '<input type="checkbox" ' + (p.enabled ? 'checked' : '') + ' onchange="WritingPacksManager.toggle(\'' + esc(p.id) + '\', this.checked)">' +
+              '启用' +
+            '</label>' +
+            '<button class="btn btn-sm" onclick="WritingPacksManager.openEdit(\'' + esc(p.id) + '\')">编辑</button>' +
+            (p.builtin ? '' : '<button class="btn btn-sm btn-danger" onclick="WritingPacksManager.deletePack(\'' + esc(p.id) + '\')">删除</button>') +
+          '</div>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    var bid = state.bookId;
+    var url = '/api/v2/writing-packs/list?book_id=' + encodeURIComponent(bid);
+    if (state.filterType !== 'all') url += '&pack_type=' + state.filterType;
+    apiFetch(url, { method: 'GET' })
+      .then(function(d) {
+        if (d.success) {
+          state.packs = d.data || [];
+          _renderList();
+        }
+      })
+      .catch(function() {});
+    // 活跃规则
+    apiFetch('/api/v2/writing-packs/active-rules?book_id=' + encodeURIComponent(bid), { method: 'GET' })
+      .then(function(d) {
+        var el = document.getElementById('wpActiveRules');
+        if (!el) return;
+        if (d.success && d.data && d.data.length > 0) {
+          el.innerHTML = d.data.map(function(r) { return '• ' + esc(r.name || r.id || '') + ': ' + esc((r.content || '').substring(0, 80)); }).join('<br>');
+        } else {
+          el.textContent = '暂无活跃规则';
+        }
+      })
+      .catch(function() {});
+  }
+
+  function toggle(packId, enabled) {
+    apiFetch('/api/v2/writing-packs/toggle', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: state.bookId, pack_id: packId, enabled: enabled })
+    })
+      .then(function(d) {
+        if (d.success) { IDE.toast(enabled ? '已启用' : '已禁用', 'success'); refresh(); }
+        else { IDE.toast('操作失败', 'error'); }
+      })
+      .catch(function() { IDE.toast('操作失败', 'error'); });
+  }
+
+  function openCreate() {
+    _openForm(null);
+  }
+
+  function openEdit(packId) {
+    apiFetch('/api/v2/writing-packs/get?book_id=' + encodeURIComponent(state.bookId) + '&pack_id=' + encodeURIComponent(packId), { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) _openForm(d.data);
+        else IDE.toast('加载失败', 'error');
+      })
+      .catch(function() { IDE.toast('加载失败', 'error'); });
+  }
+
+  function _openForm(pack) {
+    pack = pack || {};
+    var isEdit = !!pack.id;
+    var type = pack.type || 'rule';
+    var html =
+      '<div class="field-group"><label class="field-label">类型</label>' +
+        '<select class="select" id="wpFormType" onchange="WritingPacksManager._switchFormType(this.value)">' +
+          '<option value="rule"' + (type === 'rule' ? ' selected' : '') + '>Rule（规则）</option>' +
+          '<option value="workflow"' + (type === 'workflow' ? ' selected' : '') + '>Workflow（工作流）</option>' +
+          '<option value="skill"' + (type === 'skill' ? ' selected' : '') + '>Skill（技能）</option>' +
+        '</select></div>' +
+      '<div class="field-group"><label class="field-label">ID' + (isEdit ? '（不可修改）' : '') + '</label>' +
+        '<input class="input" id="wpFormId" value="' + esc(pack.id || '') + '" ' + (isEdit ? 'readonly' : '') + ' placeholder="如 rule_001"></div>' +
+      '<div class="field-group"><label class="field-label">名称</label>' +
+        '<input class="input" id="wpFormName" value="' + esc(pack.name || '') + '"></div>' +
+      '<div class="field-group"><label class="field-label">描述</label>' +
+        '<textarea class="textarea" id="wpFormDesc" rows="2">' + esc(pack.description || '') + '</textarea></div>' +
+      '<div id="wpFormTypeFields"></div>' +
+      '<div style="margin-top:12px;text-align:right;">' +
+        '<button class="btn btn-primary" onclick="WritingPacksManager._saveForm(' + (isEdit ? 'true' : 'false') + ')">' + (isEdit ? '保存' : '创建') + '</button>' +
+      '</div>';
+    IDE.openModal(isEdit ? '编辑插件' : '新建插件', html);
+    setTimeout(function() { _switchFormType(type, pack); }, 50);
+  }
+
+  function _switchFormType(type, pack) {
+    pack = pack || {};
+    var container = document.getElementById('wpFormTypeFields');
+    if (!container) return;
+    if (type === 'rule') {
+      container.innerHTML =
+        '<div class="field-group"><label class="field-label">分类</label>' +
+          '<input class="input" id="wpFormCategory" value="' + esc(pack.category || '') + '" placeholder="如 style/plot/character"></div>' +
+        '<div class="field-group"><label class="field-label">规则内容</label>' +
+          '<textarea class="textarea" id="wpFormContent" rows="4">' + esc(pack.content || '') + '</textarea></div>';
+    } else if (type === 'workflow') {
+      var steps = pack.steps || [{ name: '', description: '', prompt: '', input_required: false }];
+      container.innerHTML =
+        '<div class="field-group"><label class="field-label">触发命令</label>' +
+          '<input class="input" id="wpFormTrigger" value="' + esc(pack.trigger_command || '') + '" placeholder="如 /rewrite"></div>' +
+        '<div class="field-group"><label class="field-label">步骤（JSON数组）</label>' +
+          '<textarea class="textarea" id="wpFormSteps" rows="5" style="font-family:monospace;font-size:11px;">' + esc(JSON.stringify(steps, null, 2)) + '</textarea></div>';
+    } else {
+      container.innerHTML =
+        '<div class="field-group"><label class="field-label">知识内容</label>' +
+          '<textarea class="textarea" id="wpFormKnowledge" rows="4">' + esc(pack.knowledge || '') + '</textarea></div>' +
+        '<div class="field-group"><label class="field-label">触发场景（逗号分隔）</label>' +
+          '<input class="input" id="wpFormScenes" value="' + esc((pack.trigger_scenes || []).join(',')) + '" placeholder="如 dialogue,action"></div>';
+    }
+  }
+
+  function _saveForm(isEdit) {
+    var type = document.getElementById('wpFormType').value;
+    var id = document.getElementById('wpFormId').value.trim();
+    var name = document.getElementById('wpFormName').value.trim();
+    var desc = document.getElementById('wpFormDesc').value.trim();
+    if (!id || !name) { IDE.toast('请填写ID和名称', 'error'); return; }
+    var packData = { id: id, name: name, description: desc, type: type, enabled: true };
+    if (type === 'rule') {
+      packData.category = document.getElementById('wpFormCategory').value;
+      packData.content = document.getElementById('wpFormContent').value;
+    } else if (type === 'workflow') {
+      packData.trigger_command = document.getElementById('wpFormTrigger').value;
+      try { packData.steps = JSON.parse(document.getElementById('wpFormSteps').value); } catch(e) { IDE.toast('步骤JSON格式错误', 'error'); return; }
+    } else {
+      packData.knowledge = document.getElementById('wpFormKnowledge').value;
+      packData.trigger_scenes = document.getElementById('wpFormScenes').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+    }
+    var url, method;
+    if (isEdit) {
+      url = '/api/v2/writing-packs/update';
+      method = 'PUT';
+      apiFetch(url, { method: method, body: JSON.stringify({ book_id: state.bookId, pack_id: id, updates: packData }) })
+        .then(function(d) {
+          if (d.success) { IDE.toast('已更新', 'success'); IDE.closeModal(); refresh(); }
+          else { IDE.toast('更新失败: ' + (d.message || ''), 'error'); }
+        })
+        .catch(function() { IDE.toast('更新失败', 'error'); });
+    } else {
+      url = '/api/v2/writing-packs/create';
+      method = 'POST';
+      apiFetch(url, { method: method, body: JSON.stringify({ book_id: state.bookId, pack_data: packData }) })
+        .then(function(d) {
+          if (d.success) { IDE.toast('创建成功', 'success'); IDE.closeModal(); refresh(); }
+          else { IDE.toast('创建失败: ' + (d.message || ''), 'error'); }
+        })
+        .catch(function() { IDE.toast('创建失败', 'error'); });
+    }
+  }
+
+  function deletePack(packId) {
+    if (!confirm('确定删除该插件？')) return;
+    apiFetch('/api/v2/writing-packs/delete?book_id=' + encodeURIComponent(state.bookId) + '&pack_id=' + encodeURIComponent(packId), { method: 'DELETE' })
+      .then(function(d) {
+        if (d.success) { IDE.toast('已删除', 'success'); refresh(); }
+        else { IDE.toast('删除失败', 'error'); }
+      })
+      .catch(function() { IDE.toast('删除失败', 'error'); });
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    setFilter: setFilter,
+    toggle: toggle,
+    openCreate: openCreate,
+    openEdit: openEdit,
+    deletePack: deletePack,
+    _switchFormType: _switchFormType,
+    _saveForm: _saveForm,
+  };
+})();
+
+/* ============================================================
+   新增：技能市场管理器
+   ============================================================ */
+var MarketplaceManager = (function() {
+  var state = {
+    loaded: false,
+    bookId: 'default',
+    category: 'all',
+    searchQuery: '',
+    tab: 'all',
+    packs: [],
+    hotPacks: [],
+    installedIds: [],
+    expandedId: null,
+  };
+
+  var CATEGORIES = [
+    { key: 'all', label: '全部' },
+    { key: 'xuanhuan', label: '玄幻' },
+    { key: 'xianxia', label: '仙侠' },
+    { key: 'dushi', label: '都市' },
+    { key: 'lishi', label: '历史' },
+    { key: 'kehuan', label: '科幻' },
+  ];
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    refresh();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('marketplaceContent');
+    var catTabs = CATEGORIES.map(function(c) {
+      return '<div class="tab ' + (state.category === c.key ? 'active' : '') + '" onclick="MarketplaceManager.setCategory(\'' + c.key + '\')" style="font-size:10px;padding:3px 8px;">' + c.label + '</div>';
+    }).join('');
+    var html =
+      '<div style="padding:8px 10px;border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;">' +
+        '<input class="input" id="mkBookId" value="' + esc(state.bookId) + '" placeholder="book_id" style="width:80px;font-size:11px;">' +
+        '<input class="input" id="mkSearch" placeholder="搜索组合包..." style="flex:1;font-size:11px;" onkeyup="if(event.key===\'Enter\')MarketplaceManager.doSearch()">' +
+        '<button class="btn btn-sm" onclick="MarketplaceManager.doSearch()">搜索</button>' +
+        '<button class="btn btn-sm" onclick="MarketplaceManager.refresh()">↻</button>' +
+      '</div>' +
+      '<div class="tabs" style="padding:4px 10px;border-bottom:1px solid var(--border);">' +
+        '<div class="tab ' + (state.tab === 'all' ? 'active' : '') + '" onclick="MarketplaceManager.setTab(\'all\')" style="font-size:10px;">全部</div>' +
+        '<div class="tab ' + (state.tab === 'installed' ? 'active' : '') + '" onclick="MarketplaceManager.setTab(\'installed\')" style="font-size:10px;">已安装</div>' +
+      '</div>' +
+      '<div class="tabs" style="padding:4px 10px;border-bottom:1px solid var(--border);overflow-x:auto;flex-wrap:nowrap;">' + catTabs + '</div>' +
+      '<div id="mkHot" style="padding:6px 10px;border-bottom:1px solid var(--border);display:none;">' +
+        '<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">🔥 热门推荐</div>' +
+        '<div id="mkHotList" style="display:flex;gap:6px;overflow-x:auto;"></div>' +
+      '</div>' +
+      '<div id="mkList" style="padding:8px;max-height:450px;overflow-y:auto;"></div>';
+    panel.innerHTML = html;
+    document.getElementById('mkBookId').addEventListener('change', function() {
+      state.bookId = this.value.trim() || 'default';
+    });
+  }
+
+  function setCategory(cat) { state.category = cat; _renderPanel(); refresh(); }
+  function setTab(tab) { state.tab = tab; _renderList(); _updateTabUI(); }
+
+  function _updateTabUI() {
+    var panel = document.getElementById('marketplaceContent');
+    if (!panel) return;
+    var tabs = panel.querySelectorAll('.tab');
+    // first two are all/installed
+    if (tabs[0]) tabs[0].classList.toggle('active', state.tab === 'all');
+    if (tabs[1]) tabs[1].classList.toggle('active', state.tab === 'installed');
+  }
+
+  function doSearch() {
+    var q = document.getElementById('mkSearch').value.trim();
+    state.searchQuery = q;
+    if (!q) { refresh(); return; }
+    apiFetch('/api/v2/local-marketplace/search?q=' + encodeURIComponent(q), { method: 'GET' })
+      .then(function(d) {
+        if (d.success) { state.packs = d.data || []; _renderList(); }
+      })
+      .catch(function() {});
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    var url = '/api/v2/local-marketplace/list';
+    if (state.category !== 'all') url += '?category=' + state.category;
+    apiFetch(url, { method: 'GET' })
+      .then(function(d) {
+        if (d.success) {
+          state.packs = d.data || [];
+          _renderList();
+        }
+      })
+      .catch(function() {});
+    // 已安装
+    apiFetch('/api/v2/local-marketplace/installed?book_id=' + encodeURIComponent(state.bookId), { method: 'GET' })
+      .then(function(d) {
+        if (d.success) {
+          state.installedIds = (d.data || []).map(function(p) { return p.id; });
+          _renderList();
+        }
+      })
+      .catch(function() {});
+    // 热门
+    apiFetch('/api/v2/local-marketplace/hot?limit=5', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data && d.data.length > 0) {
+          state.hotPacks = d.data;
+          var hotEl = document.getElementById('mkHot');
+          if (hotEl) hotEl.style.display = 'block';
+          _renderHot();
+        }
+      })
+      .catch(function() {});
+  }
+
+  function _renderHot() {
+    var container = document.getElementById('mkHotList');
+    if (!container) return;
+    container.innerHTML = state.hotPacks.map(function(p) {
+      return '<div class="badge" style="cursor:pointer;white-space:nowrap;" onclick="MarketplaceManager.expand(\'' + esc(p.id) + '\')">' + esc(p.name) + ' ⭐' + (p.rating || 0) + '</div>';
+    }).join('');
+  }
+
+  function _renderList() {
+    var container = document.getElementById('mkList');
+    if (!container) return;
+    var list = state.packs;
+    if (state.tab === 'installed') {
+      list = list.filter(function(p) { return state.installedIds.indexOf(p.id) !== -1 || p.installed; });
+    }
+    if (list.length === 0) {
+      container.innerHTML = '<div class="empty-state">暂无组合包</div>';
+      return;
+    }
+    var html = '';
+    list.forEach(function(p) {
+      var isInstalled = state.installedIds.indexOf(p.id) !== -1 || p.installed;
+      var isExpanded = state.expandedId === p.id;
+      var ruleCount = (p.rule_ids || p.rule_contents || []).length;
+      var wfCount = (p.workflow_ids || p.workflow_contents || []).length;
+      var skillCount = (p.skill_ids || p.skill_contents || []).length;
+      html +=
+        '<div class="card" style="margin-bottom:8px;">' +
+          '<div class="card-title" style="cursor:pointer;" onclick="MarketplaceManager.expand(\'' + esc(p.id) + '\')">' +
+            '<span>' + (isExpanded ? '▼' : '▶') + ' ' + esc(p.name) + '</span>' +
+            (isInstalled ? '<span class="badge" style="background:#4CAF50;color:#fff;font-size:9px;margin-left:6px;">已安装</span>' : '') +
+          '</div>' +
+          '<div class="card-body">' +
+            '<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">' + esc(p.description || '') + '</div>' +
+            '<div style="display:flex;gap:8px;font-size:10px;color:var(--text-muted);margin-bottom:6px;flex-wrap:wrap;">' +
+              '<span>👤 ' + esc(p.author || '官方') + '</span>' +
+              '<span>📦 Rule:' + ruleCount + ' WF:' + wfCount + ' Skill:' + skillCount + '</span>' +
+              '<span>⬇ ' + (p.downloads || 0) + '</span>' +
+              '<span>⭐ ' + (p.rating || 0) + '</span>' +
+            '</div>' +
+            (isExpanded ? _renderDetail(p) : '') +
+            '<div style="margin-top:6px;">' +
+              (isInstalled
+                ? '<button class="btn btn-sm btn-danger" onclick="MarketplaceManager.uninstall(\'' + esc(p.id) + '\')">卸载</button>'
+                : '<button class="btn btn-sm btn-primary" onclick="MarketplaceManager.install(\'' + esc(p.id) + '\')">安装</button>') +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  function _renderDetail(p) {
+    var html = '<div style="border-top:1px solid var(--border);padding-top:6px;margin-top:6px;font-size:11px;">';
+    if (p.rule_contents && p.rule_contents.length > 0) {
+      html += '<div style="font-weight:600;margin-bottom:4px;">Rules:</div>';
+      p.rule_contents.forEach(function(r) {
+        html += '<div style="padding:2px 0;color:var(--text-muted);">• ' + esc(r.name || r.id || '') + '</div>';
+      });
+    }
+    if (p.workflow_contents && p.workflow_contents.length > 0) {
+      html += '<div style="font-weight:600;margin:6px 0 4px;">Workflows:</div>';
+      p.workflow_contents.forEach(function(w) {
+        html += '<div style="padding:2px 0;color:var(--text-muted);">• ' + esc(w.name || w.id || '') + '</div>';
+      });
+    }
+    if (p.skill_contents && p.skill_contents.length > 0) {
+      html += '<div style="font-weight:600;margin:6px 0 4px;">Skills:</div>';
+      p.skill_contents.forEach(function(s) {
+        html += '<div style="padding:2px 0;color:var(--text-muted);">• ' + esc(s.name || s.id || '') + '</div>';
+      });
+    }
+    if (p.tags && p.tags.length > 0) {
+      html += '<div style="margin-top:6px;">' + p.tags.map(function(t) { return '<span class="badge" style="font-size:9px;margin-right:4px;">' + esc(t) + '</span>'; }).join('') + '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function expand(packId) {
+    state.expandedId = state.expandedId === packId ? null : packId;
+    if (state.expandedId) {
+      apiFetch('/api/v2/local-marketplace/detail?pack_id=' + encodeURIComponent(packId), { method: 'GET' })
+        .then(function(d) {
+          if (d.success && d.data) {
+            var idx = state.packs.findIndex(function(p) { return p.id === packId; });
+            if (idx !== -1) state.packs[idx] = d.data;
+            _renderList();
+          }
+        })
+        .catch(function() {});
+    }
+    _renderList();
+  }
+
+  function install(packId) {
+    apiFetch('/api/v2/local-marketplace/install', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: state.bookId, pack_id: packId })
+    })
+      .then(function(d) {
+        if (d.success) { IDE.toast('安装成功', 'success'); refresh(); }
+        else { IDE.toast('安装失败: ' + (d.message || ''), 'error'); }
+      })
+      .catch(function() { IDE.toast('安装失败', 'error'); });
+  }
+
+  function uninstall(packId) {
+    if (!confirm('确定卸载该组合包？')) return;
+    apiFetch('/api/v2/local-marketplace/uninstall', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: state.bookId, pack_id: packId })
+    })
+      .then(function(d) {
+        if (d.success) { IDE.toast('已卸载', 'success'); refresh(); }
+        else { IDE.toast('卸载失败', 'error'); }
+      })
+      .catch(function() { IDE.toast('卸载失败', 'error'); });
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    setCategory: setCategory,
+    setTab: setTab,
+    doSearch: doSearch,
+    expand: expand,
+    install: install,
+    uninstall: uninstall,
+  };
+})();
+
+/* ============================================================
+   新增：智能学习管理器
+   ============================================================ */
+var SmartLearnManager = (function() {
+  var state = {
+    loaded: false,
+    bookId: 'default',
+    extractResult: null,
+    stats: null,
+    history: [],
+    filterCategory: 'all',
+  };
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    refresh();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('smartLearnContent');
+    var html =
+      '<div style="padding:10px;border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;">' +
+        '<input class="input" id="slBookId" value="' + esc(state.bookId) + '" placeholder="book_id" style="flex:1;font-size:11px;">' +
+        '<button class="btn btn-sm" onclick="SmartLearnManager.refresh()">刷新</button>' +
+      '</div>' +
+      // 反馈提取
+      '<div style="padding:10px;border-bottom:1px solid var(--border);">' +
+        '<div style="font-size:11px;font-weight:600;margin-bottom:6px;">🎯 反馈提取</div>' +
+        '<textarea class="textarea" id="slFeedback" rows="2" placeholder="输入用户反馈或修改意见，AI自动提取写作偏好..." style="font-size:11px;"></textarea>' +
+        '<div style="margin-top:6px;display:flex;gap:6px;">' +
+          '<button class="btn btn-primary btn-sm" onclick="SmartLearnManager.extract()">提取偏好</button>' +
+        '</div>' +
+        '<div id="slExtractResult" style="margin-top:8px;display:none;"></div>' +
+      '</div>' +
+      // 学习统计
+      '<div style="padding:10px;border-bottom:1px solid var(--border);">' +
+        '<div style="font-size:11px;font-weight:600;margin-bottom:6px;">📊 学习统计</div>' +
+        '<div id="slStats" class="result-box" style="font-size:11px;">加载中...</div>' +
+      '</div>' +
+      // 学习历史
+      '<div style="padding:10px;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+          '<span style="font-size:11px;font-weight:600;">📝 学习历史</span>' +
+          '<button class="btn btn-sm btn-danger" onclick="SmartLearnManager.clearHistory()">清空</button>' +
+        '</div>' +
+        '<select class="select" id="slFilterCat" onchange="SmartLearnManager.setFilter(this.value)" style="font-size:11px;margin-bottom:6px;">' +
+          '<option value="all">全部分类</option>' +
+          '<option value="dialogue">对话</option>' +
+          '<option value="plot">情节</option>' +
+          '<option value="style">风格</option>' +
+          '<option value="character">人物</option>' +
+          '<option value="pacing">节奏</option>' +
+          '<option value="other">其他</option>' +
+        '</select>' +
+        '<div id="slHistory" style="max-height:250px;overflow-y:auto;"></div>' +
+      '</div>';
+    panel.innerHTML = html;
+    document.getElementById('slBookId').addEventListener('change', function() {
+      state.bookId = this.value.trim() || 'default';
+    });
+  }
+
+  function setFilter(cat) { state.filterCategory = cat; _renderHistory(); }
+
+  function extract() {
+    var fb = document.getElementById('slFeedback').value.trim();
+    if (!fb) { IDE.toast('请输入反馈内容', 'error'); return; }
+    IDE.toast('正在提取偏好...', 'info');
+    apiFetch('/api/v2/smart-learn/extract', {
+      method: 'POST',
+      body: JSON.stringify({ feedback: fb })
+    })
+      .then(function(d) {
+        if (d.success && d.data) {
+          state.extractResult = d.data;
+          _renderExtractResult();
+          IDE.toast('提取完成', 'success');
+        } else {
+          IDE.toast('提取失败', 'error');
+        }
+      })
+      .catch(function(e) { IDE.toast('提取失败: ' + e.message, 'error'); });
+  }
+
+  function _renderExtractResult() {
+    var el = document.getElementById('slExtractResult');
+    if (!el || !state.extractResult) return;
+    var r = state.extractResult;
+    el.style.display = 'block';
+    el.innerHTML =
+      '<div class="card" style="padding:8px;">' +
+        '<div style="display:flex;gap:8px;font-size:11px;margin-bottom:4px;flex-wrap:wrap;">' +
+          '<span class="badge" style="background:#2196F3;color:#fff;">类型: ' + esc(r.type || '') + '</span>' +
+          '<span class="badge" style="background:#FF9800;color:#fff;">分类: ' + esc(r.category || '') + '</span>' +
+          '<span class="badge" style="background:#9C27B0;color:#fff;">动作: ' + esc(r.action || '') + '</span>' +
+          '<span class="badge" style="background:#4CAF50;color:#fff;">置信度: ' + (r.confidence || 0) + '</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">' + esc(r.content || '') + '</div>' +
+        '<button class="btn btn-sm btn-primary" onclick="SmartLearnManager.recordExtract()">记录到历史</button>' +
+      '</div>';
+  }
+
+  function recordExtract() {
+    if (!state.extractResult) return;
+    apiFetch('/api/v2/smart-learn/record', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: state.bookId, record: state.extractResult })
+    })
+      .then(function(d) {
+        if (d.success) { IDE.toast('已记录到历史', 'success'); refresh(); }
+        else { IDE.toast('记录失败', 'error'); }
+      })
+      .catch(function() { IDE.toast('记录失败', 'error'); });
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    var bid = state.bookId;
+    // 统计
+    apiFetch('/api/v2/smart-learn/stats?book_id=' + encodeURIComponent(bid), { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) {
+          state.stats = d.data;
+          _renderStats();
+        }
+      })
+      .catch(function() {});
+    // 历史
+    var url = '/api/v2/smart-learn/history?book_id=' + encodeURIComponent(bid) + '&limit=50';
+    if (state.filterCategory !== 'all') url += '&category=' + state.filterCategory;
+    apiFetch(url, { method: 'GET' })
+      .then(function(d) {
+        if (d.success) { state.history = d.data || []; _renderHistory(); }
+      })
+      .catch(function() {});
+  }
+
+  function _renderStats() {
+    var el = document.getElementById('slStats');
+    if (!el || !state.stats) return;
+    var s = state.stats;
+    var html = '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;">' +
+      '<div><span style="font-size:18px;font-weight:700;">' + (s.total || 0) + '</span><div style="font-size:10px;color:var(--text-muted);">总记录</div></div>';
+    if (s.categories) {
+      Object.keys(s.categories).forEach(function(cat) {
+        html += '<div><span style="font-size:14px;font-weight:600;">' + s.categories[cat] + '</span><div style="font-size:10px;color:var(--text-muted);">' + esc(cat) + '</div></div>';
+      });
+    }
+    html += '</div>';
+    if (s.top_preferences && s.top_preferences.length > 0) {
+      html += '<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Top 偏好:</div>';
+      html += s.top_preferences.map(function(p) {
+        return '<span class="badge" style="font-size:10px;margin-right:4px;margin-bottom:4px;">' + esc(p.content || p) + ' (' + (p.count || 1) + ')</span>';
+      }).join('');
+    }
+    if (s.recent_7days) {
+      html += '<div style="font-size:10px;color:var(--text-muted);margin-top:6px;">近7天: ' + (Array.isArray(s.recent_7days) ? s.recent_7days.join(' → ') : JSON.stringify(s.recent_7days)) + '</div>';
+    }
+    el.innerHTML = html;
+  }
+
+  function _renderHistory() {
+    var container = document.getElementById('slHistory');
+    if (!container) return;
+    if (state.history.length === 0) {
+      container.innerHTML = '<div class="empty-state">暂无学习记录</div>';
+      return;
+    }
+    var html = '';
+    state.history.forEach(function(h) {
+      var time = h.created_at || h.timestamp || h.time || '';
+      html +=
+        '<div class="list-item" style="padding:6px;margin-bottom:4px;border-left:3px solid var(--accent);">' +
+          '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:2px;">' +
+            '<span>' + esc(time) + '</span>' +
+            '<span>' + esc(h.category || '') + ' / ' + esc(h.type || '') + '</span>' +
+          '</div>' +
+          '<div style="font-size:11px;">' + esc(h.content || '') + '</div>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  function clearHistory() {
+    if (!confirm('确定清空全部学习历史？此操作不可恢复。')) return;
+    apiFetch('/api/v2/smart-learn/clear?book_id=' + encodeURIComponent(state.bookId), { method: 'DELETE' })
+      .then(function(d) {
+        if (d.success) { IDE.toast('历史已清空', 'success'); refresh(); }
+        else { IDE.toast('清空失败', 'error'); }
+      })
+      .catch(function() { IDE.toast('清空失败', 'error'); });
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    extract: extract,
+    recordExtract: recordExtract,
+    setFilter: setFilter,
+    clearHistory: clearHistory,
+  };
+})();
+
+/* ============================================================
+   新增：模式管理器（行动/规划）
+   ============================================================ */
+var ModeManager = (function() {
+  var state = {
+    currentMode: 'action',
+    canExecute: true,
+    bookId: 'default',
+    config: null,
+  };
+
+  function init(bookId) {
+    state.bookId = bookId || 'default';
+    apiFetch('/api/v2/mode/current?book_id=' + encodeURIComponent(state.bookId), { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) {
+          state.currentMode = d.data.mode || 'action';
+          state.canExecute = d.data.can_execute !== false;
+          _updateUI();
+        }
+      })
+      .catch(function() {});
+  }
+
+  function switch(mode) {
+    if (mode === state.currentMode) return;
+    apiFetch('/api/v2/mode/switch', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: state.bookId, mode: mode })
+    })
+      .then(function(d) {
+        if (d.success && d.data) {
+          state.currentMode = d.data.new_mode || mode;
+          state.canExecute = d.data.can_execute !== false;
+          _updateUI();
+          IDE.toast('已切换到' + (state.currentMode === 'planning' ? '规划' : '行动') + '模式', 'success');
+          IDE.log('Mode', '模式切换: ' + (d.data.old_mode || '') + ' → ' + state.currentMode, 'info');
+        } else {
+          IDE.toast('切换失败', 'error');
+        }
+      })
+      .catch(function() { IDE.toast('切换失败', 'error'); });
+  }
+
+  function getConfig() {
+    apiFetch('/api/v2/mode/config?book_id=' + encodeURIComponent(state.bookId), { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) {
+          state.config = d.data;
+          _showConfigModal();
+        }
+      })
+      .catch(function() {});
+  }
+
+  function _showConfigModal() {
+    if (!state.config) return;
+    var cfg = state.config.configs || {};
+    var cur = state.config.current_mode || state.currentMode;
+    var modeCfg = cfg[cur] || {};
+    var html =
+      '<div class="field-group"><label class="field-label">当前模式</label>' +
+        '<input class="input" value="' + esc(cur) + '" readonly></div>' +
+      '<div class="field-group"><label class="field-label">模型</label>' +
+        '<input class="input" id="modeCfgModel" value="' + esc(modeCfg.model || '') + '"></div>' +
+      '<div class="field-row">' +
+        '<div class="field-group"><label class="field-label">Temperature</label>' +
+          '<input class="input" id="modeCfgTemp" type="number" step="0.1" value="' + (modeCfg.temperature || 0.7) + '"></div>' +
+        '<div class="field-group"><label class="field-label">Max Tokens</label>' +
+          '<input class="input" id="modeCfgTokens" type="number" value="' + (modeCfg.max_tokens || 2048) + '"></div>' +
+      '</div>' +
+      '<div class="field-group"><label class="field-label"><input type="checkbox" id="modeCfgAuto" ' + (modeCfg.auto_approve ? 'checked' : '') + '> 自动批准</label></div>' +
+      '<div style="margin-top:12px;text-align:right;">' +
+        '<button class="btn btn-primary" onclick="ModeManager._saveConfig()">保存</button>' +
+      '</div>';
+    IDE.openModal('模式配置', html);
+  }
+
+  function _saveConfig() {
+    var config = {
+      model: document.getElementById('modeCfgModel').value,
+      temperature: parseFloat(document.getElementById('modeCfgTemp').value) || 0.7,
+      max_tokens: parseInt(document.getElementById('modeCfgTokens').value) || 2048,
+      auto_approve: document.getElementById('modeCfgAuto').checked,
+    };
+    apiFetch('/api/v2/mode/config', {
+      method: 'PUT',
+      body: JSON.stringify({ book_id: state.bookId, mode: state.currentMode, config: config })
+    })
+      .then(function(d) {
+        if (d.success) { IDE.toast('配置已保存', 'success'); IDE.closeModal(); }
+        else { IDE.toast('保存失败', 'error'); }
+      })
+      .catch(function() { IDE.toast('保存失败', 'error'); });
+  }
+
+  function canExecute() { return state.canExecute; }
+  function getCurrentMode() { return state.currentMode; }
+
+  function _updateUI() {
+    var actionBtn = document.getElementById('modeActionBtn');
+    var planBtn = document.getElementById('modePlanBtn');
+    if (actionBtn) actionBtn.classList.toggle('active', state.currentMode === 'action');
+    if (planBtn) planBtn.classList.toggle('active', state.currentMode === 'planning');
+  }
+
+  return {
+    init: init,
+    switch: switch,
+    getConfig: getConfig,
+    canExecute: canExecute,
+    getCurrentMode: getCurrentMode,
+    _saveConfig: _saveConfig,
+  };
+})();
+
+/* ============================================================
+   新增：图像生成管理器
+   ============================================================ */
+var ImageGenManager = (function() {
+  var state = {
+    styles: [],
+    currentType: 'cover',
+    loading: false,
+  };
+
+  function _loadStyles() {
+    if (state.styles.length > 0) return;
+    apiFetch('/api/v2/image-gen/styles', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) state.styles = d.data;
+      })
+      .catch(function() {});
+  }
+
+  function showImageModal(type) {
+    _loadStyles();
+    state.currentType = type || 'cover';
+    var typeLabels = { cover: '生成封面', character: '生成人物头像', scene: '生成场景插图' };
+    var html =
+      '<div class="field-group"><label class="field-label">类型</label>' +
+        '<select class="select" id="imgGenType" onchange="ImageGenManager._switchType(this.value)">' +
+          '<option value="cover"' + (state.currentType === 'cover' ? ' selected' : '') + '>封面</option>' +
+          '<option value="character"' + (state.currentType === 'character' ? ' selected' : '') + '>人物头像</option>' +
+          '<option value="scene"' + (state.currentType === 'scene' ? ' selected' : '') + '>场景插图</option>' +
+        '</select></div>' +
+      '<div id="imgGenFields"></div>' +
+      '<div class="field-group"><label class="field-label">风格</label>' +
+        '<select class="select" id="imgGenStyle"><option value="">默认</option></select></div>' +
+      '<div style="margin-top:12px;text-align:center;">' +
+        '<button class="btn btn-primary" onclick="ImageGenManager.generate()" id="imgGenBtn">🎨 生成</button>' +
+      '</div>' +
+      '<div id="imgGenResult" style="margin-top:12px;"></div>';
+    IDE.openModal(typeLabels[state.currentType] || '图像生成', html);
+    setTimeout(function() {
+      _populateStyles();
+      _switchType(state.currentType);
+    }, 50);
+  }
+
+  function _populateStyles() {
+    var sel = document.getElementById('imgGenStyle');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">默认</option>';
+    state.styles.forEach(function(s) {
+      var name = typeof s === 'string' ? s : (s.name || s.id || '');
+      sel.innerHTML += '<option value="' + esc(name) + '">' + esc(name) + '</option>';
+    });
+  }
+
+  function _switchType(type) {
+    state.currentType = type;
+    var container = document.getElementById('imgGenFields');
+    if (!container) return;
+    if (type === 'cover') {
+      container.innerHTML =
+        '<div class="field-group"><label class="field-label">书名/标题</label>' +
+          '<input class="input" id="imgGenTitle" placeholder="作品标题"></div>' +
+        '<div class="field-group"><label class="field-label">关键元素（逗号分隔）</label>' +
+          '<input class="input" id="imgGenElements" placeholder="如 剑,山,云雾,古风"></div>' +
+        '<div class="field-group"><label class="field-label">配色方案</label>' +
+          '<input class="input" id="imgGenColor" placeholder="如 暗金+漆黑"></div>';
+    } else if (type === 'character') {
+      container.innerHTML =
+        '<div class="field-group"><label class="field-label">人物名称</label>' +
+          '<input class="input" id="imgGenCharName" placeholder="人物姓名"></div>' +
+        '<div class="field-group"><label class="field-label">外貌描写</label>' +
+          '<textarea class="textarea" id="imgGenAppearance" rows="2" placeholder="外貌特征..."></textarea></div>' +
+        '<div class="field-group"><label class="field-label">性格特征</label>' +
+          '<input class="input" id="imgGenPersonality" placeholder="如 冷峻,孤傲"></div>';
+    } else {
+      container.innerHTML =
+        '<div class="field-group"><label class="field-label">场景描述</label>' +
+          '<textarea class="textarea" id="imgGenScene" rows="3" placeholder="场景描写..."></textarea></div>' +
+        '<div class="field-group"><label class="field-label">氛围/情绪</label>' +
+          '<input class="input" id="imgGenMood" placeholder="如 紧张,宁静,悲壮"></div>';
+    }
+  }
+
+  function generate() {
+    if (state.loading) return;
+    var type = document.getElementById('imgGenType').value;
+    var style = document.getElementById('imgGenStyle').value;
+    var resultEl = document.getElementById('imgGenResult');
+    var btn = document.getElementById('imgGenBtn');
+    state.loading = true;
+    btn.disabled = true;
+    btn.textContent = '生成中...';
+    resultEl.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>正在生成图像...</div>';
+
+    var url, body;
+    if (type === 'cover') {
+      url = '/api/v2/image-gen/cover';
+      body = {
+        book_id: 'default',
+        title: document.getElementById('imgGenTitle').value,
+        style: style,
+        elements: document.getElementById('imgGenElements').value.split(',').map(function(s){return s.trim();}).filter(Boolean),
+        color_scheme: document.getElementById('imgGenColor').value,
+      };
+    } else if (type === 'character') {
+      url = '/api/v2/image-gen/character';
+      body = {
+        book_id: 'default',
+        character_name: document.getElementById('imgGenCharName').value,
+        appearance: document.getElementById('imgGenAppearance').value,
+        personality: document.getElementById('imgGenPersonality').value,
+        style: style,
+      };
+    } else {
+      url = '/api/v2/image-gen/scene';
+      body = {
+        book_id: 'default',
+        scene_description: document.getElementById('imgGenScene').value,
+        style: style,
+        mood: document.getElementById('imgGenMood').value,
+      };
+    }
+
+    apiFetch(url, { method: 'POST', body: JSON.stringify(body) })
+      .then(function(d) {
+        state.loading = false;
+        btn.disabled = false;
+        btn.textContent = '🎨 生成';
+        if (d.success && d.data) {
+          if (d.data.mode === 'fallback' || d.mode === 'fallback') {
+            var prompt = d.data.prompt || d.prompt || '';
+            resultEl.innerHTML =
+              '<div class="result-box" style="padding:10px;">' +
+                '<div style="font-size:11px;color:#FF9800;margin-bottom:6px;">⚠️ 图像生成服务不可用，已降级为提示词</div>' +
+                '<div style="font-size:11px;white-space:pre-wrap;">' + esc(prompt) + '</div>' +
+                '<div style="margin-top:8px;"><button class="btn btn-sm" onclick="navigator.clipboard.writeText(\'' + esc(prompt).replace(/'/g, "\\'") + '\')">复制提示词</button></div>' +
+              '</div>';
+          } else if (d.data.image_url || d.data.url || d.data.image) {
+            var imgUrl = d.data.image_url || d.data.url || d.data.image;
+            resultEl.innerHTML = '<img src="' + esc(imgUrl) + '" style="max-width:100%;border-radius:4px;">';
+          } else {
+            resultEl.innerHTML = '<div class="result-box" style="padding:10px;font-size:11px;">生成完成: ' + esc(JSON.stringify(d.data).substring(0, 200)) + '</div>';
+          }
+        } else {
+          resultEl.innerHTML = '<div style="color:#f44336;font-size:11px;">生成失败: ' + esc(d.message || '未知错误') + '</div>';
+        }
+      })
+      .catch(function(e) {
+        state.loading = false;
+        btn.disabled = false;
+        btn.textContent = '🎨 生成';
+        resultEl.innerHTML = '<div style="color:#f44336;font-size:11px;">请求失败: ' + esc(e.message) + '</div>';
+      });
+  }
+
+  // 便捷方法
+  function generateCover(bookId, title, style, elements) {
+    showImageModal('cover');
+    setTimeout(function() {
+      var t = document.getElementById('imgGenTitle'); if (t) t.value = title || '';
+      var s = document.getElementById('imgGenStyle'); if (s && style) s.value = style;
+    }, 100);
+  }
+
+  function generateCharacter(bookId, characterName, appearance, personality) {
+    showImageModal('character');
+    setTimeout(function() {
+      var n = document.getElementById('imgGenCharName'); if (n) n.value = characterName || '';
+      var a = document.getElementById('imgGenAppearance'); if (a) a.value = appearance || '';
+      var p = document.getElementById('imgGenPersonality'); if (p) p.value = personality || '';
+    }, 100);
+  }
+
+  function generateScene(bookId, sceneDescription, mood) {
+    showImageModal('scene');
+    setTimeout(function() {
+      var s = document.getElementById('imgGenScene'); if (s) s.value = sceneDescription || '';
+      var m = document.getElementById('imgGenMood'); if (m) m.value = mood || '';
+    }, 100);
+  }
+
+  return {
+    showImageModal: showImageModal,
+    generate: generate,
+    generateCover: generateCover,
+    generateCharacter: generateCharacter,
+    generateScene: generateScene,
+    _switchType: _switchType,
+  };
+})();
+
+
+/* ============================================================
    新增：懒加载集成 — 重写 switchView
    ============================================================ */
 var _originalSwitchView = null;
@@ -4370,6 +5660,10 @@ function initLazyLoading() {
     outline: OutlineManager.ensureLoaded,
     world: BibleManager.ensureLoaded,
     versions: VersionManager.ensureLoaded,
+    constitution: ConstitutionManager.ensureLoaded,
+    'writing-packs': WritingPacksManager.ensureLoaded,
+    marketplace: MarketplaceManager.ensureLoaded,
+    'smart-learn': SmartLearnManager.ensureLoaded,
   };
   // 包装 switchView
   var origSwitch = IDE.switchView;
@@ -4490,7 +5784,7 @@ var IDE = (function() {
   function switchView(view) {
     var sidebar = document.getElementById('sidebar');
     // 如果点击当前活动视图且侧边栏未折叠，则折叠
-    if (state.currentView === view && !state.sidebarCollapsed && ['explorer','search','outline','characters','world','versions','style','memory'].indexOf(view) !== -1) {
+    if (state.currentView === view && !state.sidebarCollapsed && ['explorer','search','outline','characters','world','versions','style','memory','constitution','writing-packs','marketplace','smart-learn'].indexOf(view) !== -1) {
       toggleSidebar();
       return;
     }
@@ -5126,6 +6420,7 @@ var IDE = (function() {
     initResizers();
     initShortcuts();
     initLazyLoading();
+    ModeManager.init(state.currentBook || 'default');
     log('System', '昆仑创作引擎 IDE 工作台已加载', 'success');
     log('System', '五区布局就绪：活动栏 | 侧边栏 | 编辑区 | 底部面板 | 状态栏', 'info');
     log('System', '7个功能面板已整合：创作→AI对话 | 质量/AI率/辩论→审校结果 | 风格/记忆→侧边栏 | 导出→命令面板', 'info');
