@@ -87,3 +87,7 @@ dist_app/
 # UPX工具（本地构建用）
 tools/upx/
 
+
+# 临时构建目录
+build_app_temp/
+
