@@ -379,7 +379,7 @@ def _save_json(book_id: str, filename: str, data) -> bool:
 
 
 def _gen_id(prefix: str) -> str:
-    return f"{prefix}_{int(_time.time()*1000)}_{_uuid.uuid4().hex[:6]}"
+    return f"{prefix}_{int(_time.time() * 1000)}_{_uuid.uuid4().hex[:6]}"
 
 
 # ===========================================================================
@@ -964,4 +964,184 @@ async def delete_bible_item(item_id: str, book_id: str = "default") -> dict:
         return {"success": True, "deleted": True}
     except Exception as e:
         logger.error(f"[workstation] bible item delete failed: {e}")
+        return {"success": False, "error": str(e)}
+
+
+# ===========================================================================
+# 成本透明 API (Cost Transparency)
+# ===========================================================================
+class CostBudgetRequest(BaseModel):
+    daily: float | None = Field(default=None, description="每日预算($)")
+    monthly: float | None = Field(default=None, description="每月预算($)")
+    project: float | None = Field(default=None, description="每本书预算($)")
+
+
+class CostRecordRequest(BaseModel):
+    model: str = Field(..., description="模型名称")
+    provider: str = Field(default="openai", description="提供商: openai/deepseek/anthropic")
+    agent: str = Field(default="writer", description="调用方: architect/writer/auditor等")
+    action: str = Field(default="generate", description="调用目的: generate/audit/polish等")
+    book_id: str = Field(default="default", description="书籍ID")
+    chapter: int = Field(default=0, description="章节号")
+    input_tokens: int = Field(default=0, description="输入Token数")
+    output_tokens: int = Field(default=0, description="输出Token数")
+
+
+@router.get("/cost/summary", summary="成本摘要")
+async def cost_summary(book_id: str = "default") -> dict:
+    """获取成本摘要，包含预算状态、用量统计和当日费用分布。"""
+    try:
+        from kunlun.cost_tracker import cost_tracker
+
+        summary = cost_tracker.get_summary()
+        # 如果指定了 book_id，附加项目级预算状态
+        if book_id and book_id != "default":
+            project_status = cost_tracker.get_budget_status(book_id)
+            summary["project"] = {
+                "book_id": book_id,
+                "project_used": round(project_status.project_used, 4),
+                "project_limit": project_status.project_limit,
+                "project_ratio": round(
+                    project_status.project_used / max(project_status.project_limit, 0.01), 3
+                ),
+            }
+        return {"success": True, "summary": summary}
+    except Exception as e:
+        logger.error(f"[workstation] cost/summary 失败: {e}")
+        return {"success": False, "error": str(e)}
+
+
+@router.get("/cost/report", summary="费用报告")
+async def cost_report(book_id: str = "default", period: str = "daily") -> dict:
+    """生成费用报告，支持 daily/monthly/project 三种周期。"""
+    try:
+        from kunlun.cost_tracker import cost_tracker
+
+        report = cost_tracker.generate_report(period=period, book_id=book_id)
+        return {
+            "success": True,
+            "report": {
+                "period": report.period,
+                "total_cost": report.total_cost,
+                "total_tokens": report.total_tokens,
+                "by_model": report.by_model,
+                "by_agent": report.by_agent,
+                "by_action": report.by_action,
+                "savings_from_cache": report.savings_from_cache,
+                "savings_from_compression": report.savings_from_compression,
+            },
+        }
+    except Exception as e:
+        logger.error(f"[workstation] cost/report 失败: {e}")
+        return {"success": False, "error": str(e)}
+
+
+@router.get("/cost/trend", summary="成本趋势")
+async def cost_trend(book_id: str = "default", days: int = 7) -> dict:
+    """获取最近N天的成本趋势，按天聚合费用。"""
+    try:
+        import time as _cost_time
+
+        from kunlun.cost_tracker import cost_tracker
+
+        now = _cost_time.time()
+        day_seconds = 86400
+        trend: list[dict[str, Any]] = []
+
+        # 从 cost_tracker 内部记录按天聚合，按 book_id 过滤
+        all_records = getattr(cost_tracker, "_records", [])
+        if book_id and book_id != "default":
+            records = [r for r in all_records if r.book_id == book_id]
+        else:
+            records = all_records
+        for i in range(days - 1, -1, -1):
+            day_start = now - (i + 1) * day_seconds
+            day_end = now - i * day_seconds
+            day_records = [r for r in records if day_start <= r.timestamp < day_end]
+            day_cost = sum(r.cost_usd for r in day_records)
+            day_tokens = sum(r.input_tokens + r.output_tokens for r in day_records)
+            day_calls = len(day_records)
+            date_str = _cost_time.strftime("%Y-%m-%d", _cost_time.localtime(day_start))
+            trend.append(
+                {
+                    "date": date_str,
+                    "cost": round(day_cost, 4),
+                    "tokens": day_tokens,
+                    "calls": day_calls,
+                }
+            )
+
+        total_cost = sum(d["cost"] for d in trend)
+        total_calls = sum(d["calls"] for d in trend)
+        avg_daily = round(total_cost / max(1, days), 4)
+
+        return {
+            "success": True,
+            "trend": trend,
+            "summary": {
+                "days": days,
+                "total_cost": round(total_cost, 4),
+                "total_calls": total_calls,
+                "avg_daily_cost": avg_daily,
+            },
+        }
+    except Exception as e:
+        logger.error(f"[workstation] cost/trend 失败: {e}")
+        return {"success": False, "error": str(e)}
+
+
+@router.post("/cost/budget", summary="设置预算")
+async def set_budget(req: CostBudgetRequest) -> dict:
+    """动态设置日/月/项目三级预算。"""
+    try:
+        from kunlun.cost_tracker import cost_tracker
+
+        cost_tracker.set_budget(
+            daily=req.daily,
+            monthly=req.monthly,
+            project=req.project,
+        )
+        status = cost_tracker.get_budget_status()
+        return {
+            "success": True,
+            "budget": {
+                "daily_limit": status.daily_limit,
+                "monthly_limit": status.monthly_limit,
+                "project_limit": status.project_limit,
+                "tier": status.tier.value,
+            },
+        }
+    except Exception as e:
+        logger.error(f"[workstation] cost/budget 失败: {e}")
+        return {"success": False, "error": str(e)}
+
+
+@router.post("/cost/record", summary="手动记录调用")
+async def record_cost(req: CostRecordRequest) -> dict:
+    """手动记录一次 LLM 调用的 Token 用量和费用。"""
+    try:
+        from kunlun.cost_tracker import cost_tracker
+
+        record = cost_tracker.record(
+            model=req.model,
+            provider=req.provider,
+            agent=req.agent,
+            action=req.action,
+            book_id=req.book_id,
+            chapter=req.chapter,
+            input_tokens=req.input_tokens,
+            output_tokens=req.output_tokens,
+        )
+        return {
+            "success": True,
+            "record": {
+                "model": record.model,
+                "cost_usd": round(record.cost_usd, 6),
+                "input_tokens": record.input_tokens,
+                "output_tokens": record.output_tokens,
+                "timestamp": record.timestamp,
+            },
+        }
+    except Exception as e:
+        logger.error(f"[workstation] cost/record 失败: {e}")
         return {"success": False, "error": str(e)}

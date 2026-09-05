@@ -234,6 +234,33 @@ class ContextBudgetAllocator:
                 lines.append(f"  {key}: {ratio:.0f}% → 0字符 (空)")
         return "\n".join(lines)
 
+    def filter_world_settings(
+        self, settings: list[dict], current_volume: int, include_hidden: bool = False
+    ) -> list[dict]:
+        """过滤世界观设定，只返回对当前卷可见且未对AI隐藏的设定。
+
+        集成 WorldSettingManager 的可见性过滤逻辑，用于 RAG 检索时
+        自动过滤未开放卷和隐藏设定，防止剧透。
+
+        Args:
+            settings: 设定条目列表，每条需含 visible_from_volume 和 hidden_from_ai
+            current_volume: 当前卷号
+            include_hidden: 是否包含对AI隐藏的设定
+
+        Returns:
+            过滤后的设定条目列表
+        """
+        result: list[dict] = []
+        for entry in settings:
+            visible_from = entry.get("visible_from_volume", 0)
+            hidden = entry.get("hidden_from_ai", False)
+            if visible_from > current_volume:
+                continue
+            if hidden and not include_hidden:
+                continue
+            result.append(entry)
+        return result
+
 
 # 便捷函数
 def create_context_budget(
@@ -242,3 +269,35 @@ def create_context_budget(
     """一键装配上下文"""
     allocator = ContextBudgetAllocator(total_budget=total_budget, current_chapter=current_chapter)
     return allocator.assemble(segments)
+
+
+# ─── 世界观设定可见性过滤（集成 WorldSettingManager） ───────────────────────
+def filter_settings_by_volume(
+    settings: list[dict],
+    current_volume: int,
+    include_hidden: bool = False,
+) -> list[dict]:
+    """按卷号和 AI 隐藏状态过滤世界观设定。
+
+    过滤逻辑:
+      visible_from_volume <= current_volume
+      AND (not hidden_from_ai OR include_hidden)
+
+    Args:
+        settings: 设定条目列表（每个条目需含 visible_from_volume / hidden_from_ai 字段）
+        current_volume: 当前卷号
+        include_hidden: 是否包含对 AI 隐藏的设定
+
+    Returns:
+        过滤后的设定条目列表
+    """
+    result = []
+    for entry in settings:
+        visible_from = entry.get("visible_from_volume", 0)
+        hidden = entry.get("hidden_from_ai", False)
+        if visible_from > current_volume:
+            continue
+        if hidden and not include_hidden:
+            continue
+        result.append(entry)
+    return result

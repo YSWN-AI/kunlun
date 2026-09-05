@@ -2284,6 +2284,532 @@ input[type="range"]::-webkit-slider-thumb {
 .sidebar-content .field-row { display:flex; gap:8px; }
 .sidebar-content .field-row .field-group { flex:1; }
 
+
+/* ============================================================
+   新增面板样式：7Agent协作 / 世界观设定 / 故事画布 / 成本监控 / 爆款仿写
+   ============================================================ */
+
+/* ---------- 7Agent协作面板 ---------- */
+.agent-mode-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+.agent-mode-btn {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 11px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.agent-mode-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.agent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  transition: border-color 0.15s;
+}
+.agent-card:hover { border-color: var(--primary); }
+.agent-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.agent-card-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.agent-card-role {
+  font-size: 10px;
+  color: var(--primary-light);
+  background: rgba(var(--primary-rgb), 0.12);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.agent-card-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.agent-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agent-model-select {
+  flex: 1;
+  font-size: 11px;
+  padding: 4px 8px;
+  height: auto;
+}
+.agent-toggle {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  background: var(--border);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.agent-toggle.on { background: var(--success); }
+.agent-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.agent-toggle.on::after { transform: translateX(14px); }
+.pipeline-run-area {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.pipeline-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-size: 11px;
+  background: var(--bg-input);
+}
+.pipeline-step-status {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.pipeline-step-status.waiting { background: var(--border); color: var(--text-muted); }
+.pipeline-step-status.running { background: var(--primary); color: white; animation: pulse 1s infinite; }
+.pipeline-step-status.done { background: var(--success); color: white; }
+.pipeline-step-status.failed { background: var(--error); color: white; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+.pipeline-step-name { flex: 1; color: var(--text-secondary); }
+.pipeline-step-meta { color: var(--text-muted); font-size: 10px; }
+.pipeline-final-text {
+  margin-top: 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 11px;
+  line-height: 1.7;
+  max-height: 200px;
+  overflow-y: auto;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}
+
+/* ---------- 世界观设定面板 ---------- */
+.ws-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.ws-tab {
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  user-select: none;
+}
+.ws-tab:hover { color: var(--text-secondary); }
+.ws-tab.active { color: var(--primary-light); border-bottom-color: var(--primary); }
+.ws-tab-content { display: none; }
+.ws-tab-content.active { display: block; }
+.ws-category-bar {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+  scrollbar-width: none;
+}
+.ws-category-bar::-webkit-scrollbar { display: none; }
+.ws-category-btn {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  font-size: 11px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ws-category-btn:hover { border-color: var(--primary); color: var(--text-secondary); }
+.ws-category-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+.ws-entry-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.ws-entry-item:hover { border-color: var(--primary); }
+.ws-entry-item.selected { border-color: var(--primary); background: rgba(var(--primary-rgb), 0.08); }
+.ws-entry-name { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.ws-entry-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.ws-entry-tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg-input);
+  color: var(--text-muted);
+}
+.ws-entry-tag.volume { color: var(--primary-light); background: rgba(var(--primary-rgb), 0.12); }
+.ws-entry-tag.hidden { color: var(--warning); background: rgba(var(--warning-rgb), 0.12); }
+.ws-form-area {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.ws-form-row { margin-bottom: 8px; }
+.ws-form-label { display: block; font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500; }
+.ws-form-input, .ws-form-textarea, .ws-form-select {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: var(--text-primary);
+  font-size: 11px;
+  font-family: inherit;
+  outline: none;
+}
+.ws-form-textarea { min-height: 50px; resize: vertical; line-height: 1.5; }
+.ws-form-input:focus, .ws-form-textarea:focus, .ws-form-select:focus {
+  border-color: var(--primary);
+}
+.ws-version-item {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+.ws-version-item:last-child { border-bottom: none; }
+.ws-version-time { color: var(--text-muted); }
+.ws-version-note { color: var(--text-secondary); margin-top: 2px; }
+
+/* ---------- 故事画布面板 ---------- */
+.canvas-toolbar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.canvas-toolbar .btn { padding: 4px 10px; font-size: 11px; }
+.canvas-svg-container {
+  width: 100%;
+  height: 400px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.canvas-svg-container svg { width: 100%; height: 100%; display: block; }
+.canvas-node {
+  cursor: move;
+  user-select: none;
+}
+.canvas-node-rect {
+  rx: 8;
+  ry: 8;
+  stroke-width: 2;
+  transition: filter 0.15s;
+}
+.canvas-node:hover .canvas-node-rect { filter: brightness(1.2); }
+.canvas-node.selected .canvas-node-rect { stroke: white; stroke-width: 3; }
+.canvas-node-text {
+  fill: white;
+  font-size: 11px;
+  font-weight: 600;
+  text-anchor: middle;
+  pointer-events: none;
+}
+.canvas-edge {
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  fill: none;
+  marker-end: url(#arrowhead);
+}
+.canvas-edge-label {
+  fill: var(--text-muted);
+  font-size: 10px;
+  text-anchor: middle;
+}
+.canvas-legend {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.canvas-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.canvas-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.canvas-edit-panel {
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.canvas-edit-panel .ws-form-row { margin-bottom: 6px; }
+
+/* ---------- 成本监控面板 ---------- */
+.cost-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  padding: 12px;
+}
+.cost-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+.cost-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cost-tier-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.cost-tier-badge.normal { background: rgba(var(--success-rgb), 0.15); color: var(--success); }
+.cost-tier-badge.conservative { background: rgba(var(--warning-rgb), 0.15); color: var(--warning); }
+.cost-tier-badge.critical { background: rgba(var(--error-rgb), 0.15); color: var(--error); }
+.cost-tier-badge.exceeded { background: var(--error); color: white; }
+.cost-progress-track {
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.cost-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+.cost-stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+.cost-stat-label { color: var(--text-muted); }
+.cost-stat-value { color: var(--text-primary); font-weight: 500; }
+.cost-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+.cost-bar-label {
+  width: 80px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cost-bar-track {
+  flex: 1;
+  height: 14px;
+  background: var(--bg-input);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.cost-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+.cost-bar-value {
+  width: 50px;
+  text-align: right;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.cost-chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 100px;
+  padding-top: 10px;
+}
+.cost-chart-bar {
+  flex: 1;
+  background: var(--primary);
+  border-radius: 3px 3px 0 0;
+  position: relative;
+  min-height: 2px;
+  transition: height 0.3s;
+}
+.cost-chart-bar-label {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.cost-budget-inputs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.cost-budget-inputs .field-group { flex: 1; min-width: 0; }
+
+/* ---------- 爆款仿写面板 ---------- */
+.imitate-dim-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.imitate-dim-check {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.imitate-dim-check input { width: auto; margin: 0; }
+.imitate-result-section {
+  margin-bottom: 14px;
+  padding: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.imitate-result-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-light);
+  margin-bottom: 8px;
+}
+.imitate-metric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.imitate-metric {
+  background: var(--bg-input);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+.imitate-metric-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.imitate-metric-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.imitate-pie-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.imitate-pie {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.imitate-pie-legend { flex: 1; }
+.imitate-pie-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  margin-bottom: 3px;
+  color: var(--text-secondary);
+}
+.imitate-pie-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.imitate-compare-select {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.imitate-compare-chip {
+  padding: 4px 10px;
+  font-size: 11px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.imitate-compare-chip.selected {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
 </style>
 </head>
 <body>
@@ -2308,6 +2834,8 @@ input[type="range"]::-webkit-slider-thumb {
     <div class="activity-item" data-view="outline" onclick="IDE.switchView('outline')">📋<span class="tooltip">大纲</span></div>
     <div class="activity-item" data-view="characters" onclick="IDE.switchView('characters')">👤<span class="tooltip">人物</span></div>
     <div class="activity-item" data-view="world" onclick="IDE.switchView('world')">🌍<span class="tooltip">世界观</span></div>
+    <div class="activity-item" data-view="agents" onclick="IDE.switchView('agents')">👥<span class="tooltip">多Agent协作</span></div>
+    <div class="activity-item" data-view="canvas" onclick="IDE.switchView('canvas')">🎨<span class="tooltip">故事画布</span></div>
     <div class="activity-item" data-view="versions" onclick="IDE.switchView('versions')">🕐<span class="tooltip">版本历史</span></div>
     <div class="activity-item" data-view="style" onclick="IDE.switchView('style')">🎨<span class="tooltip">风格学习</span></div>
     <div class="activity-item" data-view="memory" onclick="IDE.switchView('memory')">🧠<span class="tooltip">记忆管理</span></div>
@@ -2375,19 +2903,171 @@ input[type="range"]::-webkit-slider-thumb {
         <div class="empty-state">人物管理 — 预留 API<br><small style="color:var(--text-muted);">// TODO: GET /api/v1/characters</small></div>
       </div>
     </div>
-    <!-- 世界观 → 故事圣经（完整实现） -->
+    <!-- 世界观 → 故事圣经 + 结构化设定（双Tab） -->
     <div class="sidebar-view" id="view-world">
-      <div class="sidebar-title"><span>故事圣经</span>
+      <div class="sidebar-title"><span>世界观</span>
         <div class="title-actions">
           <button class="icon-btn" onclick="BibleManager.openCreate()" title="新建条目">＋</button>
           <button class="icon-btn" onclick="BibleManager.refresh()" title="刷新">↻</button>
         </div>
       </div>
+      <div class="ws-tabs">
+        <div class="ws-tab active" data-ws-tab="bible" onclick="WorldSettingManager.switchTab('bible')">故事圣经</div>
+        <div class="ws-tab" data-ws-tab="setting" onclick="WorldSettingManager.switchTab('setting')">结构化设定</div>
+      </div>
       <div class="sidebar-content" style="padding:0;display:flex;flex-direction:column;height:100%;">
-        <div class="bible-panel" id="biblePanel">
-          <div class="panel-placeholder" id="biblePlaceholder">
-            <div class="loader"></div>
-            <span>点击加载故事圣经</span>
+        <!-- Tab: 故事圣经 -->
+        <div class="ws-tab-content active" id="ws-tab-bible">
+          <div class="bible-panel" id="biblePanel">
+            <div class="panel-placeholder" id="biblePlaceholder">
+              <div class="loader"></div>
+              <span>点击加载故事圣经</span>
+            </div>
+          </div>
+        </div>
+        <!-- Tab: 结构化设定 -->
+        <div class="ws-tab-content" id="ws-tab-setting" style="padding:10px;overflow-y:auto;">
+          <div class="ws-category-bar" id="wsCategoryBar">
+            <span style="font-size:11px;color:var(--text-muted);padding:4px;">加载类别中...</span>
+          </div>
+          <div id="wsEntryList" style="margin-bottom:10px;">
+            <div class="empty-state" style="padding:16px;font-size:11px;color:var(--text-muted);">选择类别查看条目</div>
+          </div>
+          <div class="ws-form-area" id="wsFormArea" style="display:none;">
+            <div class="ws-form-row">
+              <label class="ws-form-label">条目名称</label>
+              <input type="text" class="ws-form-input" id="wsEntryName" placeholder="输入名称...">
+            </div>
+            <div id="wsDynamicFields"></div>
+            <div class="ws-form-row" style="display:flex;gap:8px;align-items:center;">
+              <div style="flex:1;">
+                <label class="ws-form-label">开放卷数（0=始终可见）</label>
+                <input type="number" class="ws-form-input" id="wsVisibleVolume" value="0" min="0">
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;padding-top:18px;">
+                <div class="agent-toggle" id="wsHiddenToggle" onclick="WorldSettingManager.toggleHidden()"></div>
+                <span style="font-size:11px;color:var(--text-muted);">对AI隐藏</span>
+              </div>
+            </div>
+            <div class="ws-form-row">
+              <label class="ws-form-label">标签（逗号分隔）</label>
+              <input type="text" class="ws-form-input" id="wsEntryTags" placeholder="如：重要,伏笔">
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px;">
+              <button class="btn btn-primary btn-sm" onclick="WorldSettingManager.saveEntry()">保存</button>
+              <button class="btn btn-sm" onclick="WorldSettingManager.showHistory()">版本历史</button>
+              <button class="btn btn-sm" style="color:var(--error);" onclick="WorldSettingManager.deleteEntry()">删除</button>
+              <button class="btn btn-sm" onclick="WorldSettingManager.cancelEdit()">取消</button>
+            </div>
+            <div id="wsHistoryArea" style="display:none;margin-top:10px;max-height:150px;overflow-y:auto;background:var(--bg-input);border-radius:6px;padding:6px;"></div>
+          </div>
+          <button class="btn btn-sm btn-primary" id="wsNewBtn" style="width:100%;margin-top:4px;" onclick="WorldSettingManager.newEntry()">＋ 新建条目</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7Agent协作 -->
+    <div class="sidebar-view" id="view-agents">
+      <div class="sidebar-title"><span>多Agent协作</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="AgentPipelineManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" style="padding:10px;overflow-y:auto;">
+        <!-- 模式切换 + 运行 -->
+        <div class="agent-mode-bar">
+          <button class="agent-mode-btn active" id="agentModeSingle" onclick="AgentPipelineManager.setMode('single')">单Agent</button>
+          <button class="agent-mode-btn" id="agentModeMulti" onclick="AgentPipelineManager.setMode('multi')">多Agent</button>
+          <button class="btn btn-primary btn-sm" onclick="AgentPipelineManager.run()" style="padding:5px 12px;">▶ 运行</button>
+        </div>
+        <!-- 运行参数 -->
+        <div class="field-row" style="margin-bottom:10px;">
+          <div class="field-group" style="min-width:60px;">
+            <label class="field-label" style="font-size:10px;">章节号</label>
+            <input type="number" id="agentChapterNum" value="1" min="1" style="font-size:11px;padding:6px 8px;">
+          </div>
+          <div class="field-group">
+            <label class="field-label" style="font-size:10px;">章节标题</label>
+            <input type="text" id="agentChapterTitle" placeholder="输入章节标题..." style="font-size:11px;padding:6px 8px;">
+          </div>
+        </div>
+        <!-- Agent列表 -->
+        <div id="agentList">
+          <div class="empty-state" style="padding:16px;font-size:11px;color:var(--text-muted);">加载Agent列表中...</div>
+        </div>
+        <!-- 运行进度 -->
+        <div class="pipeline-run-area" id="pipelineRunArea" style="display:none;">
+          <div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:6px;">管线进度</div>
+          <div id="pipelineSteps"></div>
+          <div class="pipeline-final-text" id="pipelineFinalText" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 故事画布 -->
+    <div class="sidebar-view" id="view-canvas">
+      <div class="sidebar-title"><span>故事画布</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="StoryCanvasManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" style="padding:10px;overflow-y:auto;">
+        <!-- 工具栏 -->
+        <div class="canvas-toolbar">
+          <button class="btn btn-sm" onclick="StoryCanvasManager.addNode('storyline')">＋ 故事线</button>
+          <button class="btn btn-sm" onclick="StoryCanvasManager.addNode('foreshadow')">＋ 伏笔</button>
+          <button class="btn btn-sm" onclick="StoryCanvasManager.addNode('climax')">＋ 高潮</button>
+          <button class="btn btn-sm" onclick="StoryCanvasManager.addNode('event')">＋ 事件</button>
+          <button class="btn btn-sm" style="color:var(--error);margin-left:auto;" onclick="StoryCanvasManager.clearAll()">清空</button>
+        </div>
+        <!-- SVG画布 -->
+        <div class="canvas-svg-container" id="canvasSvgContainer">
+          <svg id="storyCanvasSvg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <polygon points="0 0, 8 3, 0 6" fill="var(--text-muted)"/>
+              </marker>
+              <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--border)" stroke-width="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)"/>
+            <g id="canvasEdges"></g>
+            <g id="canvasNodes"></g>
+          </svg>
+        </div>
+        <!-- 图例 -->
+        <div class="canvas-legend">
+          <div class="canvas-legend-item"><div class="canvas-legend-dot" style="background:#5B8FF9;"></div>故事线</div>
+          <div class="canvas-legend-item"><div class="canvas-legend-dot" style="background:#F6BD16;"></div>伏笔</div>
+          <div class="canvas-legend-item"><div class="canvas-legend-dot" style="background:#E86452;"></div>高潮</div>
+          <div class="canvas-legend-item"><div class="canvas-legend-dot" style="background:#6DC8EC;"></div>事件</div>
+        </div>
+        <!-- 节点编辑面板 -->
+        <div class="canvas-edit-panel" id="canvasEditPanel" style="display:none;">
+          <div style="font-size:11px;font-weight:600;margin-bottom:8px;color:var(--text-primary);">编辑节点</div>
+          <div class="ws-form-row">
+            <label class="ws-form-label">标题</label>
+            <input type="text" class="ws-form-input" id="canvasNodeTitle">
+          </div>
+          <div class="ws-form-row">
+            <label class="ws-form-label">描述</label>
+            <textarea class="ws-form-textarea" id="canvasNodeDesc" rows="2"></textarea>
+          </div>
+          <div class="ws-form-row" style="display:flex;gap:8px;">
+            <div style="flex:1;">
+              <label class="ws-form-label">卷</label>
+              <input type="number" class="ws-form-input" id="canvasNodeVolume" value="1" min="1">
+            </div>
+            <div style="flex:1;">
+              <label class="ws-form-label">章</label>
+              <input type="number" class="ws-form-input" id="canvasNodeChapter" value="1" min="1">
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:8px;">
+            <button class="btn btn-primary btn-sm" onclick="StoryCanvasManager.saveNode()">保存</button>
+            <button class="btn btn-sm" style="color:var(--error);" onclick="StoryCanvasManager.deleteNode()">删除</button>
+            <button class="btn btn-sm" onclick="StoryCanvasManager.startEdge()">连线</button>
           </div>
         </div>
       </div>
@@ -2418,6 +3098,7 @@ input[type="range"]::-webkit-slider-thumb {
             <div class="tab active" data-style-tab="extract">提取</div>
             <div class="tab" data-style-tab="presets">预设</div>
             <div class="tab" data-style-tab="compare">对比</div>
+            <div class="tab" data-style-tab="imitate" onclick="styleSwitchTab('imitate')">爆款仿写</div>
           </div>
           <div class="tab-content active" id="style-extract">
             <div class="card">
@@ -2451,6 +3132,87 @@ input[type="range"]::-webkit-slider-thumb {
               </div>
             </div>
             <div id="styleCompareResult"><div class="result-box empty">尚未对比</div></div>
+          </div>
+          <!-- 爆款仿写 -->
+          <div class="tab-content" id="style-imitate">
+            <div class="card">
+              <div class="card-title">爆款仿写分析 <span class="badge">POST /style-learner/analyze</span></div>
+              <!-- 维度选择 -->
+              <div class="imitate-dim-row">
+                <label class="imitate-dim-check"><input type="checkbox" id="imitateDimSetting" checked> 设定仿写</label>
+                <label class="imitate-dim-check"><input type="checkbox" id="imitateDimPlot" checked> 情节仿写</label>
+                <label class="imitate-dim-check"><input type="checkbox" id="imitateDimStyle" checked> 风格仿写</label>
+                <label class="imitate-dim-check"><input type="checkbox" id="imitateDimStructure" checked> 结构仿写</label>
+              </div>
+              <div class="field-row">
+                <div class="field-group"><label class="field-label">书名（可选）</label><input type="text" id="imitateTitle" placeholder="如：诡秘之主"></div>
+              </div>
+              <textarea id="imitateRefText" rows="4" placeholder="粘贴参考文本（建议3000字以上）..."></textarea>
+              <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <button class="btn btn-primary btn-sm" onclick="imitateAnalyze()">开始分析</button>
+                <button class="btn btn-sm" onclick="IDE.useEditorText('imitateRefText')">使用编辑器文本</button>
+                <span id="imitateLoading" class="loading-overlay" style="padding:0;"><span class="spinner"></span>分析中</span>
+              </div>
+            </div>
+            <!-- 分析结果 -->
+            <div id="imitateResult" style="display:none;">
+              <!-- 设定仿写结果 -->
+              <div class="imitate-result-section" id="imitateSettingResult" style="display:none;">
+                <div class="imitate-result-title">🏛 设定仿写</div>
+                <div class="imitate-metric-grid">
+                  <div class="imitate-metric"><div class="imitate-metric-value" id="imitateSettingDensity">-</div><div class="imitate-metric-label">设定密度</div></div>
+                  <div class="imitate-metric"><div class="imitate-metric-value" id="imitateSettingTypes">-</div><div class="imitate-metric-label">设定类型数</div></div>
+                </div>
+                <div id="imitateSettingDist" style="margin-top:8px;"></div>
+              </div>
+              <!-- 情节仿写结果 -->
+              <div class="imitate-result-section" id="imitatePlotResult" style="display:none;">
+                <div class="imitate-result-title">⚔ 情节仿写</div>
+                <div class="imitate-metric-grid">
+                  <div class="imitate-metric"><div class="imitate-metric-value" id="imitatePlotDensity">-</div><div class="imitate-metric-label">情节密度(事件/千字)</div></div>
+                  <div class="imitate-metric"><div class="imitate-metric-value" id="imitateEmotionPeaks">-</div><div class="imitate-metric-label">情绪波峰频率</div></div>
+                </div>
+                <div id="imitateRhythmCurve" style="margin-top:8px;"></div>
+              </div>
+              <!-- 风格仿写结果 -->
+              <div class="imitate-result-section" id="imitateStyleResult" style="display:none;">
+                <div class="imitate-result-title">✍ 风格仿写</div>
+                <div class="imitate-metric-grid">
+                  <div class="imitate-metric"><div class="imitate-metric-value" id="imitateAvgSentLen">-</div><div class="imitate-metric-label">平均句长</div></div>
+                  <div class="imitate-metric"><div class="imitate-metric-value" id="imitateDescDensity">-</div><div class="imitate-metric-label">描写密度</div></div>
+                </div>
+                <div class="imitate-pie-container">
+                  <div class="imitate-pie" id="imitateSentencePie"></div>
+                  <div class="imitate-pie-legend" id="imitateSentenceLegend"></div>
+                </div>
+                <div style="margin-top:8px;">
+                  <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">高频词</div>
+                  <div id="imitateHighFreqWords" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+                </div>
+              </div>
+              <!-- 结构仿写结果 -->
+              <div class="imitate-result-section" id="imitateStructureResult" style="display:none;">
+                <div class="imitate-result-title">📐 结构仿写</div>
+                <div class="imitate-metric-grid">
+                  <div class="imitate-metric"><div class="imitate-metric-value" id="imitateOpeningMode">-</div><div class="imitate-metric-label">开篇模式</div></div>
+                  <div class="imitate-metric"><div class="imitate-metric-value" id="imitateEndingMode">-</div><div class="imitate-metric-label">结尾模式</div></div>
+                </div>
+                <div id="imitateChapterDist" style="margin-top:8px;"></div>
+              </div>
+            </div>
+            <!-- 多书对比 -->
+            <div class="card" style="margin-top:12px;">
+              <div class="card-title">多书对比 <span class="badge">POST /style-learner/compare</span></div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">选择历史分析记录（最多3本）</div>
+              <div class="imitate-compare-select" id="imitateCompareSelect">
+                <span style="font-size:11px;color:var(--text-muted);">加载中...</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-primary btn-sm" onclick="imitateCompare()">对比选中</button>
+                <span id="imitateCompareLoading" class="loading-overlay" style="padding:0;"><span class="spinner"></span>对比中</span>
+              </div>
+              <div id="imitateCompareResult" style="margin-top:10px;"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -2594,6 +3356,7 @@ input[type="range"]::-webkit-slider-thumb {
           <div class="bottom-tab active" data-bottom-tab="ai" onclick="IDE.switchBottomTab('ai')">🤖 AI对话</div>
           <div class="bottom-tab" data-bottom-tab="review" onclick="IDE.switchBottomTab('review')">📊 审校结果</div>
           <div class="bottom-tab" data-bottom-tab="log" onclick="IDE.switchBottomTab('log')">📝 输出日志</div>
+          <div class="bottom-tab" data-bottom-tab="cost" onclick="IDE.switchBottomTab('cost')">💰 成本监控</div>
         </div>
         <div class="mode-selector" id="modeSelector">
           <span class="mode-label">模式:</span>
@@ -2728,6 +3491,51 @@ input[type="range"]::-webkit-slider-thumb {
         <!-- 输出日志 -->
         <div class="bottom-tab-content" id="bottom-tab-log">
           <div class="log-output" id="logOutput"></div>
+        </div>
+        <!-- 成本监控 -->
+        <div class="bottom-tab-content" id="bottom-tab-cost">
+          <div class="cost-grid">
+            <!-- 预算状态 -->
+            <div class="cost-card">
+              <div class="cost-card-title">
+                <span>💰 预算状态</span>
+                <span class="cost-tier-badge normal" id="costTierBadge">normal</span>
+              </div>
+              <div class="cost-stat-row"><span class="cost-stat-label">今日已用</span><span class="cost-stat-value" id="costDailyUsed">$0.00</span></div>
+              <div class="cost-stat-row"><span class="cost-stat-label">今日限额</span><span class="cost-stat-value" id="costDailyLimit">$0.00</span></div>
+              <div class="cost-progress-track"><div class="cost-progress-fill" id="costDailyProgress" style="width:0%;background:var(--success);"></div></div>
+              <div class="cost-stat-row"><span class="cost-stat-label">本月已用</span><span class="cost-stat-value" id="costMonthlyUsed">$0.00</span></div>
+              <div class="cost-stat-row"><span class="cost-stat-label">总调用次数</span><span class="cost-stat-value" id="costTotalCalls">0</span></div>
+              <div class="cost-stat-row"><span class="cost-stat-label">缓存命中</span><span class="cost-stat-value" id="costCachedCalls">0 (0%)</span></div>
+            </div>
+            <!-- 按模型分布 -->
+            <div class="cost-card">
+              <div class="cost-card-title"><span>🤖 按模型分布</span><button class="icon-btn" onclick="CostPanelManager.refresh()" title="刷新" style="width:20px;height:20px;font-size:12px;">↻</button></div>
+              <div id="costByModel"><div style="font-size:11px;color:var(--text-muted);padding:10px;text-align:center;">加载中...</div></div>
+            </div>
+            <!-- 按Agent分布 -->
+            <div class="cost-card">
+              <div class="cost-card-title"><span>👥 按Agent分布</span></div>
+              <div id="costByAgent"><div style="font-size:11px;color:var(--text-muted);padding:10px;text-align:center;">加载中...</div></div>
+            </div>
+            <!-- 7日趋势 -->
+            <div class="cost-card">
+              <div class="cost-card-title"><span>📈 7日费用趋势</span></div>
+              <div class="cost-chart-bars" id="costTrendChart" style="min-height:120px;">
+                <div style="font-size:11px;color:var(--text-muted);padding:10px;text-align:center;width:100%;">加载中...</div>
+              </div>
+            </div>
+            <!-- 预算设置 -->
+            <div class="cost-card">
+              <div class="cost-card-title"><span>⚙ 预算设置</span></div>
+              <div class="cost-budget-inputs">
+                <div class="field-group"><label class="field-label" style="font-size:10px;">日预算 ($)</label><input type="number" id="costBudgetDaily" value="5.00" step="0.1" min="0" style="font-size:11px;padding:6px 8px;"></div>
+                <div class="field-group"><label class="field-label" style="font-size:10px;">月预算 ($)</label><input type="number" id="costBudgetMonthly" value="100.00" step="1" min="0" style="font-size:11px;padding:6px 8px;"></div>
+                <div class="field-group"><label class="field-label" style="font-size:10px;">项目预算 ($)</label><input type="number" id="costBudgetProject" value="500.00" step="1" min="0" style="font-size:11px;padding:6px 8px;"></div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="CostPanelManager.saveBudget()" style="width:100%;">保存预算</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -5784,7 +6592,7 @@ var IDE = (function() {
   function switchView(view) {
     var sidebar = document.getElementById('sidebar');
     // 如果点击当前活动视图且侧边栏未折叠，则折叠
-    if (state.currentView === view && !state.sidebarCollapsed && ['explorer','search','outline','characters','world','versions','style','memory','constitution','writing-packs','marketplace','smart-learn'].indexOf(view) !== -1) {
+    if (state.currentView === view && !state.sidebarCollapsed && ['explorer','search','outline','characters','world','agents','canvas','versions','style','memory','constitution','writing-packs','marketplace','smart-learn'].indexOf(view) !== -1) {
       toggleSidebar();
       return;
     }
@@ -6467,6 +7275,1158 @@ var IDE = (function() {
     init: init
   };
 })();
+
+
+/* ============================================================
+   新增面板 JS 管理器
+   ============================================================ */
+
+/* ---------- style tab 切换（支持imitate） ---------- */
+function styleSwitchTab(tab) {
+  document.querySelectorAll('#panel-style .tabs .tab').forEach(function(t) {
+    t.classList.toggle('active', t.getAttribute('data-style-tab') === tab);
+  });
+  document.querySelectorAll('#panel-style .tab-content').forEach(function(c) {
+    c.classList.toggle('active', c.id === 'style-' + tab);
+  });
+  if (tab === 'imitate') {
+    imitateLoadHistory();
+  }
+}
+
+/* ============================================================
+   AgentPipelineManager — 7Agent协作管线
+   ============================================================ */
+var AgentPipelineManager = (function() {
+  var state = {
+    mode: 'single',
+    agents: [],
+    config: null,
+    running: false
+  };
+
+  var PIPELINE_STEPS = [
+    { id: 'structure', name: '结构规划', agent: 'architect' },
+    { id: 'blueprint', name: '蓝图设计', agent: 'planner' },
+    { id: 'generation', name: '正文生成', agent: 'writer' },
+    { id: 'consistency', name: '一致性检查', agent: 'auditor' },
+    { id: 'correction', name: '修正润色', agent: 'editor' }
+  ];
+
+  function refresh() {
+    loadAgents();
+    loadConfig();
+  }
+
+  function loadAgents() {
+    apiFetch('/api/v1/agent-pipeline/agents?book_id=default')
+      .then(function(d) {
+        if (d.success) {
+          state.agents = d.agents || [];
+          renderAgents();
+        }
+      })
+      .catch(function() { IDE.toast('加载Agent列表失败', 'error'); });
+  }
+
+  function loadConfig() {
+    apiFetch('/api/v1/agent-pipeline/config?book_id=default')
+      .then(function(d) {
+        if (d.success && d.config) {
+          state.config = d.config;
+          if (d.config.mode) setMode(d.config.mode, true);
+        }
+      })
+      .catch(function() { /* 静默失败 */ });
+  }
+
+  function renderAgents() {
+    var container = document.getElementById('agentList');
+    if (!container) return;
+    if (!state.agents.length) {
+      container.innerHTML = '<div class="empty-state" style="padding:16px;font-size:11px;color:var(--text-muted);">暂无Agent数据</div>';
+      return;
+    }
+    var html = '';
+    state.agents.forEach(function(a, i) {
+      var model = a.configured_model || a.default_model || 'default';
+      var enabled = a.enabled !== false;
+      html += '<div class="agent-card" data-agent-id="' + esc(a.id) + '">' +
+        '<div class="agent-card-header">' +
+          '<span class="agent-card-name">' + esc(a.name) + '</span>' +
+          '<span class="agent-card-role">' + esc(a.role || '') + '</span>' +
+        '</div>' +
+        '<div class="agent-card-desc">' + esc(a.description || '') + '</div>' +
+        '<div class="agent-card-footer">' +
+          '<select class="agent-model-select" onchange="AgentPipelineManager.updateModel(\'' + esc(a.id) + '\', this.value)">' +
+            '<option value="default"' + (model === 'default' ? ' selected' : '') + '>default</option>' +
+            '<option value="gpt-4o"' + (model === 'gpt-4o' ? ' selected' : '') + '>gpt-4o</option>' +
+            '<option value="deepseek-chat"' + (model === 'deepseek-chat' ? ' selected' : '') + '>deepseek-chat</option>' +
+            '<option value="claude-3-5-sonnet"' + (model === 'claude-3-5-sonnet' ? ' selected' : '') + '>claude-3-5-sonnet</option>' +
+          '</select>' +
+          '<div class="agent-toggle' + (enabled ? ' on' : '') + '" onclick="AgentPipelineManager.toggleAgent(\'' + esc(a.id) + '\', this)"></div>' +
+        '</div>' +
+      '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  function setMode(mode, skipSave) {
+    state.mode = mode;
+    var sBtn = document.getElementById('agentModeSingle');
+    var mBtn = document.getElementById('agentModeMulti');
+    if (sBtn) sBtn.classList.toggle('active', mode === 'single');
+    if (mBtn) mBtn.classList.toggle('active', mode === 'multi');
+    if (!skipSave) saveConfig();
+  }
+
+  function updateModel(agentId, model) {
+    var agent = state.agents.find(function(a) { return a.id === agentId; });
+    if (agent) agent.configured_model = model;
+    saveConfig();
+  }
+
+  function toggleAgent(agentId, el) {
+    var agent = state.agents.find(function(a) { return a.id === agentId; });
+    if (agent) {
+      agent.enabled = !agent.enabled;
+      el.classList.toggle('on', agent.enabled);
+      saveConfig();
+    }
+  }
+
+  function saveConfig() {
+    var agentModels = {};
+    var enabledAgents = [];
+    state.agents.forEach(function(a) {
+      if (a.configured_model) agentModels[a.id] = a.configured_model;
+      if (a.enabled !== false) enabledAgents.push(a.id);
+    });
+    apiFetch('/api/v1/agent-pipeline/config', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: 'default', mode: state.mode, agent_models: agentModels, enabled_agents: enabledAgents })
+    }).catch(function() { /* 静默 */ });
+  }
+
+  function run() {
+    if (state.running) { IDE.toast('管线正在运行中', 'warning'); return; }
+    var chNum = document.getElementById('agentChapterNum');
+    var chTitle = document.getElementById('agentChapterTitle');
+    var chapterNumber = chNum ? parseInt(chNum.value) || 1 : 1;
+    var chapterTitle = chTitle ? chTitle.value.trim() : '';
+    if (!chapterTitle) { IDE.toast('请输入章节标题', 'warning'); return; }
+
+    state.running = true;
+    var runArea = document.getElementById('pipelineRunArea');
+    if (runArea) runArea.style.display = 'block';
+    renderSteps('waiting');
+
+    apiFetch('/api/v1/agent-pipeline/run', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: 'default', chapter_number: chapterNumber, chapter_title: chapterTitle })
+    })
+    .then(function(d) {
+      state.running = false;
+      if (d.success) {
+        if (d.steps) renderStepsFromResult(d.steps);
+        if (d.final_text) {
+          var finalEl = document.getElementById('pipelineFinalText');
+          if (finalEl) {
+            finalEl.style.display = 'block';
+            finalEl.textContent = d.final_text;
+          }
+        }
+        IDE.toast('管线运行完成，总耗时 ' + ((d.total_duration_ms || 0) / 1000).toFixed(1) + 's', 'success');
+      } else {
+        IDE.toast('管线运行失败', 'error');
+      }
+    })
+    .catch(function(e) {
+      state.running = false;
+      renderSteps('failed');
+      IDE.toast('管线运行异常: ' + e.message, 'error');
+    });
+  }
+
+  function renderSteps(status) {
+    var container = document.getElementById('pipelineSteps');
+    if (!container) return;
+    var html = '';
+    PIPELINE_STEPS.forEach(function(s) {
+      var icon = status === 'waiting' ? '○' : status === 'running' ? '◌' : status === 'done' ? '✓' : '✗';
+      html += '<div class="pipeline-step" data-step="' + s.id + '">' +
+        '<div class="pipeline-step-status ' + status + '">' + icon + '</div>' +
+        '<span class="pipeline-step-name">' + esc(s.name) + '</span>' +
+        '<span class="pipeline-step-meta"></span>' +
+      '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  function renderStepsFromResult(steps) {
+    var container = document.getElementById('pipelineSteps');
+    if (!container) return;
+    var html = '';
+    steps.forEach(function(s) {
+      var st = s.status || 'done';
+      var icon = st === 'waiting' ? '○' : st === 'running' ? '◌' : st === 'failed' ? '✗' : '✓';
+      var meta = '';
+      if (s.duration_ms) meta += (s.duration_ms / 1000).toFixed(1) + 's';
+      if (s.tokens) meta += ' · ' + s.tokens + 'tok';
+      if (s.model) meta += ' · ' + s.model;
+      html += '<div class="pipeline-step">' +
+        '<div class="pipeline-step-status ' + st + '">' + icon + '</div>' +
+        '<span class="pipeline-step-name">' + esc(s.name || s.agent_id || '') + '</span>' +
+        '<span class="pipeline-step-meta">' + esc(meta) + '</span>' +
+      '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  return {
+    refresh: refresh,
+    setMode: setMode,
+    updateModel: updateModel,
+    toggleAgent: toggleAgent,
+    run: run
+  };
+})();
+
+/* ============================================================
+   WorldSettingManager — 世界观结构化设定
+   ============================================================ */
+var WorldSettingManager = (function() {
+  var state = {
+    categories: [],
+    entries: [],
+    currentCategory: null,
+    currentEntry: null,
+    editing: false,
+    hidden: false
+  };
+
+  function switchTab(tab) {
+    document.querySelectorAll('.ws-tab').forEach(function(t) {
+      t.classList.toggle('active', t.getAttribute('data-ws-tab') === tab);
+    });
+    document.querySelectorAll('.ws-tab-content').forEach(function(c) {
+      c.classList.toggle('active', c.id === 'ws-tab-' + tab);
+    });
+    if (tab === 'setting' && !state.categories.length) {
+      loadCategories();
+    }
+  }
+
+  function loadCategories() {
+    apiFetch('/api/v1/world-setting/categories')
+      .then(function(d) {
+        if (d.success) {
+          state.categories = d.categories || [];
+          renderCategories();
+          if (state.categories.length) selectCategory(state.categories[0].category_id);
+        }
+      })
+      .catch(function() { IDE.toast('加载类别失败', 'error'); });
+  }
+
+  function renderCategories() {
+    var bar = document.getElementById('wsCategoryBar');
+    if (!bar) return;
+    var html = '';
+    state.categories.forEach(function(c) {
+      html += '<div class="ws-category-btn' + (state.currentCategory === c.category_id ? ' active' : '') + '" onclick="WorldSettingManager.selectCategory(\'' + esc(c.category_id) + '\')">' +
+        '<span>' + esc(c.icon || '📁') + '</span><span>' + esc(c.name) + '</span></div>';
+    });
+    bar.innerHTML = html;
+  }
+
+  function selectCategory(catId) {
+    state.currentCategory = catId;
+    state.currentEntry = null;
+    state.editing = false;
+    renderCategories();
+    hideForm();
+    loadEntries(catId);
+  }
+
+  function loadEntries(catId) {
+    apiFetch('/api/v1/world-setting/entries?book_id=default&category=' + encodeURIComponent(catId))
+      .then(function(d) {
+        if (d.success) {
+          state.entries = d.entries || [];
+          renderEntries();
+        }
+      })
+      .catch(function() { IDE.toast('加载条目失败', 'error'); });
+  }
+
+  function renderEntries() {
+    var list = document.getElementById('wsEntryList');
+    if (!list) return;
+    if (!state.entries.length) {
+      list.innerHTML = '<div class="empty-state" style="padding:16px;font-size:11px;color:var(--text-muted);">该类别暂无条目</div>';
+      return;
+    }
+    var html = '';
+    state.entries.forEach(function(e) {
+      var tags = (e.tags || []).map(function(t) { return '<span class="ws-entry-tag">' + esc(t) + '</span>'; }).join('');
+      var volTag = '<span class="ws-entry-tag volume">卷' + (e.visible_from_volume || 0) + '+</span>';
+      var hiddenTag = e.hidden_from_ai ? '<span class="ws-entry-tag hidden">AI隐藏</span>' : '';
+      html += '<div class="ws-entry-item' + (state.currentEntry && state.currentEntry.id === e.id ? ' selected' : '') + '" onclick="WorldSettingManager.editEntry(\'' + esc(e.id) + '\')">' +
+        '<div class="ws-entry-name">' + esc(e.name) + '</div>' +
+        '<div class="ws-entry-meta">' + volTag + hiddenTag + tags + '</div>' +
+      '</div>';
+    });
+    list.innerHTML = html;
+  }
+
+  function newEntry() {
+    if (!state.currentCategory) { IDE.toast('请先选择类别', 'warning'); return; }
+    state.currentEntry = null;
+    state.editing = true;
+    state.hidden = false;
+    showForm();
+    var nameEl = document.getElementById('wsEntryName');
+    if (nameEl) nameEl.value = '';
+    var volEl = document.getElementById('wsVisibleVolume');
+    if (volEl) volEl.value = '0';
+    var tagsEl = document.getElementById('wsEntryTags');
+    if (tagsEl) tagsEl.value = '';
+    updateHiddenToggle();
+    renderDynamicFields({});
+  }
+
+  function editEntry(entryId) {
+    var entry = state.entries.find(function(e) { return e.id === entryId; });
+    if (!entry) return;
+    state.currentEntry = entry;
+    state.editing = true;
+    state.hidden = !!entry.hidden_from_ai;
+    showForm();
+    var nameEl = document.getElementById('wsEntryName');
+    if (nameEl) nameEl.value = entry.name || '';
+    var volEl = document.getElementById('wsVisibleVolume');
+    if (volEl) volEl.value = entry.visible_from_volume || 0;
+    var tagsEl = document.getElementById('wsEntryTags');
+    if (tagsEl) tagsEl.value = (entry.tags || []).join(',');
+    updateHiddenToggle();
+    renderDynamicFields(entry.fields || {});
+    renderEntries();
+  }
+
+  function showForm() {
+    var form = document.getElementById('wsFormArea');
+    if (form) form.style.display = 'block';
+    var newBtn = document.getElementById('wsNewBtn');
+    if (newBtn) newBtn.style.display = 'none';
+    var hist = document.getElementById('wsHistoryArea');
+    if (hist) hist.style.display = 'none';
+  }
+
+  function hideForm() {
+    var form = document.getElementById('wsFormArea');
+    if (form) form.style.display = 'none';
+    var newBtn = document.getElementById('wsNewBtn');
+    if (newBtn) newBtn.style.display = 'block';
+  }
+
+  function cancelEdit() {
+    state.editing = false;
+    state.currentEntry = null;
+    hideForm();
+    renderEntries();
+  }
+
+  function renderDynamicFields(fieldsData) {
+    var container = document.getElementById('wsDynamicFields');
+    if (!container) return;
+    var cat = state.categories.find(function(c) { return c.category_id === state.currentCategory; });
+    if (!cat || !cat.fields) { container.innerHTML = ''; return; }
+    var html = '';
+    cat.fields.forEach(function(f) {
+      var val = fieldsData[f.name] || '';
+      html += '<div class="ws-form-row"><label class="ws-form-label">' + esc(f.label || f.name) + '</label>';
+      if (f.type === 'textarea') {
+        html += '<textarea class="ws-form-textarea" data-field-name="' + esc(f.name) + '" placeholder="' + esc(f.placeholder || '') + '">' + esc(val) + '</textarea>';
+      } else if (f.type === 'select') {
+        html += '<select class="ws-form-select" data-field-name="' + esc(f.name) + '">';
+        (f.options || []).forEach(function(opt) {
+          html += '<option value="' + esc(opt) + '"' + (String(val) === String(opt) ? ' selected' : '') + '>' + esc(opt) + '</option>';
+        });
+        html += '</select>';
+      } else if (f.type === 'number') {
+        html += '<input type="number" class="ws-form-input" data-field-name="' + esc(f.name) + '" value="' + esc(val) + '" placeholder="' + esc(f.placeholder || '') + '">';
+      } else {
+        html += '<input type="text" class="ws-form-input" data-field-name="' + esc(f.name) + '" value="' + esc(val) + '" placeholder="' + esc(f.placeholder || '') + '">';
+      }
+      html += '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  function collectDynamicFields() {
+    var fields = {};
+    document.querySelectorAll('#wsDynamicFields [data-field-name]').forEach(function(el) {
+      var name = el.getAttribute('data-field-name');
+      fields[name] = el.value;
+    });
+    return fields;
+  }
+
+  function toggleHidden() {
+    state.hidden = !state.hidden;
+    updateHiddenToggle();
+  }
+
+  function updateHiddenToggle() {
+    var el = document.getElementById('wsHiddenToggle');
+    if (el) el.classList.toggle('on', state.hidden);
+  }
+
+  function saveEntry() {
+    var nameEl = document.getElementById('wsEntryName');
+    var name = nameEl ? nameEl.value.trim() : '';
+    if (!name) { IDE.toast('请输入条目名称', 'warning'); return; }
+    var volEl = document.getElementById('wsVisibleVolume');
+    var visibleVolume = volEl ? parseInt(volEl.value) || 0 : 0;
+    var tagsEl = document.getElementById('wsEntryTags');
+    var tags = tagsEl ? tagsEl.value.split(',').map(function(t) { return t.trim(); }).filter(Boolean) : [];
+    var fields = collectDynamicFields();
+
+    var body = {
+      book_id: 'default',
+      category: state.currentCategory,
+      name: name,
+      fields: fields,
+      visible_from_volume: visibleVolume,
+      hidden_from_ai: state.hidden,
+      tags: tags
+    };
+
+    var url, method;
+    if (state.currentEntry) {
+      url = '/api/v1/world-setting/entries/' + state.currentEntry.id;
+      method = 'PUT';
+      body = { book_id: 'default', fields: fields, change_note: '前端编辑' };
+    } else {
+      url = '/api/v1/world-setting/entries';
+      method = 'POST';
+    }
+
+    apiFetch(url, { method: method, body: JSON.stringify(body) })
+      .then(function(d) {
+        if (d.success) {
+          IDE.toast('保存成功', 'success');
+          state.editing = false;
+          state.currentEntry = null;
+          hideForm();
+          loadEntries(state.currentCategory);
+        } else {
+          IDE.toast('保存失败', 'error');
+        }
+      })
+      .catch(function(e) { IDE.toast('保存异常: ' + e.message, 'error'); });
+  }
+
+  function deleteEntry() {
+    if (!state.currentEntry) return;
+    if (!confirm('确定删除该条目？')) return;
+    apiFetch('/api/v1/world-setting/entries/' + state.currentEntry.id + '?book_id=default', { method: 'DELETE' })
+      .then(function(d) {
+        if (d.success) {
+          IDE.toast('删除成功', 'success');
+          state.currentEntry = null;
+          state.editing = false;
+          hideForm();
+          loadEntries(state.currentCategory);
+        }
+      })
+      .catch(function() { IDE.toast('删除失败', 'error'); });
+  }
+
+  function showHistory() {
+    if (!state.currentEntry) return;
+    var histArea = document.getElementById('wsHistoryArea');
+    if (histArea) histArea.style.display = 'block';
+    apiFetch('/api/v1/world-setting/entries/' + state.currentEntry.id + '/history?book_id=default')
+      .then(function(d) {
+        if (d.success && histArea) {
+          var versions = d.versions || [];
+          if (!versions.length) {
+            histArea.innerHTML = '<div style="font-size:11px;color:var(--text-muted);padding:8px;">暂无历史版本</div>';
+            return;
+          }
+          var html = '';
+          versions.forEach(function(v) {
+            html += '<div class="ws-version-item">' +
+              '<div class="ws-version-time">v' + esc(v.version) + ' · ' + esc(v.timestamp || '') + '</div>' +
+              '<div class="ws-version-note">' + esc(v.change_note || '无备注') + '</div>' +
+            '</div>';
+          });
+          histArea.innerHTML = html;
+        }
+      })
+      .catch(function() { if (histArea) histArea.innerHTML = '<div style="font-size:11px;color:var(--error);padding:8px;">加载历史失败</div>'; });
+  }
+
+  return {
+    switchTab: switchTab,
+    selectCategory: selectCategory,
+    newEntry: newEntry,
+    editEntry: editEntry,
+    saveEntry: saveEntry,
+    deleteEntry: deleteEntry,
+    cancelEdit: cancelEdit,
+    toggleHidden: toggleHidden,
+    showHistory: showHistory
+  };
+})();
+
+/* ============================================================
+   StoryCanvasManager — 故事画布
+   ============================================================ */
+var StoryCanvasManager = (function() {
+  var state = {
+    nodes: [],
+    edges: [],
+    selectedNode: null,
+    dragging: null,
+    dragOffset: { x: 0, y: 0 },
+    edgeMode: false,
+    edgeSource: null,
+    nextId: 1
+  };
+
+  var NODE_COLORS = {
+    storyline: '#5B8FF9',
+    foreshadow: '#F6BD16',
+    climax: '#E86452',
+    event: '#6DC8EC'
+  };
+  var NODE_W = 100, NODE_H = 44;
+
+  function refresh() {
+    apiFetch('/api/v1/story-canvas?book_id=default')
+      .then(function(d) {
+        if (d.success && d.canvas) {
+          state.nodes = d.canvas.nodes || [];
+          state.edges = d.canvas.edges || [];
+          state.nextId = state.nodes.length + 1;
+          render();
+        }
+      })
+      .catch(function() { IDE.toast('加载画布失败', 'error'); });
+  }
+
+  function render() {
+    renderEdges();
+    renderNodes();
+  }
+
+  function renderNodes() {
+    var g = document.getElementById('canvasNodes');
+    if (!g) return;
+    var html = '';
+    state.nodes.forEach(function(n) {
+      var color = NODE_COLORS[n.type] || '#888';
+      var selected = state.selectedNode && state.selectedNode.id === n.id ? ' selected' : '';
+      html += '<g class="canvas-node' + selected + '" data-node-id="' + esc(n.id) + '" transform="translate(' + n.x + ',' + n.y + ')">' +
+        '<rect class="canvas-node-rect" width="' + NODE_W + '" height="' + NODE_H + '" fill="' + color + '" stroke="' + color + '"/>' +
+        '<text class="canvas-node-text" x="' + (NODE_W / 2) + '" y="20">' + esc((n.title || '').substring(0, 8)) + '</text>' +
+        '<text class="canvas-node-text" x="' + (NODE_W / 2) + '" y="34" style="font-size:9px;opacity:0.8;">v' + esc(n.volume || 1) + 'c' + esc(n.chapter || 1) + '</text>' +
+      '</g>';
+    });
+    g.innerHTML = html;
+    // 绑定事件
+    var svg = document.getElementById('storyCanvasSvg');
+    if (!svg) return;
+    g.querySelectorAll('.canvas-node').forEach(function(nodeEl) {
+      nodeEl.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var id = nodeEl.getAttribute('data-node-id');
+        var node = state.nodes.find(function(n) { return String(n.id) === String(id); });
+        if (!node) return;
+        if (state.edgeMode && state.edgeSource) {
+          // 完成连线
+          createEdge(state.edgeSource.id, node.id);
+          state.edgeMode = false;
+          state.edgeSource = null;
+          return;
+        }
+        if (state.edgeMode) {
+          state.edgeSource = node;
+          IDE.toast('点击目标节点完成连线', 'info');
+          return;
+        }
+        state.selectedNode = node;
+        state.dragging = node;
+        var pt = getSvgPoint(e);
+        state.dragOffset = { x: pt.x - node.x, y: pt.y - node.y };
+        showEditPanel();
+        render();
+      });
+    });
+    svg.addEventListener('mousemove', onMouseMove);
+    svg.addEventListener('mouseup', onMouseUp);
+    svg.addEventListener('click', function(e) {
+      if (e.target.tagName === 'rect' && e.target.getAttribute('width') === '100%') {
+        state.selectedNode = null;
+        hideEditPanel();
+        render();
+      }
+    });
+  }
+
+  function renderEdges() {
+    var g = document.getElementById('canvasEdges');
+    if (!g) return;
+    var html = '';
+    state.edges.forEach(function(e) {
+      var from = state.nodes.find(function(n) { return String(n.id) === String(e.from_node); });
+      var to = state.nodes.find(function(n) { return String(n.id) === String(e.to_node); });
+      if (!from || !to) return;
+      var x1 = from.x + NODE_W / 2, y1 = from.y + NODE_H / 2;
+      var x2 = to.x + NODE_W / 2, y2 = to.y + NODE_H / 2;
+      var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      html += '<line class="canvas-edge" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/>';
+      if (e.label) {
+        html += '<text class="canvas-edge-label" x="' + mx + '" y="' + (my - 4) + '">' + esc(e.label) + '</text>';
+      }
+    });
+    g.innerHTML = html;
+  }
+
+  function getSvgPoint(e) {
+    var svg = document.getElementById('storyCanvasSvg');
+    var rect = svg.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (svg.clientWidth ? svg.viewBox.baseVal.width / rect.width : 1),
+      y: (e.clientY - rect.top) * (svg.clientHeight ? svg.viewBox.baseVal.height / rect.height : 1)
+    };
+  }
+
+  function onMouseMove(e) {
+    if (!state.dragging) return;
+    var pt = getSvgPoint(e);
+    state.dragging.x = Math.max(0, pt.x - state.dragOffset.x);
+    state.dragging.y = Math.max(0, pt.y - state.dragOffset.y);
+    render();
+  }
+
+  function onMouseUp() {
+    if (state.dragging) {
+      // 保存位置
+      var node = state.dragging;
+      apiFetch('/api/v1/story-canvas/nodes/' + node.id, {
+        method: 'PUT',
+        body: JSON.stringify({ book_id: 'default', x: node.x, y: node.y })
+      }).catch(function() {});
+      state.dragging = null;
+    }
+  }
+
+  function addNode(type) {
+    var x = 50 + Math.random() * 200;
+    var y = 50 + Math.random() * 200;
+    var node = {
+      id: 'node_' + (state.nextId++),
+      type: type,
+      x: x,
+      y: y,
+      title: type === 'storyline' ? '新故事线' : type === 'foreshadow' ? '新伏笔' : type === 'climax' ? '新高潮' : '新事件',
+      description: '',
+      color: NODE_COLORS[type],
+      volume: 1,
+      chapter: 1
+    };
+    apiFetch('/api/v1/story-canvas/nodes', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: 'default', type: type, x: x, y: y, title: node.title, description: '', color: NODE_COLORS[type], volume: 1, chapter: 1 })
+    })
+    .then(function(d) {
+      if (d.success && d.node) {
+        node.id = d.node.id || node.id;
+      }
+      state.nodes.push(node);
+      state.selectedNode = node;
+      showEditPanel();
+      render();
+    })
+    .catch(function() {
+      state.nodes.push(node);
+      state.selectedNode = node;
+      showEditPanel();
+      render();
+    });
+  }
+
+  function showEditPanel() {
+    var panel = document.getElementById('canvasEditPanel');
+    if (!panel || !state.selectedNode) return;
+    panel.style.display = 'block';
+    document.getElementById('canvasNodeTitle').value = state.selectedNode.title || '';
+    document.getElementById('canvasNodeDesc').value = state.selectedNode.description || '';
+    document.getElementById('canvasNodeVolume').value = state.selectedNode.volume || 1;
+    document.getElementById('canvasNodeChapter').value = state.selectedNode.chapter || 1;
+  }
+
+  function hideEditPanel() {
+    var panel = document.getElementById('canvasEditPanel');
+    if (panel) panel.style.display = 'none';
+  }
+
+  function saveNode() {
+    if (!state.selectedNode) return;
+    state.selectedNode.title = document.getElementById('canvasNodeTitle').value;
+    state.selectedNode.description = document.getElementById('canvasNodeDesc').value;
+    state.selectedNode.volume = parseInt(document.getElementById('canvasNodeVolume').value) || 1;
+    state.selectedNode.chapter = parseInt(document.getElementById('canvasNodeChapter').value) || 1;
+    apiFetch('/api/v1/story-canvas/nodes/' + state.selectedNode.id, {
+      method: 'PUT',
+      body: JSON.stringify({ book_id: 'default', title: state.selectedNode.title, description: state.selectedNode.description, volume: state.selectedNode.volume, chapter: state.selectedNode.chapter })
+    }).catch(function() {});
+    render();
+    IDE.toast('节点已保存', 'success');
+  }
+
+  function deleteNode() {
+    if (!state.selectedNode) return;
+    var id = state.selectedNode.id;
+    apiFetch('/api/v1/story-canvas/nodes/' + id + '?book_id=default', { method: 'DELETE' })
+      .catch(function() {});
+    state.nodes = state.nodes.filter(function(n) { return n.id !== id; });
+    state.edges = state.edges.filter(function(e) { return String(e.from_node) !== String(id) && String(e.to_node) !== String(id); });
+    state.selectedNode = null;
+    hideEditPanel();
+    render();
+  }
+
+  function startEdge() {
+    if (!state.selectedNode) { IDE.toast('请先选择起始节点', 'warning'); return; }
+    state.edgeMode = true;
+    state.edgeSource = state.selectedNode;
+    IDE.toast('连线模式：点击目标节点', 'info');
+  }
+
+  function createEdge(fromId, toId) {
+    if (String(fromId) === String(toId)) return;
+    var edge = { id: 'edge_' + Date.now(), from_node: fromId, to_node: toId, label: '', type: 'relation' };
+    apiFetch('/api/v1/story-canvas/edges', {
+      method: 'POST',
+      body: JSON.stringify({ book_id: 'default', from_node: fromId, to_node: toId, label: '', type: 'relation' })
+    }).catch(function() {});
+    state.edges.push(edge);
+    render();
+    IDE.toast('连线已创建', 'success');
+  }
+
+  function clearAll() {
+    if (!confirm('确定清空画布所有节点和连线？')) return;
+    state.nodes.forEach(function(n) {
+      apiFetch('/api/v1/story-canvas/nodes/' + n.id + '?book_id=default', { method: 'DELETE' }).catch(function() {});
+    });
+    state.nodes = [];
+    state.edges = [];
+    state.selectedNode = null;
+    hideEditPanel();
+    render();
+  }
+
+  return {
+    refresh: refresh,
+    addNode: addNode,
+    saveNode: saveNode,
+    deleteNode: deleteNode,
+    startEdge: startEdge,
+    clearAll: clearAll
+  };
+})();
+
+/* ============================================================
+   CostPanelManager — 成本监控
+   ============================================================ */
+var CostPanelManager = (function() {
+  var state = { summary: null, trend: [] };
+
+  function refresh() {
+    loadSummary();
+    loadTrend();
+  }
+
+  function loadSummary() {
+    apiFetch('/api/v1/workstation/cost/summary?book_id=default')
+      .then(function(d) {
+        if (d.success) {
+          state.summary = d;
+          renderSummary();
+          renderByModel(d.daily_cost && d.daily_cost.by_model ? d.daily_cost.by_model : {});
+          renderByAgent(d.daily_cost && d.daily_cost.by_agent ? d.daily_cost.by_agent : {});
+        }
+      })
+      .catch(function() { IDE.toast('加载成本数据失败', 'error'); });
+  }
+
+  function loadTrend() {
+    apiFetch('/api/v1/workstation/cost/trend?book_id=default&days=7')
+      .then(function(d) {
+        if (d.success) {
+          state.trend = d.trend || [];
+          renderTrend();
+        }
+      })
+      .catch(function() {});
+  }
+
+  function renderSummary() {
+    var s = state.summary;
+    if (!s) return;
+    var budget = s.budget || {};
+    var usage = s.usage || {};
+    var daily = s.daily_cost || {};
+    var tier = budget.tier || 'normal';
+    var badge = document.getElementById('costTierBadge');
+    if (badge) {
+      badge.textContent = tier;
+      badge.className = 'cost-tier-badge ' + tier;
+    }
+    var dailyUsed = budget.daily_used != null ? budget.daily_used : (daily.total || 0);
+    var dailyLimit = budget.daily_limit || 0;
+    var ratio = dailyLimit > 0 ? Math.min(100, (dailyUsed / dailyLimit) * 100) : 0;
+    setText('costDailyUsed', '$' + Number(dailyUsed).toFixed(2));
+    setText('costDailyLimit', '$' + Number(dailyLimit).toFixed(2));
+    var prog = document.getElementById('costDailyProgress');
+    if (prog) {
+      prog.style.width = ratio + '%';
+      prog.style.background = ratio > 90 ? 'var(--error)' : ratio > 70 ? 'var(--warning)' : 'var(--success)';
+    }
+    setText('costMonthlyUsed', '$' + Number(budget.monthly_used || 0).toFixed(2));
+    setText('costTotalCalls', usage.total_calls != null ? usage.total_calls : '-');
+    var cached = usage.cached_calls || 0;
+    var total = usage.total_calls || 1;
+    var cachePct = total > 0 ? Math.round((cached / total) * 100) : 0;
+    setText('costCachedCalls', cached + ' (' + cachePct + '%)');
+  }
+
+  function renderByModel(byModel) {
+    var container = document.getElementById('costByModel');
+    if (!container) return;
+    renderBarChart(container, byModel, '模型');
+  }
+
+  function renderByAgent(byAgent) {
+    var container = document.getElementById('costByAgent');
+    if (!container) return;
+    renderBarChart(container, byAgent, 'Agent');
+  }
+
+  function renderBarChart(container, data, label) {
+    var keys = Object.keys(data);
+    if (!keys.length) {
+      container.innerHTML = '<div style="font-size:11px;color:var(--text-muted);padding:10px;text-align:center;">暂无' + label + '数据</div>';
+      return;
+    }
+    var max = 0;
+    keys.forEach(function(k) { max = Math.max(max, Number(data[k]) || 0); });
+    var colors = ['#5B8FF9', '#61DDAA', '#F6BD16', '#7262FD', '#78D3F8', '#9661BC', '#F6903D'];
+    var html = '';
+    keys.forEach(function(k, i) {
+      var val = Number(data[k]) || 0;
+      var pct = max > 0 ? (val / max) * 100 : 0;
+      html += '<div class="cost-bar-row">' +
+        '<span class="cost-bar-label">' + esc(k) + '</span>' +
+        '<div class="cost-bar-track"><div class="cost-bar-fill" style="width:' + pct + '%;background:' + colors[i % colors.length] + ';"></div></div>' +
+        '<span class="cost-bar-value">$' + val.toFixed(2) + '</span>' +
+      '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  function renderTrend() {
+    var container = document.getElementById('costTrendChart');
+    if (!container) return;
+    if (!state.trend.length) {
+      container.innerHTML = '<div style="font-size:11px;color:var(--text-muted);padding:10px;text-align:center;width:100%;">暂无趋势数据</div>';
+      return;
+    }
+    var max = 0;
+    state.trend.forEach(function(t) { max = Math.max(max, Number(t.cost) || 0); });
+    var html = '';
+    state.trend.forEach(function(t) {
+      var val = Number(t.cost) || 0;
+      var h = max > 0 ? Math.max(2, (val / max) * 90) : 2;
+      var date = (t.date || '').substring(5);
+      html += '<div class="cost-chart-bar" style="height:' + h + 'px;" title="$' + val.toFixed(2) + '">' +
+        '<span class="cost-chart-bar-label">' + esc(date) + '</span></div>';
+    });
+    container.innerHTML = html;
+  }
+
+  function saveBudget() {
+    var daily = parseFloat(document.getElementById('costBudgetDaily').value) || 0;
+    var monthly = parseFloat(document.getElementById('costBudgetMonthly').value) || 0;
+    var project = parseFloat(document.getElementById('costBudgetProject').value) || 0;
+    apiFetch('/api/v1/workstation/cost/budget', {
+      method: 'POST',
+      body: JSON.stringify({ daily: daily, monthly: monthly, project: project })
+    })
+    .then(function(d) {
+      if (d.success) { IDE.toast('预算已保存', 'success'); refresh(); }
+      else { IDE.toast('保存失败', 'error'); }
+    })
+    .catch(function(e) { IDE.toast('保存异常: ' + e.message, 'error'); });
+  }
+
+  function setText(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  return { refresh: refresh, saveBudget: saveBudget };
+})();
+
+/* ============================================================
+   爆款仿写分析函数
+   ============================================================ */
+var imitateState = { history: [], selectedIds: [] };
+
+function imitateAnalyze() {
+  var refText = document.getElementById('imitateRefText').value.trim();
+  if (!refText) { IDE.toast('请输入参考文本', 'warning'); return; }
+  var title = document.getElementById('imitateTitle').value.trim();
+  var dimensions = [];
+  if (document.getElementById('imitateDimSetting').checked) dimensions.push('setting');
+  if (document.getElementById('imitateDimPlot').checked) dimensions.push('plot');
+  if (document.getElementById('imitateDimStyle').checked) dimensions.push('style');
+  if (document.getElementById('imitateDimStructure').checked) dimensions.push('structure');
+  if (!dimensions.length) { IDE.toast('请至少选择一个维度', 'warning'); return; }
+
+  var loading = document.getElementById('imitateLoading');
+  if (loading) loading.classList.add('show');
+
+  apiFetch('/api/v1/style-learner/analyze', {
+    method: 'POST',
+    body: JSON.stringify({ book_id: 'default', reference_text: refText, title: title, dimensions: dimensions })
+  })
+  .then(function(d) {
+    if (loading) loading.classList.remove('show');
+    if (d.success && d.analysis) {
+      renderImitateResult(d.analysis, dimensions);
+      imitateLoadHistory();
+      IDE.toast('分析完成', 'success');
+    } else {
+      IDE.toast('分析失败', 'error');
+    }
+  })
+  .catch(function(e) {
+    if (loading) loading.classList.remove('show');
+    IDE.toast('分析异常: ' + e.message, 'error');
+  });
+}
+
+function renderImitateResult(analysis, dimensions) {
+  var resultEl = document.getElementById('imitateResult');
+  if (resultEl) resultEl.style.display = 'block';
+
+  // 设定仿写
+  if (dimensions.indexOf('setting') !== -1 && analysis.setting) {
+    document.getElementById('imitateSettingResult').style.display = 'block';
+    var s = analysis.setting;
+    setText('imitateSettingDensity', s.setting_density != null ? Number(s.setting_density).toFixed(1) : '-');
+    var types = s.setting_types || s.type_distribution || {};
+    var typeCount = typeof types === 'object' ? Object.keys(types).length : (Array.isArray(types) ? types.length : 0);
+    setText('imitateSettingTypes', typeCount);
+    var distHtml = '';
+    if (typeof types === 'object' && !Array.isArray(types)) {
+      Object.keys(types).forEach(function(k) {
+        distHtml += '<div class="cost-bar-row"><span class="cost-bar-label">' + esc(k) + '</span>' +
+          '<div class="cost-bar-track"><div class="cost-bar-fill" style="width:' + Math.min(100, Number(types[k]) * 10 || 10) + '%;background:#5B8FF9;"></div></div>' +
+          '<span class="cost-bar-value">' + esc(types[k]) + '</span></div>';
+      });
+    }
+    var distEl = document.getElementById('imitateSettingDist');
+    if (distEl) distEl.innerHTML = distHtml;
+  } else {
+    document.getElementById('imitateSettingResult').style.display = 'none';
+  }
+
+  // 情节仿写
+  if (dimensions.indexOf('plot') !== -1 && analysis.plot) {
+    document.getElementById('imitatePlotResult').style.display = 'block';
+    var p = analysis.plot;
+    setText('imitatePlotDensity', p.plot_density != null ? Number(p.plot_density).toFixed(2) : '-');
+    setText('imitateEmotionPeaks', p.emotion_peaks != null ? Number(p.emotion_peaks).toFixed(1) : '-');
+    var rhythm = p.rhythm_curve || p.emotion_curve || [];
+    var rhythmHtml = '';
+    if (Array.isArray(rhythm) && rhythm.length) {
+      var maxR = Math.max.apply(null, rhythm.map(function(v) { return Math.abs(Number(v) || 0); })) || 1;
+      rhythmHtml += '<div style="display:flex;align-items:flex-end;gap:2px;height:40px;">';
+      rhythm.forEach(function(v) {
+        var h = Math.max(2, Math.abs(Number(v) || 0) / maxR * 36);
+        rhythmHtml += '<div style="flex:1;height:' + h + 'px;background:' + (Number(v) >= 0 ? '#5B8FF9' : '#E86452') + ';border-radius:2px;min-width:4px;"></div>';
+      });
+      rhythmHtml += '</div>';
+    }
+    var rhythmEl = document.getElementById('imitateRhythmCurve');
+    if (rhythmEl) rhythmEl.innerHTML = rhythmHtml || '<span style="font-size:11px;color:var(--text-muted);">暂无节奏数据</span>';
+  } else {
+    document.getElementById('imitatePlotResult').style.display = 'none';
+  }
+
+  // 风格仿写
+  if (dimensions.indexOf('style') !== -1 && analysis.style) {
+    document.getElementById('imitateStyleResult').style.display = 'block';
+    var st = analysis.style;
+    setText('imitateAvgSentLen', st.avg_sentence_length != null ? Number(st.avg_sentence_length).toFixed(1) : '-');
+    setText('imitateDescDensity', st.description_density != null ? Number(st.description_density).toFixed(2) : '-');
+    // 句式分布饼图
+    var sentDist = st.sentence_distribution || {};
+    var pieColors = ['#5B8FF9', '#61DDAA', '#F6BD16', '#7262FD', '#F6903D'];
+    var pieKeys = Object.keys(sentDist);
+    var totalSent = pieKeys.reduce(function(s, k) { return s + (Number(sentDist[k]) || 0); }, 0) || 1;
+    var gradient = '';
+    var acc = 0;
+    pieKeys.forEach(function(k, i) {
+      var pct = (Number(sentDist[k]) || 0) / totalSent * 100;
+      gradient += pieColors[i % pieColors.length] + ' ' + acc + '% ' + (acc + pct) + '%';
+      if (i < pieKeys.length - 1) gradient += ', ';
+      acc += pct;
+    });
+    var pieEl = document.getElementById('imitateSentencePie');
+    if (pieEl) pieEl.style.background = 'conic-gradient(' + gradient + ')';
+    var legendHtml = '';
+    pieKeys.forEach(function(k, i) {
+      var pct = ((Number(sentDist[k]) || 0) / totalSent * 100).toFixed(0);
+      legendHtml += '<div class="imitate-pie-legend-item"><div class="imitate-pie-dot" style="background:' + pieColors[i % pieColors.length] + ';"></div>' +
+        '<span>' + esc(k) + ' ' + pct + '%</span></div>';
+    });
+    var legendEl = document.getElementById('imitateSentenceLegend');
+    if (legendEl) legendEl.innerHTML = legendHtml;
+    // 高频词
+    var words = st.high_freq_words || st.top_words || [];
+    var wordsHtml = '';
+    (Array.isArray(words) ? words : []).forEach(function(w) {
+      var word = typeof w === 'string' ? w : (w.word || w.name || '');
+      var count = typeof w === 'object' ? (w.count || w.freq || '') : '';
+      wordsHtml += '<span class="ws-entry-tag">' + esc(word) + (count ? ' (' + esc(count) + ')' : '') + '</span>';
+    });
+    var wordsEl = document.getElementById('imitateHighFreqWords');
+    if (wordsEl) wordsEl.innerHTML = wordsHtml || '<span style="font-size:11px;color:var(--text-muted);">暂无</span>';
+  } else {
+    document.getElementById('imitateStyleResult').style.display = 'none';
+  }
+
+  // 结构仿写
+  if (dimensions.indexOf('structure') !== -1 && analysis.structure) {
+    document.getElementById('imitateStructureResult').style.display = 'block';
+    var str = analysis.structure;
+    setText('imitateOpeningMode', str.opening_mode || str.opening_pattern || '-');
+    setText('imitateEndingMode', str.ending_mode || str.ending_pattern || '-');
+    var chDist = str.chapter_word_distribution || {};
+    var chHtml = '';
+    if (typeof chDist === 'object') {
+      Object.keys(chDist).forEach(function(k) {
+        chHtml += '<div class="cost-bar-row"><span class="cost-bar-label">' + esc(k) + '</span>' +
+          '<div class="cost-bar-track"><div class="cost-bar-fill" style="width:' + Math.min(100, Number(chDist[k]) / 5000 * 100 || 10) + '%;background:#61DDAA;"></div></div>' +
+          '<span class="cost-bar-value">' + esc(chDist[k]) + '</span></div>';
+      });
+    }
+    var chEl = document.getElementById('imitateChapterDist');
+    if (chEl) chEl.innerHTML = chHtml || '<span style="font-size:11px;color:var(--text-muted);">暂无章节字数分布</span>';
+  } else {
+    document.getElementById('imitateStructureResult').style.display = 'none';
+  }
+}
+
+function imitateLoadHistory() {
+  apiFetch('/api/v1/style-learner/history?book_id=default')
+    .then(function(d) {
+      if (d.success) {
+        imitateState.history = d.analyses || [];
+        renderCompareSelect();
+      }
+    })
+    .catch(function() {});
+}
+
+function renderCompareSelect() {
+  var container = document.getElementById('imitateCompareSelect');
+  if (!container) return;
+  if (!imitateState.history.length) {
+    container.innerHTML = '<span style="font-size:11px;color:var(--text-muted);">暂无历史分析记录</span>';
+    return;
+  }
+  var html = '';
+  imitateState.history.forEach(function(a) {
+    var id = a.id || a.analysis_id || '';
+    var title = a.title || a.book_title || ('分析#' + id);
+    var selected = imitateState.selectedIds.indexOf(id) !== -1 ? ' selected' : '';
+    html += '<div class="imitate-compare-chip' + selected + '" onclick="imitateToggleCompare(\'' + esc(id) + '\')">' + esc(title) + '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function imitateToggleCompare(id) {
+  var idx = imitateState.selectedIds.indexOf(id);
+  if (idx !== -1) {
+    imitateState.selectedIds.splice(idx, 1);
+  } else {
+    if (imitateState.selectedIds.length >= 3) { IDE.toast('最多选择3本', 'warning'); return; }
+    imitateState.selectedIds.push(id);
+  }
+  renderCompareSelect();
+}
+
+function imitateCompare() {
+  if (imitateState.selectedIds.length < 2) { IDE.toast('请至少选择2本进行对比', 'warning'); return; }
+  var loading = document.getElementById('imitateCompareLoading');
+  if (loading) loading.classList.add('show');
+  apiFetch('/api/v1/style-learner/compare', {
+    method: 'POST',
+    body: JSON.stringify({ book_id: 'default', analysis_ids: imitateState.selectedIds })
+  })
+  .then(function(d) {
+    if (loading) loading.classList.remove('show');
+    var resultEl = document.getElementById('imitateCompareResult');
+    if (!resultEl) return;
+    if (d.success) {
+      var html = '';
+      if (d.common_patterns && d.common_patterns.length) {
+        html += '<div style="font-size:11px;font-weight:600;color:var(--success);margin-bottom:6px;">共性规律</div>';
+        d.common_patterns.forEach(function(p) {
+          html += '<div class="ws-entry-item" style="cursor:default;"><div class="ws-entry-name" style="font-size:11px;">' + esc(p.pattern || p.name || p) + '</div>' +
+            (p.description ? '<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">' + esc(p.description) + '</div>' : '') + '</div>';
+        });
+      }
+      if (d.differences && d.differences.length) {
+        html += '<div style="font-size:11px;font-weight:600;color:var(--warning);margin:10px 0 6px;">差异点</div>';
+        d.differences.forEach(function(p) {
+          html += '<div class="ws-entry-item" style="cursor:default;"><div class="ws-entry-name" style="font-size:11px;">' + esc(p.dimension || p.aspect || p.name || p) + '</div>' +
+            (p.description ? '<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">' + esc(p.description) + '</div>' : '') + '</div>';
+        });
+      }
+      resultEl.innerHTML = html || '<div style="font-size:11px;color:var(--text-muted);">无显著共性或差异</div>';
+    } else {
+      resultEl.innerHTML = '<div style="font-size:11px;color:var(--error);">对比失败</div>';
+    }
+  })
+  .catch(function(e) {
+    if (loading) loading.classList.remove('show');
+    IDE.toast('对比异常: ' + e.message, 'error');
+  });
+}
+
+function setText(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+/* ---------- 初始化时加载成本面板数据 ---------- */
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    if (typeof CostPanelManager !== 'undefined') CostPanelManager.refresh();
+  }, 800);
+});
 
 /* ============================================================
    初始化

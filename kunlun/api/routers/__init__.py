@@ -66,6 +66,7 @@
 from fastapi import APIRouter
 
 from kunlun.api.routers.admin import router as admin_router
+from kunlun.api.routers.agent_pipeline import router as agent_pipeline_router
 from kunlun.api.routers.aigc_detect import router as aigc_detect_router
 from kunlun.api.routers.api_providers import router as api_providers_router
 from kunlun.api.routers.audit import router as audit_router
@@ -112,9 +113,12 @@ from kunlun.api.routers.stats import router as stats_router
 
 # v2 新增路由模块
 from kunlun.api.routers.story_bible import router as story_bible_router
+from kunlun.api.routers.story_canvas import router as story_canvas_router
 from kunlun.api.routers.stream import router as stream_router
+from kunlun.api.routers.style_learner import router as style_learner_router
 from kunlun.api.routers.usage_routes import router as usage_router
 from kunlun.api.routers.vibe import router as vibe_router
+from kunlun.api.routers.world_setting import router as world_setting_router
 from kunlun.api.routers.write_routes import router as write_router
 from kunlun.api.routers.writer_context import router as writer_context_router
 from kunlun.api.routers.writing_packs import router as writing_packs_router
@@ -162,6 +166,8 @@ api_router.include_router(writer_context_router)
 api_router.include_router(retention_router)
 api_router.include_router(write_router)
 api_router.include_router(stats_router)
+api_router.include_router(story_canvas_router)
+api_router.include_router(style_learner_router)
 api_router.include_router(learn_router)
 api_router.include_router(image_gen_router)
 api_router.include_router(local_marketplace_router)
@@ -174,9 +180,12 @@ api_router.include_router(orchestrator_router)
 api_router.include_router(writing_packs_router)
 api_router.include_router(constitution_router)
 api_router.include_router(mode_router)
+api_router.include_router(world_setting_router)
+api_router.include_router(agent_pipeline_router)
 
 __all__ = [
     "admin_router",
+    "agent_pipeline_router",
     "aigc_detect_router",
     "api_providers_router",
     "api_router",
@@ -221,9 +230,12 @@ __all__ = [
     "smart_learn_router",
     "stats_router",
     "story_bible_router",
+    "story_canvas_router",
     "stream_router",
+    "style_learner_router",
     "usage_router",
     "vibe_router",
+    "world_setting_router",
     "write_router",
     "writer_context_router",
     "writing_packs_router",
