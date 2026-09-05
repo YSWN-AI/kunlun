@@ -233,8 +233,7 @@ class DebateOrchestrator:
             )
             if debate_result is not None:
                 # CRITIC 验证 + Reflexion 修订
-                debate_result = await self._apply_critic_and_reflexion(debate_result, sorted_issues)
-                return debate_result
+                return await self._apply_critic_and_reflexion(debate_result, sorted_issues)
         except Exception as e:
             logger.warning(f"[DebateOrchestrator] LLM辩论失败，回退规则辩论: {e}")
 
@@ -243,8 +242,7 @@ class DebateOrchestrator:
             text, chapter, context, sorted_issues, critic_report, reader_feedback
         )
         # CRITIC 验证 + Reflexion 修订
-        debate_result = await self._apply_critic_and_reflexion(debate_result, sorted_issues)
-        return debate_result
+        return await self._apply_critic_and_reflexion(debate_result, sorted_issues)
 
     # ── LLM 辩论 ────────────────────────────────────────
 
@@ -339,20 +337,20 @@ class DebateOrchestrator:
             all_unresolved.extend(parsed.get("issues_unresolved", []))
 
             # 收集修订建议
-            for suggestion in parsed.get("revision_suggestions", []):
-                revision_suggestions.append(
-                    {
-                        "round": round_num,
-                        "issue": suggestion.get("issue", ""),
-                        "suggestion": suggestion.get("suggestion", ""),
-                        "priority": suggestion.get("priority", 3),
-                    }
-                )
+            revision_suggestions.extend(
+                {
+                    "round": round_num,
+                    "issue": suggestion.get("issue", ""),
+                    "suggestion": suggestion.get("suggestion", ""),
+                    "priority": suggestion.get("priority", 3),
+                }
+                for suggestion in parsed.get("revision_suggestions", [])
+            )
 
         # 最终裁决
         final_verdict = self._generate_final_verdict(all_agreed, all_unresolved, critic_report)
         total_score = self._calculate_debate_score(
-            critic_report, reader_feedback, len(all_agreed), len(all_unresolved)
+            critic_report, reader_feedback, len(all_unresolved)
         )
 
         return DebateResult(
@@ -384,6 +382,8 @@ class DebateOrchestrator:
             f"{' 建议: ' + issue.suggestion if issue.suggestion else ''}"
             for i, issue in enumerate(issues)
         )
+        pp = critic_report.poison_points
+        poison_text = ", ".join(pp[:3]) if pp else "无"
 
         return (
             f"你是一场小说质量辩论的主持人。请主持第{round_num}轮辩论。\n\n"
@@ -391,7 +391,7 @@ class DebateOrchestrator:
             f"【上下文】{context or '无'}\n\n"
             f"【本轮聚焦问题】\n{issues_text}\n\n"
             f"【评论家观点】综合评分{critic_report.overall_score}/100，"
-            f"主要毒点: {', '.join(critic_report.poison_points[:3]) if critic_report.poison_points else '无'}\n\n"
+            f"主要毒点: {poison_text}\n\n"
             f"【读者反馈】{reader_feedback.reader_name}评分{reader_feedback.overall_score}/10，"
             f"继续阅读={reader_feedback.continue_reading}，"
             f"情感反应: {reader_feedback.emotional_response}\n\n"
@@ -490,19 +490,19 @@ class DebateOrchestrator:
             all_unresolved.extend(unresolved_list)
 
         # 收集修订建议
-        for priority in rule_result.revision_priority[:5]:
-            revision_suggestions.append(
-                {
-                    "round": 1,
-                    "issue": priority.get("description", ""),
-                    "suggestion": priority.get("suggestion", ""),
-                    "priority": priority.get("priority", 3),
-                }
-            )
+        revision_suggestions.extend(
+            {
+                "round": 1,
+                "issue": priority.get("description", ""),
+                "suggestion": priority.get("suggestion", ""),
+                "priority": priority.get("priority", 3),
+            }
+            for priority in rule_result.revision_priority[:5]
+        )
 
         final_verdict = self._generate_final_verdict(all_agreed, all_unresolved, critic_report)
         total_score = self._calculate_debate_score(
-            critic_report, reader_feedback, len(all_agreed), len(all_unresolved)
+            critic_report, reader_feedback, len(all_unresolved)
         )
 
         return DebateResult(
@@ -658,7 +658,7 @@ class DebateOrchestrator:
         # 基于问题描述推断根因
         root_cause = self._infer_root_cause(issue_description)
         revision_direction = self._infer_revision_direction(issue_description, root_cause)
-        expected_effect = self._infer_expected_effect(issue_description, revision_direction)
+        expected_effect = self._infer_expected_effect(issue_description)
 
         # 优先级基于问题在列表中的严重度
         priority = 3
@@ -710,7 +710,7 @@ class DebateOrchestrator:
         return f"针对根因（{root_cause}）进行系统性修改，建议先定位具体段落再逐一优化"
 
     @staticmethod
-    def _infer_expected_effect(issue_description: str, revision_direction: str) -> str:
+    def _infer_expected_effect(issue_description: str) -> str:
         """推断预期效果"""
         if "爽点" in issue_description:
             return "预计提升爽点满足度20-30%，追读率提升15%"
@@ -753,7 +753,6 @@ class DebateOrchestrator:
     def _calculate_debate_score(
         critic_report: CriticReport,
         reader_feedback: EnhancedReaderFeedback,
-        agreed_count: int,
         unresolved_count: int,
     ) -> float:
         """计算辩论综合评分"""
@@ -873,7 +872,7 @@ class DebateOrchestrator:
         )
 
     def _stage2_gacha_suggestion(
-        self, text: str, chapter: int, stage1: PipelineStage
+        self, _text: str, _chapter: int, stage1: PipelineStage
     ) -> PipelineStage:
         """Stage2: 抽卡建议（输出建议，不实际执行）"""
         start = time.monotonic()
@@ -970,8 +969,8 @@ class DebateOrchestrator:
 
     def _stage5_final_review(
         self,
-        text: str,
-        chapter: int,
+        _text: str,
+        _chapter: int,
         stage1: PipelineStage,
         stage3: PipelineStage,
         stage4: PipelineStage,
@@ -1018,7 +1017,7 @@ class DebateOrchestrator:
             duration_ms=round(duration, 2),
         )
 
-    def _stage6_polish_suggestion(self, text: str, stage5: PipelineStage) -> PipelineStage:
+    def _stage6_polish_suggestion(self, _text: str, stage5: PipelineStage) -> PipelineStage:
         """Stage6: 润色建议（输出建议，不实际执行）"""
         start = time.monotonic()
         final_score = stage5.result.get("final_score", 50.0)
@@ -1048,7 +1047,7 @@ class DebateOrchestrator:
         )
 
     def _stage7_knowledge_update(
-        self, text: str, chapter: int, stage1: PipelineStage
+        self, _text: str, chapter: int, stage1: PipelineStage
     ) -> PipelineStage:
         """Stage7: 知识更新建议（输出建议，不实际执行）"""
         start = time.monotonic()

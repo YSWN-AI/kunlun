@@ -4,10 +4,9 @@
 
 import pytest
 
-pytestmark = pytest.mark.integration
-
 from kunlun.style.engineer import StyleEngineer
 
+pytestmark = pytest.mark.integration
 
 class TestConjunctionReplacement:
     """连词替换"""

@@ -200,16 +200,18 @@ class CriticAgent(BaseAgent):
         total_score = max(0.0, min(100.0, total_score))
 
         # 毒点（严重度 >= 4 的问题）
-        poison_points: list[str] = []
-        for issue in issues:
-            if issue.severity >= 4:
-                poison_points.append(f"[{issue.dimension.value}] {issue.description}")
+        poison_points = [
+            f"[{issue.dimension.value}] {issue.description}"
+            for issue in issues
+            if issue.severity >= 4
+        ]
 
         # 建议（按严重度排序取前5）
-        suggestions: list[str] = []
-        for issue in sorted(issues, key=lambda i: i.severity, reverse=True)[:5]:
-            if issue.suggestion:
-                suggestions.append(issue.suggestion)
+        suggestions = [
+            issue.suggestion
+            for issue in sorted(issues, key=lambda i: i.severity, reverse=True)[:5]
+            if issue.suggestion
+        ]
 
         # 市场潜力评价
         if total_score >= 85:

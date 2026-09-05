@@ -78,7 +78,7 @@ class VibeQualityFeedback:
     DROP_OFF_NO_CONFLICT = 1500  # 超过1500字无冲突
 
     @classmethod
-    def analyze(cls, text: str, chapter: int = 0) -> QualityFeedback:
+    def analyze(cls, text: str, chapter: int = 0) -> QualityFeedback:  # noqa: PLR0912, PLR0915
         """分析文本，生成即时质量反馈"""
         fb = QualityFeedback()
         if not text or len(text.strip()) < 20:

@@ -6,7 +6,7 @@ import pytest
 
 pytestmark = pytest.mark.unit
 
-from kunlun.safety.engine import (
+from kunlun.safety.engine import (  # noqa: E402
     ContentRating,
     SafetyFilter,
     SafetyReport,
@@ -77,7 +77,10 @@ class TestSafetyFilterCleanText:
     """测试干净文本应该无违规"""
 
     def test_normal_novel_text(self):
-        text = "张三站在山巅，望着远方的夕阳，心中充满了对未来的憧憬。他深吸一口气，决定下山去寻找自己的命运。"
+        text = (
+            "张三站在山巅，望着远方的夕阳，心中充满了对未来的憧憬。"
+            "他深吸一口气，决定下山去寻找自己的命运。"
+        )
         report = SafetyFilter.scan(text, chapter=1, book_id="test")
         assert report.passed is True
         assert report.violation_count == 0

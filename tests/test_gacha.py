@@ -4,10 +4,9 @@
 
 import pytest
 
-pytestmark = pytest.mark.unit
-
 from kunlun.gacha.engine import DEFAULT_MODELS, GachaEngine
 
+pytestmark = pytest.mark.unit
 
 class TestGachaScoring:
     """评分体系"""

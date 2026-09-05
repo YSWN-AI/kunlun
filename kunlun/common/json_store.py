@@ -35,8 +35,7 @@ def load_json(path: Path, *, default: T | None = None) -> T | None:
     if not path.exists():
         return default
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-        return data
+        return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
         logger.debug(f"[JsonStore] 加载失败 {path}: {e}")
         return default

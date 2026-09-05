@@ -2,14 +2,13 @@
 测试: WebSocket 进度管理器
 """
 
-import pytest
-
-pytestmark = pytest.mark.unit
-
 from unittest.mock import AsyncMock
+
+import pytest
 
 from kunlun.api.ws_manager import WSProgressManager
 
+pytestmark = pytest.mark.unit
 
 class TestWSProgressManagerInit:
     """初始化"""

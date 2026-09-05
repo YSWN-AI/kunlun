@@ -170,7 +170,7 @@ class StyleDriftDetector:
             return {}
 
         target = self.target_fingerprint
-        dimensions = {
+        return {
             "句长差异": abs(chapter_fp.avg_sentence_length - target.avg_sentence_length),
             "句长波动差异": abs(chapter_fp.sentence_length_std - target.sentence_length_std),
             "词汇多样性差异": abs(chapter_fp.word_diversity - target.word_diversity),
@@ -185,7 +185,6 @@ class StyleDriftDetector:
             "心理描写差异": abs(chapter_fp.psych_desc_ratio - target.psych_desc_ratio),
             "AI味差异": abs(chapter_fp.ai_taste_score - target.ai_taste_score),
         }
-        return dimensions
 
     def _calc_similarity(self, fp1: StyleFingerprint, fp2: StyleFingerprint) -> float:
         """计算两个指纹的相似度

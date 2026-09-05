@@ -251,7 +251,8 @@ class StyleFingerprint:
             )
             if self.exclamation_ratio > 0:
                 parts.append(
-                    f"- 语气: 感叹号/句号比{self.exclamation_ratio:.2f}，问号/句号比{self.question_ratio:.2f}"
+                    f"- 语气: 感叹号/句号比{self.exclamation_ratio:.2f}，"
+                    f"问号/句号比{self.question_ratio:.2f}"
                 )
 
         # 词汇
@@ -262,7 +263,8 @@ class StyleFingerprint:
                 f"生僻词占比{self.rare_word_ratio:.1%}"
             )
             parts.append(
-                f"- 词密度: 动词{self.verb_density:.1f}/千字，形容词{self.adjective_density:.1f}/千字"
+                f"- 词密度: 动词{self.verb_density:.1f}/千字，"
+                f"形容词{self.adjective_density:.1f}/千字"
             )
             if self.signature_words:
                 parts.append(f"- 标志性词: {', '.join(self.signature_words[:10])}")
@@ -314,7 +316,7 @@ class StyleFingerprint:
         min_len = min(len(v1), len(v2))
         v1 = v1[:min_len]
         v2 = v2[:min_len]
-        dot = sum(a * b for a, b in zip(v1, v2))
+        dot = sum(a * b for a, b in zip(v1, v2, strict=True))
         norm1 = math.sqrt(sum(a * a for a in v1))
         norm2 = math.sqrt(sum(b * b for b in v2))
         if norm1 == 0 or norm2 == 0:
@@ -338,7 +340,7 @@ class StyleAnalyzer:
     10. 综合 (特征向量、AI味指数)
     """
 
-    def analyze(self, text: str, name: str = "reference") -> StyleFingerprint:
+    def analyze(self, text: str, name: str = "reference") -> StyleFingerprint:  # noqa: PLR0912, PLR0915
         """分析文本,提取统计指纹
 
         Args:
@@ -494,8 +496,8 @@ class StyleAnalyzer:
         # 检测连续3个以上逗号分隔的相似长度片段
         comma_segments = re.split(r"[，,]", text)
         run_length = 0
-        for seg in comma_segments:
-            seg = seg.strip()
+        for raw_seg in comma_segments:
+            seg = raw_seg.strip()
             if 3 <= len(seg) <= 20:
                 run_length += 1
                 if run_length >= 3:
@@ -614,7 +616,7 @@ class StyleAnalyzer:
         Returns:
             归一化特征向量
         """
-        vector = [
+        return [
             # 句长（归一化到[0,1]）
             min(fp.avg_sentence_length / 100.0, 1.0),
             min(fp.sentence_length_std / 50.0, 1.0),
@@ -647,7 +649,6 @@ class StyleAnalyzer:
             min(fp.psych_desc_ratio, 1.0),
             min(fp.single_sentence_para_ratio, 1.0),
         ]
-        return vector
 
     def _calc_ai_taste(self, text: str, fp: StyleFingerprint) -> float:
         """计算AI味指数（0-1，越高越像AI写的）

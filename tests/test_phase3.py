@@ -184,7 +184,7 @@ class TestMarketplaceEngine:
         assert all(r.is_official for r in results)
 
     def test_install(self, engine):
-        tpl_id = list(engine._templates.keys())[0]
+        tpl_id = next(iter(engine._templates.keys()))
         assert engine.install(tpl_id, "user_001") is True
 
         lib = engine.get_library("user_001")
@@ -194,7 +194,7 @@ class TestMarketplaceEngine:
         assert len(installed) == 1
 
     def test_uninstall(self, engine):
-        tpl_id = list(engine._templates.keys())[0]
+        tpl_id = next(iter(engine._templates.keys()))
         engine.install(tpl_id, "user_001")
         assert engine.uninstall(tpl_id, "user_001") is True
 
@@ -205,7 +205,7 @@ class TestMarketplaceEngine:
         assert engine.install("nonexistent", "user_001") is False
 
     def test_favorite(self, engine):
-        tpl_id = list(engine._templates.keys())[0]
+        tpl_id = next(iter(engine._templates.keys()))
         assert engine.favorite(tpl_id, "user_001") is True
 
         lib = engine.get_library("user_001")
@@ -226,14 +226,14 @@ class TestMarketplaceEngine:
         assert tpl.template_id in lib.published
 
     def test_rate_template(self, engine):
-        tpl_id = list(engine._templates.keys())[0]
+        tpl_id = next(iter(engine._templates.keys()))
         assert engine.rate_template(tpl_id, 4.5) is True
 
         tpl = engine._templates[tpl_id]
         assert tpl.rating_count > 0
 
     def test_rate_template_range(self, engine):
-        tpl_id = list(engine._templates.keys())[0]
+        tpl_id = next(iter(engine._templates.keys()))
         engine.rate_template(tpl_id, 10.0)  # 应 clamp 到 5.0
         engine.rate_template(tpl_id, -1.0)  # 应 clamp 到 1.0
 
@@ -245,7 +245,7 @@ class TestMarketplaceEngine:
         assert isinstance(results, list)
 
     def test_get_recommended_with_history(self, engine):
-        tpl_id = list(engine._templates.keys())[0]
+        tpl_id = next(iter(engine._templates.keys()))
         engine.install(tpl_id, "user_001")
         results = engine.get_recommended("user_001", 5)
         assert isinstance(results, list)
@@ -302,7 +302,7 @@ class TestPluginStoreEngine:
         assert all(r.is_official for r in results)
 
     def test_install(self, engine):
-        plg_id = list(engine._plugins.keys())[0]
+        plg_id = next(iter(engine._plugins.keys()))
         assert engine.install(plg_id, "user_001") is True
 
         installed = engine.get_installed("user_001")
@@ -311,7 +311,7 @@ class TestPluginStoreEngine:
         assert engine.is_installed(plg_id, "user_001") is True
 
     def test_uninstall(self, engine):
-        plg_id = list(engine._plugins.keys())[0]
+        plg_id = next(iter(engine._plugins.keys()))
         engine.install(plg_id, "user_001")
         assert engine.uninstall(plg_id, "user_001") is True
 
@@ -321,16 +321,16 @@ class TestPluginStoreEngine:
         assert engine.install("nonexistent", "user_001") is False
 
     def test_update(self, engine):
-        plg_id = list(engine._plugins.keys())[0]
+        plg_id = next(iter(engine._plugins.keys()))
         engine.install(plg_id, "user_001")
         assert engine.update(plg_id, "user_001") is True
 
     def test_update_not_installed(self, engine):
-        plg_id = list(engine._plugins.keys())[0]
+        plg_id = next(iter(engine._plugins.keys()))
         assert engine.update(plg_id, "no_user") is False
 
     def test_check_updates(self, engine):
-        plg_id = list(engine._plugins.keys())[0]
+        plg_id = next(iter(engine._plugins.keys()))
         engine.install(plg_id, "user_001")
 
         # 篡改已安装版本为旧版本
@@ -359,7 +359,7 @@ class TestPluginStoreEngine:
         assert engine.get_plugin(plg.plugin_id).status == "published"
 
     def test_deprecate_plugin(self, engine):
-        plg_id = list(engine._plugins.keys())[0]
+        plg_id = next(iter(engine._plugins.keys()))
         assert engine.deprecate_plugin(plg_id) is True
         assert engine.get_plugin(plg_id).status == "deprecated"
 

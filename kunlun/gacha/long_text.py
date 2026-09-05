@@ -66,8 +66,7 @@ class TextDeduplicator:
     def _normalize(text: str) -> str:
         """标准化文本用于比较"""
         text = re.sub(r"\s+", "", text)
-        text = re.sub(r'[，。！？、；：""' "（）【】《》]", "", text)
-        return text
+        return re.sub(r'[，。！？、；：""' "（）【】《》]", "", text)
 
     @staticmethod
     def _simhash(text: str, n: int = 4) -> str:
@@ -89,8 +88,8 @@ class TextDeduplicator:
         norm2 = TextDeduplicator._normalize(text2)
         if len(norm1) < n or len(norm2) < n:
             return 0.0
-        set1 = set(norm1[i : i + n] for i in range(len(norm1) - n + 1))
-        set2 = set(norm2[i : i + n] for i in range(len(norm2) - n + 1))
+        set1 = {norm1[i : i + n] for i in range(len(norm1) - n + 1)}
+        set2 = {norm2[i : i + n] for i in range(len(norm2) - n + 1)}
         if not set1 or not set2:
             return 0.0
         intersection = len(set1 & set2)
@@ -221,7 +220,7 @@ class LongTextGenerator:
         """构建分段生成的prompt"""
         summary = self._build_summary(previous_text, self.config.summary_chars)
 
-        segment_prompt = f"""{base_prompt}
+        return f"""{base_prompt}
 
 【当前进度】第 {segment_index + 1}/{total_segments} 段
 【每段要求】约 {self.config.segment_chars} 字
@@ -237,7 +236,6 @@ class LongTextGenerator:
 5. 直接输出正文，不要输出标题或说明
 
 请继续写作："""
-        return segment_prompt
 
     async def generate(
         self,

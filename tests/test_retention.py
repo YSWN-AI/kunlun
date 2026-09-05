@@ -6,7 +6,7 @@ import pytest
 
 pytestmark = pytest.mark.unit
 
-from kunlun.retention.engine import (
+from kunlun.retention.engine import (  # noqa: E402
     Debt,
     DebtType,
     DropOffPrediction,

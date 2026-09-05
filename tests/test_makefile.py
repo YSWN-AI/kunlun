@@ -4,10 +4,9 @@
 
 import pytest
 
-pytestmark = pytest.mark.integration
-
 from kunlun.agents.makefile import Makefile, PipelineState, PipelineStep
 
+pytestmark = pytest.mark.integration
 
 class TestPipelineState:
     """流水线状态"""

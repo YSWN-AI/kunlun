@@ -176,8 +176,7 @@ class SummaryTree:
                 if not volume.chapter_range:
                     continue
                 v_start, v_end = volume.chapter_range
-                if v_end >= from_ch and v_start <= to_ch:
-                    if volume.summary:
+                if v_end >= from_ch and v_start <= to_ch and volume.summary:
                         parts.append(f"【{volume.title}】{volume.summary}")
         else:
             # 用章摘要（max_level >= 2）

@@ -3,13 +3,11 @@
 """
 
 import pytest
-
-pytestmark = pytest.mark.integration
-
 from fastapi.testclient import TestClient
 
 from kunlun.api.main import app
 
+pytestmark = pytest.mark.integration
 
 @pytest.fixture
 def client():

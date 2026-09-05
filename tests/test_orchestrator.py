@@ -6,10 +6,9 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.integration
-
 from kunlun.vibe_writer.orchestrator import VibeOrchestrator
 
+pytestmark = pytest.mark.integration
 
 class TestVibeOrchestrator:
     def setup_method(self):

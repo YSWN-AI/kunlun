@@ -1718,6 +1718,554 @@ input[type="range"]::-webkit-slider-thumb {
   border-color: var(--primary);
 }
 
+
+/* ============================================================
+   新增：虚拟滚动
+   ============================================================ */
+.virtual-scroll {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.virtual-scroll-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.virtual-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  box-sizing: border-box;
+}
+.virtual-row:hover {
+  background: var(--bg-input);
+}
+.virtual-row.selected {
+  background: rgba(var(--primary-rgb), 0.15);
+  color: var(--primary-light);
+}
+
+/* ============================================================
+   新增：人物卡面板
+   ============================================================ */
+.char-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.char-list-section {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.char-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.char-virtual-list {
+  height: 180px;
+  position: relative;
+}
+.char-detail-section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+.char-detail-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.char-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.char-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.char-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.char-card-role {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: rgba(var(--primary-rgb), 0.15);
+  color: var(--primary-light);
+  border-radius: 3px;
+}
+.char-field {
+  margin-bottom: 8px;
+}
+.char-field-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+.char-field-value {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.char-relations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.char-relation-chip {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-secondary);
+}
+.char-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* ============================================================
+   新增：大纲面板
+   ============================================================ */
+.outline-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.outline-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.outline-tab {
+  padding: 6px 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.outline-tab:hover {
+  color: var(--text-secondary);
+}
+.outline-tab.active {
+  color: var(--primary-light);
+  border-bottom-color: var(--primary);
+}
+.outline-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+.outline-tree-node {
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.outline-tree-node:hover {
+  background: var(--bg-input);
+}
+.outline-tree-node.selected {
+  background: rgba(var(--primary-rgb), 0.15);
+  color: var(--primary-light);
+}
+.outline-tree-node .tree-arrow {
+  width: 12px;
+  text-align: center;
+  font-size: 10px;
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+.outline-tree-node.collapsed .tree-arrow {
+  transform: rotate(-90deg);
+}
+.outline-tree-node .node-type-icon {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.outline-tree-node .node-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.outline-tree-node .node-status {
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.status-draft { background: var(--bg-input); color: var(--text-muted); }
+.status-writing { background: rgba(245,158,11,0.15); color: var(--warning); }
+.status-done { background: rgba(16,185,129,0.15); color: var(--success); }
+.outline-children {
+  padding-left: 16px;
+}
+.outline-children.collapsed {
+  display: none;
+}
+.foreshadow-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+}
+.foreshadow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.foreshadow-title {
+  font-size: 12px;
+  font-weight: 500;
+}
+.foreshadow-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.foreshadow-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.story-template-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.story-template-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+.story-template-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.story-template-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.story-template-beats {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.template-beat {
+  font-size: 9px;
+  padding: 1px 5px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   新增：版本面板
+   ============================================================ */
+.version-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.version-list-section {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.version-virtual-list {
+  height: 200px;
+  position: relative;
+}
+.version-detail-section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+.version-item-row {
+  height: 44px;
+}
+.version-info {
+  flex: 1;
+  min-width: 0;
+}
+.version-label {
+  font-size: 12px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.version-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.version-badge {
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: rgba(var(--primary-rgb), 0.15);
+  color: var(--primary-light);
+  flex-shrink: 0;
+}
+.diff-view {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.diff-line {
+  padding: 1px 4px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.diff-line.added { background: rgba(16,185,129,0.1); color: var(--success); }
+.diff-line.removed { background: rgba(239,68,68,0.1); color: var(--error); }
+.diff-line.modified { background: rgba(245,158,11,0.1); color: var(--warning); }
+.diff-stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+.diff-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================================
+   新增：故事圣经面板
+   ============================================================ */
+.bible-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.bible-section-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.bible-section-tab {
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+.bible-section-tab:hover {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+}
+.bible-section-tab.active {
+  background: rgba(var(--primary-rgb), 0.15);
+  color: var(--primary-light);
+}
+.bible-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+.bible-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 6px;
+}
+.bible-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.bible-item-title {
+  font-size: 12px;
+  font-weight: 600;
+}
+.bible-item-content {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.bible-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 6px;
+}
+.bible-tag {
+  font-size: 9px;
+  padding: 1px 5px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   新增：通用模态表单
+   ============================================================ */
+.form-group {
+  margin-bottom: 10px;
+}
+.form-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 6px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--primary);
+}
+.form-textarea {
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.5;
+}
+.form-row {
+  display: flex;
+  gap: 8px;
+}
+.form-row .form-group {
+  flex: 1;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ============================================================
+   新增：关系图谱（简易）
+   ============================================================ */
+.relation-graph {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+  min-height: 120px;
+}
+.relation-graph-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.relation-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 11px;
+  border-bottom: 1px solid var(--border);
+}
+.relation-list-item:last-child {
+  border-bottom: none;
+}
+.relation-target {
+  font-weight: 500;
+  color: var(--primary-light);
+  min-width: 60px;
+}
+.relation-type {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* 面板懒加载占位 */
+.panel-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 12px;
+  flex-direction: column;
+  gap: 8px;
+}
+.panel-placeholder .loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 </style>
 </head>
 <body>
@@ -1742,6 +2290,7 @@ input[type="range"]::-webkit-slider-thumb {
     <div class="activity-item" data-view="outline" onclick="IDE.switchView('outline')">📋<span class="tooltip">大纲</span></div>
     <div class="activity-item" data-view="characters" onclick="IDE.switchView('characters')">👤<span class="tooltip">人物</span></div>
     <div class="activity-item" data-view="world" onclick="IDE.switchView('world')">🌍<span class="tooltip">世界观</span></div>
+    <div class="activity-item" data-view="versions" onclick="IDE.switchView('versions')">🕐<span class="tooltip">版本历史</span></div>
     <div class="activity-item" data-view="style" onclick="IDE.switchView('style')">🎨<span class="tooltip">风格学习</span></div>
     <div class="activity-item" data-view="memory" onclick="IDE.switchView('memory')">🧠<span class="tooltip">记忆管理</span></div>
     <div class="activity-item" data-view="ai" onclick="IDE.toggleBottomPanel('ai')">🤖<span class="tooltip">AI对话</span></div>
@@ -1765,26 +2314,77 @@ input[type="range"]::-webkit-slider-thumb {
         <div id="searchResults" style="margin-top:10px;"><div class="empty-state" style="padding:20px;">输入关键词搜索</div></div>
       </div>
     </div>
-    <!-- 大纲 -->
+    <!-- 大纲（完整实现） -->
     <div class="sidebar-view" id="view-outline">
-      <div class="sidebar-title"><span>大纲</span></div>
-      <div class="sidebar-content" style="padding:10px;">
-        <div class="empty-state">大纲视图 — 从编辑器文本自动提取</div>
-        <div id="outlineContent"></div>
+      <div class="sidebar-title"><span>大纲结构</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="OutlineManager.openCreateNode()" title="新建节点">＋</button>
+          <button class="icon-btn" onclick="OutlineManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" style="padding:0;display:flex;flex-direction:column;height:100%;">
+        <div class="outline-panel" id="outlinePanel">
+          <div class="panel-placeholder" id="outlinePlaceholder">
+            <div class="loader"></div>
+            <span>点击加载大纲管理</span>
+          </div>
+        </div>
       </div>
     </div>
     <!-- 人物 -->
+    <!-- 人物（完整实现） -->
     <div class="sidebar-view" id="view-characters">
-      <div class="sidebar-title"><span>人物</span></div>
+      <div class="sidebar-title"><span>人物卡</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="CharacterManager.openCreate()" title="新建人物">＋</button>
+          <button class="icon-btn" onclick="CharacterManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" style="padding:0;display:flex;flex-direction:column;height:100%;">
+        <div class="char-panel" id="charPanel">
+          <div class="panel-placeholder" id="charPlaceholder">
+            <div class="loader"></div>
+            <span>点击加载人物管理</span>
+          </div>
+        </div>
+      </div>
+    </div></div>
       <div class="sidebar-content" style="padding:10px;">
         <div class="empty-state">人物管理 — 预留 API<br><small style="color:var(--text-muted);">// TODO: GET /api/v1/characters</small></div>
       </div>
     </div>
-    <!-- 世界观 -->
+    <!-- 世界观 → 故事圣经（完整实现） -->
     <div class="sidebar-view" id="view-world">
-      <div class="sidebar-title"><span>世界观</span></div>
-      <div class="sidebar-content" style="padding:10px;">
-        <div class="empty-state">世界观管理 — 预留 API<br><small style="color:var(--text-muted);">// TODO: GET /api/v1/worlds</small></div>
+      <div class="sidebar-title"><span>故事圣经</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="BibleManager.openCreate()" title="新建条目">＋</button>
+          <button class="icon-btn" onclick="BibleManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" style="padding:0;display:flex;flex-direction:column;height:100%;">
+        <div class="bible-panel" id="biblePanel">
+          <div class="panel-placeholder" id="biblePlaceholder">
+            <div class="loader"></div>
+            <span>点击加载故事圣经</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 版本/检查点 -->
+    <div class="sidebar-view" id="view-versions">
+      <div class="sidebar-title"><span>版本历史</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="VersionManager.createCheckpoint()" title="创建检查点">＋</button>
+          <button class="icon-btn" onclick="VersionManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" style="padding:0;display:flex;flex-direction:column;height:100%;">
+        <div class="version-panel" id="versionPanel">
+          <div class="panel-placeholder" id="versionPlaceholder">
+            <div class="loader"></div>
+            <span>点击加载版本历史</span>
+          </div>
+        </div>
       </div>
     </div>
     <!-- 风格学习（原面板4） -->
@@ -2980,6 +3580,808 @@ function auditRun() {
 /* ============================================================
    IDE 命名空间 — 五区布局核心逻辑
    ============================================================ */
+
+/* ============================================================
+   新增：通用模态框辅助
+   ============================================================ */
+function openModalForm(title, bodyHtml, onSubmit, submitLabel) {
+  submitLabel = submitLabel || '保存';
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay show';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = '<div class="modal" style="width:520px;max-height:80vh;display:flex;flex-direction:column;">' +
+    '<div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);">' +
+    '<h3 style="font-size:14px;">' + esc(title) + '</h3>' +
+    '<button class="icon-btn" onclick="this.closest(\'.modal-overlay\').remove()">✕</button></div>' +
+    '<div class="modal-body" style="flex:1;overflow-y:auto;padding:16px;">' + bodyHtml + '</div>' +
+    '<div class="form-actions" style="padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;">' +
+    '<button class="btn btn-sm" onclick="this.closest(\'.modal-overlay\').remove()">取消</button>' +
+    '<button class="btn btn-primary btn-sm" id="modalSubmitBtn">' + esc(submitLabel) + '</button></div></div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  document.getElementById('modalSubmitBtn').addEventListener('click', function() {
+    var result = onSubmit(overlay);
+    if (result !== false) overlay.remove();
+  });
+  return overlay;
+}
+
+function getFormValues(overlay) {
+  var values = {};
+  overlay.querySelectorAll('[data-field]').forEach(function(el) {
+    var key = el.getAttribute('data-field');
+    if (el.type === 'checkbox') values[key] = el.checked;
+    else if (el.tagName === 'SELECT') values[key] = el.value;
+    else values[key] = el.value;
+  });
+  return values;
+}
+
+/* ============================================================
+   新增：虚拟滚动类
+   ============================================================ */
+var VirtualScroll = (function() {
+  function VirtualScroll(container, options) {
+    this.container = container;
+    this.items = options.items || [];
+    this.itemHeight = options.itemHeight || 32;
+    this.renderItem = options.renderItem || function(item, index) { return '<div>' + item + '</div>'; };
+    this.onSelect = options.onSelect || function() {};
+    this.selectedIndex = -1;
+    this.buffer = options.buffer || 5;
+    this._init();
+  }
+  VirtualScroll.prototype._init = function() {
+    var self = this;
+    this.container.style.position = 'relative';
+    this.container.style.overflowY = 'auto';
+    this.container.innerHTML = '';
+    this.content = document.createElement('div');
+    this.content.style.cssText = 'position:absolute;top:0;left:0;right:0;';
+    this.container.appendChild(this.content);
+    this._updateTotalHeight();
+    this.container.addEventListener('scroll', function() { self._render(); });
+    this._render();
+  };
+  VirtualScroll.prototype._updateTotalHeight = function() {
+    this.content.style.height = (this.items.length * this.itemHeight) + 'px';
+  };
+  VirtualScroll.prototype.setItems = function(items) {
+    this.items = items || [];
+    this.selectedIndex = -1;
+    this._updateTotalHeight();
+    this.container.scrollTop = 0;
+    this._render();
+  };
+  VirtualScroll.prototype._render = function() {
+    var scrollTop = this.container.scrollTop;
+    var viewportHeight = this.container.clientHeight;
+    var startIndex = Math.max(0, Math.floor(scrollTop / this.itemHeight) - this.buffer);
+    var endIndex = Math.min(this.items.length, Math.ceil((scrollTop + viewportHeight) / this.itemHeight) + this.buffer);
+    var html = '';
+    for (var i = startIndex; i < endIndex; i++) {
+      var item = this.items[i];
+      var top = i * this.itemHeight;
+      var selected = i === this.selectedIndex ? ' selected' : '';
+      html += '<div class="virtual-row' + selected + '" data-index="' + i + '" style="top:' + top + 'px;height:' + this.itemHeight + 'px;" onclick="VirtualScroll._handleClick(this)">' + this.renderItem(item, i) + '</div>';
+    }
+    this.content.innerHTML = html;
+  };
+  VirtualScroll._handleClick = function(el) {
+    var vs = el.closest('.virtual-scroll-host');
+    if (vs && vs._vsInstance) {
+      vs._vsInstance.selectedIndex = parseInt(el.getAttribute('data-index'));
+      vs._vsInstance._render();
+      vs._vsInstance.onSelect(vs._vsInstance.items[vs._vsInstance.selectedIndex], vs._vsInstance.selectedIndex);
+    }
+  };
+  VirtualScroll.prototype.getSelected = function() {
+    if (this.selectedIndex >= 0 && this.selectedIndex < this.items.length) {
+      return this.items[this.selectedIndex];
+    }
+    return null;
+  };
+  return VirtualScroll;
+})();
+
+function createVirtualScroll(container, options) {
+  container.classList.add('virtual-scroll-host');
+  container._vsInstance = new VirtualScroll(container, options);
+  return container._vsInstance;
+}
+
+/* ============================================================
+   新增：人物卡管理器
+   ============================================================ */
+var CharacterManager = (function() {
+  var state = {
+    loaded: false,
+    characters: [],
+    selected: null,
+    vs: null,
+  };
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    refresh();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('charPanel');
+    panel.innerHTML =
+      '<div class="char-list-section">' +
+        '<div class="char-list-header"><span>人物列表</span><span id="charCount">0</span></div>' +
+        '<div class="char-virtual-list" id="charVList"></div>' +
+      '</div>' +
+      '<div class="char-detail-section" id="charDetail">' +
+        '<div class="char-detail-empty">选择或创建人物查看详情</div>' +
+      '</div>';
+    state.vs = createVirtualScroll(document.getElementById('charVList'), {
+      itemHeight: 36,
+      items: [],
+      renderItem: function(c) {
+        return '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(c.name) + '</span>' +
+          '<span style="font-size:9px;color:var(--text-muted);flex-shrink:0;">' + esc(c.role || '') + '</span>';
+      },
+      onSelect: function(c) { state.selected = c; _renderDetail(c); },
+    });
+  }
+
+  function _renderDetail(c) {
+    var detail = document.getElementById('charDetail');
+    if (!c) { detail.innerHTML = '<div class="char-detail-empty">选择或创建人物查看详情</div>'; return; }
+    var relHtml = '';
+    if (c.relationships && c.relationships.length > 0) {
+      relHtml = '<div class="relation-graph"><div class="relation-graph-title">人物关系</div>';
+      c.relationships.forEach(function(r) {
+        relHtml += '<div class="relation-list-item"><span class="relation-target">' + esc(r.target || r.name || '') + '</span><span class="relation-type">' + esc(r.type || r.relation || '') + '</span></div>';
+      });
+      relHtml += '</div>';
+    }
+    detail.innerHTML =
+      '<div class="char-card">' +
+        '<div class="char-card-header">' +
+          '<span class="char-card-name">' + esc(c.name) + '</span>' +
+          (c.role ? '<span class="char-card-role">' + esc(c.role) + '</span>' : '') +
+        '</div>' +
+        _field('性格', c.personality) +
+        _field('外貌', c.appearance) +
+        _field('背景', c.background) +
+        _field('能力', c.abilities) +
+        _field('动机', c.motivation) +
+        _field('成长弧光', c.growth_arc) +
+        _field('备注', c.notes) +
+        relHtml +
+        '<div class="char-actions">' +
+          '<button class="btn btn-sm btn-primary" onclick="CharacterManager.openEdit(\'' + c.id + '\')">编辑</button>' +
+          '<button class="btn btn-sm" onclick="CharacterManager.deleteChar(\'' + c.id + '\')">删除</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function _field(label, value) {
+    if (!value) return '';
+    return '<div class="char-field"><div class="char-field-label">' + esc(label) + '</div><div class="char-field-value">' + esc(value) + '</div></div>';
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    apiFetch('/api/v1/workstation/characters?book_id=default', { method: 'GET' })
+      .then(function(d) {
+        if (d.success) {
+          state.characters = d.characters || [];
+          document.getElementById('charCount').textContent = state.characters.length;
+          state.vs.setItems(state.characters);
+          if (state.selected) {
+            var found = state.characters.find(function(c) { return c.id === state.selected.id; });
+            if (found) {
+              apiFetch('/api/v1/workstation/characters/' + found.id + '?book_id=default', { method: 'GET' })
+                .then(function(d2) { if (d2.success) { state.selected = d2.character; _renderDetail(d2.character); } });
+            }
+          }
+        }
+      })
+      .catch(function() {});
+  }
+
+  function openCreate() {
+    ensureLoaded();
+    var body = _formHtml({});
+    openModalForm('新建人物卡', body, function(overlay) {
+      var v = getFormValues(overlay);
+      if (!v.name) { IDE.toast('请输入人物姓名', 'error'); return false; }
+      v.relationships = v.relationships ? JSON.parse(v.relationships) : [];
+      apiFetch('/api/v1/workstation/characters', { method: 'POST', body: JSON.stringify(v) })
+        .then(function(d) { if (d.success) { IDE.toast('人物创建成功', 'success'); refresh(); } else { IDE.toast('创建失败: ' + d.error, 'error'); } });
+    }, '创建');
+  }
+
+  function openEdit(id) {
+    apiFetch('/api/v1/workstation/characters/' + id + '?book_id=default', { method: 'GET' })
+      .then(function(d) {
+        if (!d.success) { IDE.toast('加载失败', 'error'); return; }
+        var c = d.character;
+        var body = _formHtml(c);
+        openModalForm('编辑人物卡', body, function(overlay) {
+          var v = getFormValues(overlay);
+          v.relationships = v.relationships ? JSON.parse(v.relationships) : [];
+          apiFetch('/api/v1/workstation/characters/' + id, { method: 'PUT', body: JSON.stringify(v) })
+            .then(function(d2) { if (d2.success) { IDE.toast('更新成功', 'success'); state.selected = d2.character; _renderDetail(d2.character); refresh(); } else { IDE.toast('更新失败', 'error'); } });
+        }, '保存');
+      });
+  }
+
+  function _formHtml(c) {
+    c = c || {};
+    return '<div class="form-group"><label class="form-label">姓名 *</label><input class="form-input" data-field="name" value="' + esc(c.name || '') + '"></div>' +
+      '<div class="form-row"><div class="form-group"><label class="form-label">角色定位</label><input class="form-input" data-field="role" value="' + esc(c.role || '') + '" placeholder="主角/配角/反派..."></div>' +
+      '<div class="form-group"><label class="form-label">动机/目标</label><input class="form-input" data-field="motivation" value="' + esc(c.motivation || '') + '"></div></div>' +
+      '<div class="form-group"><label class="form-label">性格特征</label><textarea class="form-textarea" data-field="personality">' + esc(c.personality || '') + '</textarea></div>' +
+      '<div class="form-group"><label class="form-label">外貌描写</label><textarea class="form-textarea" data-field="appearance">' + esc(c.appearance || '') + '</textarea></div>' +
+      '<div class="form-group"><label class="form-label">背景故事</label><textarea class="form-textarea" data-field="background">' + esc(c.background || '') + '</textarea></div>' +
+      '<div class="form-group"><label class="form-label">能力/技能</label><textarea class="form-textarea" data-field="abilities">' + esc(c.abilities || '') + '</textarea></div>' +
+      '<div class="form-group"><label class="form-label">成长弧光</label><textarea class="form-textarea" data-field="growth_arc">' + esc(c.growth_arc || '') + '</textarea></div>' +
+      '<div class="form-group"><label class="form-label">人物关系 (JSON数组，如 [{"target":"张三","type":"师徒"}])</label><textarea class="form-textarea" data-field="relationships" style="font-family:monospace;font-size:11px;">' + esc(c.relationships ? JSON.stringify(c.relationships) : '[]') + '</textarea></div>' +
+      '<div class="form-group"><label class="form-label">备注</label><textarea class="form-textarea" data-field="notes">' + esc(c.notes || '') + '</textarea></div>';
+  }
+
+  function deleteChar(id) {
+    if (!confirm('确定删除该人物卡？')) return;
+    apiFetch('/api/v1/workstation/characters/' + id + '?book_id=default', { method: 'DELETE' })
+      .then(function(d) {
+        if (d.success) { IDE.toast('已删除', 'success'); state.selected = null; _renderDetail(null); refresh(); }
+        else { IDE.toast('删除失败', 'error'); }
+      });
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    openCreate: openCreate,
+    openEdit: openEdit,
+    deleteChar: deleteChar,
+  };
+})();
+
+/* ============================================================
+   新增：大纲管理器
+   ============================================================ */
+var OutlineManager = (function() {
+  var state = {
+    loaded: false,
+    nodes: [],
+    foreshadows: [],
+    activeTab: 'tree',
+    selectedNode: null,
+    collapsed: {},
+  };
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    refresh();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('outlinePanel');
+    panel.innerHTML =
+      '<div class="outline-tabs">' +
+        '<div class="outline-tab active" data-otab="tree" onclick="OutlineManager.switchTab(\'tree\')">📋 章节树</div>' +
+        '<div class="outline-tab" data-otab="foreshadow" onclick="OutlineManager.switchTab(\'foreshadow\')">🔮 伏笔</div>' +
+        '<div class="outline-tab" data-otab="template" onclick="OutlineManager.switchTab(\'template\')">📐 叙事模板</div>' +
+      '</div>' +
+      '<div class="outline-content" id="outlineContent"></div>';
+  }
+
+  function switchTab(tab) {
+    state.activeTab = tab;
+    document.querySelectorAll('.outline-tab').forEach(function(t) {
+      t.classList.toggle('active', t.getAttribute('data-otab') === tab);
+    });
+    _renderContent();
+  }
+
+  function _renderContent() {
+    var content = document.getElementById('outlineContent');
+    if (state.activeTab === 'tree') _renderTree(content);
+    else if (state.activeTab === 'foreshadow') _renderForeshadows(content);
+    else _renderTemplates(content);
+  }
+
+  function _renderTree(content) {
+    var roots = state.nodes.filter(function(n) { return !n.parent_id; });
+    roots.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+    var html = '';
+    roots.forEach(function(n) { html += _renderNode(n, 0); });
+    if (roots.length === 0) html = '<div class="empty-state" style="padding:20px;">暂无大纲节点，点击＋创建</div>';
+    content.innerHTML = html;
+  }
+
+  function _renderNode(node, depth) {
+    var children = state.nodes.filter(function(n) { return n.parent_id === node.id; });
+    children.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+    var isCollapsed = state.collapsed[node.id];
+    var typeIcons = { volume: '📚', chapter: '📄', scene: '🎬', arc: '📈' };
+    var statusClass = 'status-' + (node.status || 'draft');
+    var html = '<div class="outline-tree-node' + (isCollapsed ? ' collapsed' : '') + (state.selectedNode === node.id ? ' selected' : '') + '" onclick="OutlineManager.selectNode(\'' + node.id + '\')" style="padding-left:' + (8 + depth * 14) + 'px;">' +
+      '<span class="tree-arrow" onclick="event.stopPropagation();OutlineManager.toggleNode(\'' + node.id + '\')">' + (children.length > 0 ? '▼' : '') + '</span>' +
+      '<span class="node-type-icon">' + (typeIcons[node.node_type] || '📄') + '</span>' +
+      '<span class="node-title">' + esc(node.title) + '</span>' +
+      '<span class="node-status ' + statusClass + '">' + esc(node.status || 'draft') + '</span>' +
+      '</div>';
+    if (children.length > 0 && !isCollapsed) {
+      html += '<div class="outline-children">';
+      children.forEach(function(c) { html += _renderNode(c, depth + 1); });
+      html += '</div>';
+    }
+    return html;
+  }
+
+  function selectNode(id) {
+    state.selectedNode = id;
+    var node = state.nodes.find(function(n) { return n.id === id; });
+    if (node) {
+      var body = '<div class="form-group"><label class="form-label">标题</label><input class="form-input" data-field="title" value="' + esc(node.title) + '"></div>' +
+        '<div class="form-row"><div class="form-group"><label class="form-label">类型</label><select class="form-select" data-field="node_type"><option value="volume"' + (node.node_type === 'volume' ? ' selected' : '') + '>卷</option><option value="chapter"' + (node.node_type === 'chapter' ? ' selected' : '') + '>章</option><option value="scene"' + (node.node_type === 'scene' ? ' selected' : '') + '>场景</option><option value="arc"' + (node.node_type === 'arc' ? ' selected' : '') + '>弧线</option></select></div>' +
+        '<div class="form-group"><label class="form-label">状态</label><select class="form-select" data-field="status"><option value="draft"' + (node.status === 'draft' ? ' selected' : '') + '>草稿</option><option value="writing"' + (node.status === 'writing' ? ' selected' : '') + '>写作中</option><option value="done"' + (node.status === 'done' ? ' selected' : '') + '>完成</option></select></div></div>' +
+        '<div class="form-group"><label class="form-label">摘要</label><textarea class="form-textarea" data-field="summary">' + esc(node.summary || '') + '</textarea></div>' +
+        '<div class="form-group"><label class="form-label">情节点 (每行一个)</label><textarea class="form-textarea" data-field="plot_points_text">' + esc((node.plot_points || []).join('\n')) + '</textarea></div>' +
+        '<div class="form-row"><div class="form-group"><label class="form-label">目标字数</label><input class="form-input" type="number" data-field="word_target" value="' + (node.word_target || 0) + '"></div>' +
+        '<div class="form-group"><label class="form-label">排序</label><input class="form-input" type="number" data-field="order" value="' + (node.order || 0) + '"></div></div>';
+      openModalForm('编辑大纲节点', body, function(overlay) {
+        var v = getFormValues(overlay);
+        v.plot_points = v.plot_points_text ? v.plot_points_text.split('\n').filter(function(s) { return s.trim(); }) : [];
+        delete v.plot_points_text;
+        v.word_target = parseInt(v.word_target) || 0;
+        v.order = parseInt(v.order) || 0;
+        apiFetch('/api/v1/workstation/outline/nodes/' + id, { method: 'PUT', body: JSON.stringify(v) })
+          .then(function(d) { if (d.success) { IDE.toast('更新成功', 'success'); refresh(); } else { IDE.toast('更新失败', 'error'); } });
+      }, '保存');
+    }
+    _renderContent();
+  }
+
+  function toggleNode(id) {
+    state.collapsed[id] = !state.collapsed[id];
+    _renderContent();
+  }
+
+  function _renderForeshadows(content) {
+    var html = '<div style="margin-bottom:8px;"><button class="btn btn-sm btn-primary" onclick="OutlineManager.openCreateForeshadow()">＋ 新建伏笔</button></div>';
+    if (state.foreshadows.length === 0) {
+      html += '<div class="empty-state" style="padding:20px;">暂无伏笔</div>';
+    } else {
+      state.foreshadows.forEach(function(f) {
+        var statusColor = f.status === 'resolved' ? 'var(--success)' : (f.status === 'active' ? 'var(--warning)' : 'var(--text-muted)');
+        html += '<div class="foreshadow-item">' +
+          '<div class="foreshadow-header"><span class="foreshadow-title">' + esc(f.title) + '</span>' +
+          '<span class="foreshadow-meta" style="color:' + statusColor + ';">' + esc(f.status) + ' · ' + esc(f.importance) + '</span></div>' +
+          '<div class="foreshadow-desc">' + esc(f.description || '') + '</div>' +
+          '<div class="foreshadow-meta" style="margin-top:4px;">埋设: ' + esc(f.planted_chapter || '-') + ' | 回收: ' + esc(f.resolved_chapter || '-') + '</div>' +
+          '<div style="margin-top:6px;display:flex;gap:4px;">' +
+          '<button class="btn btn-sm" onclick="OutlineManager.toggleForeshadowStatus(\'' + f.id + '\')">切换状态</button>' +
+          '<button class="btn btn-sm" onclick="OutlineManager.deleteForeshadow(\'' + f.id + '\')">删除</button></div>' +
+          '</div>';
+      });
+    }
+    content.innerHTML = html;
+  }
+
+  function _renderTemplates(content) {
+    var templates = [
+      { name: '三幕式结构', desc: '经典戏剧结构：建置-对抗-结局', beats: ['开场', '激励事件', '第一转折点', '上升动作', '中点', '第二转折点', '高潮', '结局'] },
+      { name: '英雄之旅', desc: '坎贝尔神话学模型，12阶段英雄成长', beats: ['日常世界', '冒险召唤', '拒绝召唤', '遇见导师', '跨越门槛', '考验/盟友/敌人', '接近洞穴', '严峻考验', '奖赏', '回头路', '复活', '携药归来'] },
+      { name: '起承转合', desc: '东方传统叙事四阶段', beats: ['起（开端）', '承（发展）', '转（高潮/转折）', '合（结局）'] },
+      { name: '七点结构', desc: 'Dan Wells 七点叙事法', beats: ['钩子', '转折点1', '转折点2', '中点', '转折点3', '转折点4', '结局'] },
+    ];
+    var html = '';
+    templates.forEach(function(t) {
+      html += '<div class="story-template-card" onclick="OutlineManager.applyTemplate(\'' + esc(t.name) + '\')">' +
+        '<div class="story-template-title">' + esc(t.name) + '</div>' +
+        '<div class="story-template-desc">' + esc(t.desc) + '</div>' +
+        '<div class="story-template-beats">';
+      t.beats.forEach(function(b) { html += '<span class="template-beat">' + esc(b) + '</span>'; });
+      html += '</div></div>';
+    });
+    content.innerHTML = html;
+  }
+
+  function applyTemplate(name) {
+    IDE.toast('已应用模板: ' + name + '（可在章节树中查看）', 'info');
+    var beats = {
+      '三幕式结构': ['开场', '激励事件', '第一转折点', '上升动作', '中点', '第二转折点', '高潮', '结局'],
+      '英雄之旅': ['日常世界', '冒险召唤', '拒绝召唤', '遇见导师', '跨越门槛', '考验', '接近洞穴', '严峻考验', '奖赏', '回头路', '复活', '携药归来'],
+      '起承转合': ['起（开端）', '承（发展）', '转（高潮）', '合（结局）'],
+      '七点结构': ['钩子', '转折点1', '转折点2', '中点', '转折点3', '转折点4', '结局'],
+    };
+    var list = beats[name] || [];
+    var volId = _genId('node_');
+    apiFetch('/api/v1/workstation/outline/nodes', { method: 'POST', body: JSON.stringify({ title: name, node_type: 'volume', order: 99 }) })
+      .then(function(d) {
+        if (d.success) {
+          list.forEach(function(beat, i) {
+            apiFetch('/api/v1/workstation/outline/nodes', { method: 'POST', body: JSON.stringify({ title: beat, node_type: 'chapter', parent_id: d.id, order: i }) });
+          });
+          setTimeout(refresh, 500);
+        }
+      });
+  }
+
+  function _genId(prefix) { return prefix + '_' + Date.now(); }
+
+  function openCreateNode() {
+    ensureLoaded();
+    var body = '<div class="form-group"><label class="form-label">标题 *</label><input class="form-input" data-field="title" value=""></div>' +
+      '<div class="form-row"><div class="form-group"><label class="form-label">类型</label><select class="form-select" data-field="node_type"><option value="volume">卷</option><option value="chapter" selected>章</option><option value="scene">场景</option><option value="arc">弧线</option></select></div>' +
+      '<div class="form-group"><label class="form-label">状态</label><select class="form-select" data-field="status"><option value="draft">草稿</option><option value="writing">写作中</option><option value="done">完成</option></select></div></div>' +
+      '<div class="form-group"><label class="form-label">父节点ID (留空为顶级)</label><input class="form-input" data-field="parent_id" value=""></div>' +
+      '<div class="form-group"><label class="form-label">摘要</label><textarea class="form-textarea" data-field="summary"></textarea></div>' +
+      '<div class="form-row"><div class="form-group"><label class="form-label">目标字数</label><input class="form-input" type="number" data-field="word_target" value="0"></div>' +
+      '<div class="form-group"><label class="form-label">排序</label><input class="form-input" type="number" data-field="order" value="0"></div></div>';
+    openModalForm('新建大纲节点', body, function(overlay) {
+      var v = getFormValues(overlay);
+      if (!v.title) { IDE.toast('请输入标题', 'error'); return false; }
+      v.word_target = parseInt(v.word_target) || 0;
+      v.order = parseInt(v.order) || 0;
+      if (!v.parent_id) delete v.parent_id;
+      apiFetch('/api/v1/workstation/outline/nodes', { method: 'POST', body: JSON.stringify(v) })
+        .then(function(d) { if (d.success) { IDE.toast('创建成功', 'success'); refresh(); } else { IDE.toast('创建失败', 'error'); } });
+    }, '创建');
+  }
+
+  function openCreateForeshadow() {
+    var body = '<div class="form-group"><label class="form-label">伏笔标题 *</label><input class="form-input" data-field="title" value=""></div>' +
+      '<div class="form-group"><label class="form-label">描述</label><textarea class="form-textarea" data-field="description"></textarea></div>' +
+      '<div class="form-row"><div class="form-group"><label class="form-label">埋设章节</label><input class="form-input" data-field="planted_chapter" value=""></div>' +
+      '<div class="form-group"><label class="form-label">回收章节</label><input class="form-input" data-field="resolved_chapter" value=""></div></div>' +
+      '<div class="form-row"><div class="form-group"><label class="form-label">状态</label><select class="form-select" data-field="status"><option value="active">活跃</option><option value="resolved">已回收</option><option value="abandoned">废弃</option></select></div>' +
+      '<div class="form-group"><label class="form-label">重要性</label><select class="form-select" data-field="importance"><option value="low">低</option><option value="medium" selected>中</option><option value="high">高</option></select></div></div>';
+    openModalForm('新建伏笔', body, function(overlay) {
+      var v = getFormValues(overlay);
+      if (!v.title) { IDE.toast('请输入标题', 'error'); return false; }
+      apiFetch('/api/v1/workstation/outline/foreshadows', { method: 'POST', body: JSON.stringify(v) })
+        .then(function(d) { if (d.success) { IDE.toast('伏笔创建成功', 'success'); refresh(); } else { IDE.toast('创建失败', 'error'); } });
+    }, '创建');
+  }
+
+  function toggleForeshadowStatus(id) {
+    var fs = state.foreshadows.find(function(f) { return f.id === id; });
+    if (!fs) return;
+    var newStatus = fs.status === 'active' ? 'resolved' : 'active';
+    apiFetch('/api/v1/workstation/outline/foreshadows/' + id, { method: 'PUT', body: JSON.stringify({ status: newStatus, title: fs.title, description: fs.description || '', planted_chapter: fs.planted_chapter || '', resolved_chapter: fs.resolved_chapter || '', importance: fs.importance || 'medium' }) })
+      .then(function(d) { if (d.success) refresh(); });
+  }
+
+  function deleteForeshadow(id) {
+    if (!confirm('确定删除该伏笔？')) return;
+    apiFetch('/api/v1/workstation/outline/foreshadows/' + id + '?book_id=default', { method: 'DELETE' })
+      .then(function(d) { if (d.success) { IDE.toast('已删除', 'success'); refresh(); } });
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    apiFetch('/api/v1/workstation/outline?book_id=default', { method: 'GET' })
+      .then(function(d) {
+        if (d.success) {
+          state.nodes = d.nodes || [];
+          state.foreshadows = d.foreshadows || [];
+          _renderContent();
+        }
+      })
+      .catch(function() {});
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    switchTab: switchTab,
+    selectNode: selectNode,
+    toggleNode: toggleNode,
+    openCreateNode: openCreateNode,
+    openCreateForeshadow: openCreateForeshadow,
+    toggleForeshadowStatus: toggleForeshadowStatus,
+    deleteForeshadow: deleteForeshadow,
+    applyTemplate: applyTemplate,
+  };
+})();
+
+/* ============================================================
+   新增：版本管理器
+   ============================================================ */
+var VersionManager = (function() {
+  var state = {
+    loaded: false,
+    versions: [],
+    selected: null,
+    vs: null,
+    diffMode: false,
+    diffSelection: [],
+  };
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    refresh();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('versionPanel');
+    panel.innerHTML =
+      '<div class="version-list-section">' +
+        '<div class="char-list-header"><span>版本历史</span><span id="versionCount">0</span></div>' +
+        '<div class="version-virtual-list" id="versionVList"></div>' +
+      '</div>' +
+      '<div class="version-detail-section" id="versionDetail">' +
+        '<div class="char-detail-empty">选择版本查看详情，或创建检查点</div>' +
+      '</div>';
+    state.vs = createVirtualScroll(document.getElementById('versionVList'), {
+      itemHeight: 44,
+      items: [],
+      renderItem: function(v) {
+        return '<div class="version-info"><div class="version-label">' + esc(v.label || '未命名') + '</div>' +
+          '<div class="version-meta">' + esc(v.chapter_name || '') + ' · ' + (v.word_count || 0) + '字 · ' + esc(v.created_at || '') + '</div></div>' +
+          (v.is_checkpoint ? '<span class="version-badge">检查点</span>' : '');
+      },
+      onSelect: function(v) { state.selected = v; _renderDetail(v); },
+    });
+  }
+
+  function _renderDetail(v) {
+    var detail = document.getElementById('versionDetail');
+    if (!v) { detail.innerHTML = '<div class="char-detail-empty">选择版本查看详情</div>'; return; }
+    detail.innerHTML =
+      '<div class="char-card">' +
+        '<div class="char-card-header"><span class="char-card-name">' + esc(v.label || '未命名版本') + '</span>' +
+        (v.is_checkpoint ? '<span class="char-card-role">检查点</span>' : '') + '</div>' +
+        '<div class="char-field"><div class="char-field-label">章节</div><div class="char-field-value">' + esc(v.chapter_name || '-') + '</div></div>' +
+        '<div class="char-field"><div class="char-field-label">字数</div><div class="char-field-value">' + (v.word_count || 0) + ' 字</div></div>' +
+        '<div class="char-field"><div class="char-field-label">创建时间</div><div class="char-field-value">' + esc(v.created_at || '') + '</div></div>' +
+        '<div class="char-actions">' +
+          '<button class="btn btn-sm btn-primary" onclick="VersionManager.restore(\'' + v.id + '\')">恢复此版本</button>' +
+          '<button class="btn btn-sm" onclick="VersionManager.viewContent(\'' + v.id + '\')">查看内容</button>' +
+          '<button class="btn btn-sm" onclick="VersionManager.delete(\'' + v.id + '\')">删除</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function viewContent(id) {
+    apiFetch('/api/v1/workstation/versions/' + id + '?book_id=default', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.version) {
+          var body = '<div class="form-group"><label class="form-label">版本内容预览</label>' +
+            '<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:4px;padding:10px;max-height:400px;overflow-y:auto;font-size:12px;line-height:1.7;white-space:pre-wrap;">' + esc(d.version.content || '(空)') + '</div></div>';
+          openModalForm('版本内容 - ' + (d.version.label || ''), body, function() {}, '关闭');
+        }
+      });
+  }
+
+  function restore(id) {
+    if (!confirm('恢复到此版本将覆盖当前编辑器内容，确定继续？')) return;
+    apiFetch('/api/v1/workstation/versions/restore', { method: 'POST', body: JSON.stringify({ version_id: id }) })
+      .then(function(d) {
+        if (d.success) {
+          var taId = IDE.state.activePane === 1 ? 'editorTextarea1' : 'editorTextarea2';
+          var ta = document.getElementById(taId);
+          if (ta) { ta.value = d.content || ''; IDE.updateStatus(); }
+          IDE.toast('已恢复到版本: ' + (d.version && d.version.label || id), 'success');
+        } else { IDE.toast('恢复失败', 'error'); }
+      });
+  }
+
+  function createCheckpoint() {
+    var taId = IDE.state.activePane === 1 ? 'editorTextarea1' : 'editorTextarea2';
+    var ta = document.getElementById(taId);
+    var content = ta ? ta.value : '';
+    var chName = IDE.state.activeTabId || '未命名章节';
+    var body = '<div class="form-group"><label class="form-label">检查点标签</label><input class="form-input" data-field="label" value="手动检查点 ' + new Date().toLocaleString('zh-CN') + '"></div>' +
+      '<div class="form-group"><label class="form-label">章节名称</label><input class="form-input" data-field="chapter_name" value="' + esc(chName) + '"></div>' +
+      '<div class="form-group"><label class="form-label">内容字数</label><div style="font-size:12px;color:var(--text-secondary);">' + content.length + ' 字</div></div>';
+    openModalForm('创建检查点', body, function(overlay) {
+      var v = getFormValues(overlay);
+      v.content = content;
+      v.chapter_id = IDE.state.activeTabId || '';
+      v.word_count = content.length;
+      apiFetch('/api/v1/workstation/versions/checkpoint', { method: 'POST', body: JSON.stringify(v) })
+        .then(function(d) { if (d.success) { IDE.toast('检查点创建成功', 'success'); refresh(); } else { IDE.toast('创建失败', 'error'); } });
+    }, '创建');
+  }
+
+  function delete(id) {
+    if (!confirm('确定删除该版本？')) return;
+    apiFetch('/api/v1/workstation/versions/' + id + '?book_id=default', { method: 'DELETE' })
+      .then(function(d) { if (d.success) { IDE.toast('已删除', 'success'); state.selected = null; _renderDetail(null); refresh(); } });
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    apiFetch('/api/v1/workstation/versions?book_id=default', { method: 'GET' })
+      .then(function(d) {
+        if (d.success) {
+          state.versions = d.versions || [];
+          document.getElementById('versionCount').textContent = state.versions.length;
+          state.vs.setItems(state.versions);
+        }
+      })
+      .catch(function() {});
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    createCheckpoint: createCheckpoint,
+    restore: restore,
+    viewContent: viewContent,
+    delete: delete,
+  };
+})();
+
+/* ============================================================
+   新增：故事圣经管理器
+   ============================================================ */
+var BibleManager = (function() {
+  var state = {
+    loaded: false,
+    sections: {},
+    activeSection: 'worldview',
+    sectionDefs: [
+      { key: 'worldview', label: '🌍 世界观' },
+      { key: 'power_system', label: '⚡ 力量体系' },
+      { key: 'geography', label: '🗺️ 地理' },
+      { key: 'factions', label: '🏛️ 势力' },
+      { key: 'timeline', label: '📅 时间线' },
+      { key: 'notes', label: '📝 备注' },
+    ],
+  };
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    refresh();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('biblePanel');
+    var tabsHtml = state.sectionDefs.map(function(s) {
+      return '<div class="bible-section-tab' + (s.key === state.activeSection ? ' active' : '') + '" onclick="BibleManager.switchSection(\'' + s.key + '\')">' + s.label + '</div>';
+    }).join('');
+    panel.innerHTML =
+      '<div class="bible-section-tabs">' + tabsHtml + '</div>' +
+      '<div class="bible-content" id="bibleContent"></div>';
+  }
+
+  function switchSection(key) {
+    state.activeSection = key;
+    document.querySelectorAll('.bible-section-tab').forEach(function(t) {
+      t.classList.toggle('active', t.getAttribute('onclick').indexOf(key) !== -1);
+    });
+    _renderContent();
+  }
+
+  function _renderContent() {
+    var content = document.getElementById('bibleContent');
+    var items = state.sections[state.activeSection] || [];
+    if (items.length === 0) {
+      content.innerHTML = '<div class="empty-state" style="padding:20px;">暂无条目，点击＋创建</div>';
+      return;
+    }
+    var html = '';
+    items.forEach(function(item) {
+      var tagsHtml = '';
+      if (item.tags && item.tags.length > 0) {
+        tagsHtml = '<div class="bible-item-tags">';
+        item.tags.forEach(function(t) { tagsHtml += '<span class="bible-tag">' + esc(t) + '</span>'; });
+        tagsHtml += '</div>';
+      }
+      html += '<div class="bible-item">' +
+        '<div class="bible-item-header"><span class="bible-item-title">' + esc(item.title || '未命名') + '</span>' +
+        '<div style="display:flex;gap:4px;">' +
+        '<button class="icon-btn" style="width:20px;height:20px;font-size:11px;" onclick="BibleManager.openEdit(\'' + item.id + '\')" title="编辑">✏️</button>' +
+        '<button class="icon-btn" style="width:20px;height:20px;font-size:11px;" onclick="BibleManager.deleteItem(\'' + item.id + '\')" title="删除">🗑️</button>' +
+        '</div></div>' +
+        (item.content ? '<div class="bible-item-content">' + esc(item.content) + '</div>' : '') +
+        tagsHtml +
+        '</div>';
+    });
+    content.innerHTML = html;
+  }
+
+  function openCreate() {
+    ensureLoaded();
+    var sectionLabels = {};
+    state.sectionDefs.forEach(function(s) { sectionLabels[s.key] = s.label; });
+    var body = '<div class="form-group"><label class="form-label">板块</label><select class="form-select" data-field="section">' +
+      state.sectionDefs.map(function(s) { return '<option value="' + s.key + '"' + (s.key === state.activeSection ? ' selected' : '') + '>' + s.label + '</option>'; }).join('') +
+      '</select></div>' +
+      '<div class="form-group"><label class="form-label">标题</label><input class="form-input" data-field="title" value=""></div>' +
+      '<div class="form-group"><label class="form-label">内容</label><textarea class="form-textarea" data-field="content" style="min-height:120px;"></textarea></div>' +
+      '<div class="form-group"><label class="form-label">标签 (逗号分隔)</label><input class="form-input" data-field="tags_text" value=""></div>';
+    openModalForm('新建圣经条目', body, function(overlay) {
+      var v = getFormValues(overlay);
+      v.tags = v.tags_text ? v.tags_text.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; }) : [];
+      delete v.tags_text;
+      apiFetch('/api/v1/workstation/bible/items', { method: 'POST', body: JSON.stringify(v) })
+        .then(function(d) { if (d.success) { IDE.toast('创建成功', 'success'); state.activeSection = v.section; refresh(); } else { IDE.toast('创建失败', 'error'); } });
+    }, '创建');
+  }
+
+  function openEdit(id) {
+    var item = null;
+    for (var key in state.sections) {
+      var found = state.sections[key].find(function(i) { return i.id === id; });
+      if (found) { item = found; break; }
+    }
+    if (!item) return;
+    var body = '<div class="form-group"><label class="form-label">板块</label><select class="form-select" data-field="section">' +
+      state.sectionDefs.map(function(s) { return '<option value="' + s.key + '"' + (s.key === item.section ? ' selected' : '') + '>' + s.label + '</option>'; }).join('') +
+      '</select></div>' +
+      '<div class="form-group"><label class="form-label">标题</label><input class="form-input" data-field="title" value="' + esc(item.title || '') + '"></div>' +
+      '<div class="form-group"><label class="form-label">内容</label><textarea class="form-textarea" data-field="content" style="min-height:120px;">' + esc(item.content || '') + '</textarea></div>' +
+      '<div class="form-group"><label class="form-label">标签 (逗号分隔)</label><input class="form-input" data-field="tags_text" value="' + esc((item.tags || []).join(',')) + '"></div>';
+    openModalForm('编辑圣经条目', body, function(overlay) {
+      var v = getFormValues(overlay);
+      v.tags = v.tags_text ? v.tags_text.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; }) : [];
+      delete v.tags_text;
+      apiFetch('/api/v1/workstation/bible/items/' + id, { method: 'PUT', body: JSON.stringify(v) })
+        .then(function(d) { if (d.success) { IDE.toast('更新成功', 'success'); refresh(); } else { IDE.toast('更新失败', 'error'); } });
+    }, '保存');
+  }
+
+  function deleteItem(id) {
+    if (!confirm('确定删除该条目？')) return;
+    apiFetch('/api/v1/workstation/bible/items/' + id + '?book_id=default', { method: 'DELETE' })
+      .then(function(d) { if (d.success) { IDE.toast('已删除', 'success'); refresh(); } });
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    apiFetch('/api/v1/workstation/bible?book_id=default', { method: 'GET' })
+      .then(function(d) {
+        if (d.success) {
+          state.sections = d.sections || {};
+          _renderContent();
+        }
+      })
+      .catch(function() {});
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    switchSection: switchSection,
+    openCreate: openCreate,
+    openEdit: openEdit,
+    deleteItem: deleteItem,
+  };
+})();
+
+/* ============================================================
+   新增：懒加载集成 — 重写 switchView
+   ============================================================ */
+var _originalSwitchView = null;
+function initLazyLoading() {
+  // 面板懒加载映射
+  var lazyPanels = {
+    characters: CharacterManager.ensureLoaded,
+    outline: OutlineManager.ensureLoaded,
+    world: BibleManager.ensureLoaded,
+    versions: VersionManager.ensureLoaded,
+  };
+  // 包装 switchView
+  var origSwitch = IDE.switchView;
+  IDE.switchView = function(view) {
+    origSwitch(view);
+    if (lazyPanels[view]) {
+      setTimeout(function() { lazyPanels[view](); }, 50);
+    }
+  };
+}
+
+
 var IDE = (function() {
   /* ---------- 状态 ---------- */
   var state = {
@@ -3047,6 +4449,15 @@ var IDE = (function() {
     { group: '视图', icon: '⧉', name: '左右分屏', shortcut: 'Ctrl+\\', action: function() { toggleSplit(); } },
     { group: '视图', icon: '🎯', name: '专注模式', shortcut: 'F11', action: function() { toggleFocus(); } },
     { group: '视图', icon: '⌨️', name: '快捷键列表', shortcut: '', action: function() { showShortcuts(); } },
+    { group: '人物', icon: '👤', name: '人物卡管理', shortcut: '', action: function() { switchView('characters'); } },
+    { group: '人物', icon: '➕', name: '新建人物卡', shortcut: '', action: function() { switchView('characters'); setTimeout(function(){ CharacterManager.openCreate(); }, 200); } },
+    { group: '大纲', icon: '📋', name: '大纲结构', shortcut: '', action: function() { switchView('outline'); } },
+    { group: '大纲', icon: '➕', name: '新建大纲节点', shortcut: '', action: function() { switchView('outline'); setTimeout(function(){ OutlineManager.openCreateNode(); }, 200); } },
+    { group: '大纲', icon: '🔮', name: '伏笔管理', shortcut: '', action: function() { switchView('outline'); setTimeout(function(){ OutlineManager.switchTab('foreshadow'); }, 200); } },
+    { group: '版本', icon: '🕐', name: '版本历史', shortcut: '', action: function() { switchView('versions'); } },
+    { group: '版本', icon: '💾', name: '创建检查点', shortcut: '', action: function() { switchView('versions'); setTimeout(function(){ VersionManager.createCheckpoint(); }, 200); } },
+    { group: '圣经', icon: '📖', name: '故事圣经', shortcut: '', action: function() { switchView('world'); } },
+    { group: '圣经', icon: '➕', name: '新建圣经条目', shortcut: '', action: function() { switchView('world'); setTimeout(function(){ BibleManager.openCreate(); }, 200); } },
   ];
 
   /* ---------- 日志 ---------- */
@@ -3079,7 +4490,7 @@ var IDE = (function() {
   function switchView(view) {
     var sidebar = document.getElementById('sidebar');
     // 如果点击当前活动视图且侧边栏未折叠，则折叠
-    if (state.currentView === view && !state.sidebarCollapsed && ['explorer','search','outline','characters','world','style','memory'].indexOf(view) !== -1) {
+    if (state.currentView === view && !state.sidebarCollapsed && ['explorer','search','outline','characters','world','versions','style','memory'].indexOf(view) !== -1) {
       toggleSidebar();
       return;
     }
@@ -3714,6 +5125,7 @@ var IDE = (function() {
     renderChapterTree();
     initResizers();
     initShortcuts();
+    initLazyLoading();
     log('System', '昆仑创作引擎 IDE 工作台已加载', 'success');
     log('System', '五区布局就绪：活动栏 | 侧边栏 | 编辑区 | 底部面板 | 状态栏', 'info');
     log('System', '7个功能面板已整合：创作→AI对话 | 质量/AI率/辩论→审校结果 | 风格/记忆→侧边栏 | 导出→命令面板', 'info');
@@ -3756,6 +5168,7 @@ var IDE = (function() {
     doSearch: doSearch,
     log: log,
     toast: toast,
+    state: state,
     init: init
   };
 })();

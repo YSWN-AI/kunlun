@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 四层记忆 L1-L2 增强测试
 
@@ -22,11 +21,9 @@
 """
 
 import asyncio
-import os
 import tempfile
 import time
-
-import pytest
+from pathlib import Path
 
 from kunlun.memory import (
     EbbinghausForgetting,
@@ -37,10 +34,8 @@ from kunlun.memory import (
     MemoryItem,
     MemoryManager,
     SummaryTree,
-    SummaryTreeNode,
     WorkingMemory,
 )
-
 
 # ══════════════════════════════════════════════════════
 # SummaryTree 测试
@@ -319,7 +314,11 @@ class TestEventExtractor:
     def test_extract_battle_event(self):
         """测试战斗事件提取"""
         extractor = EventExtractor()
-        text = "林天道拔剑出鞘，剑光如练。\n\n他一剑斩出，剑气轰然爆发，将敌人碾压成碎片。这一击秒杀了三名修士，战斗瞬间结束。"
+        text = (
+            "林天道拔剑出鞘，剑光如练。\n\n"
+            "他一剑斩出，剑气轰然爆发，将敌人碾压成碎片。"
+            "这一击秒杀了三名修士，战斗瞬间结束。"
+        )
         events = extractor.extract_events(text, chapter=1)
         assert len(events) > 0
         assert any(e["event_type"] == "battle" for e in events)
@@ -556,7 +555,7 @@ class TestEpisodicMemoryEnhanced:
             filepath = f.name
         try:
             em.save(filepath)
-            assert os.path.exists(filepath)
+            assert Path(filepath).exists()
 
             em2 = EpisodicMemory()
             em2.load(filepath)
@@ -564,7 +563,7 @@ class TestEpisodicMemoryEnhanced:
             assert em2.events[0].id == "persist_test"
             assert em2.summary_tree is not None
         finally:
-            os.unlink(filepath)
+            Path(filepath).unlink()
 
 
 # ══════════════════════════════════════════════════════
@@ -641,7 +640,7 @@ class TestMemoryManagerEnhanced:
             assert len(mm2.semantic.entities) > 0
             assert "测试者" in mm2.working.character_states
         finally:
-            os.unlink(filepath)
+            Path(filepath).unlink()
 
 
 # ══════════════════════════════════════════════════════

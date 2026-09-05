@@ -2,10 +2,9 @@
 
 import pytest
 
-pytestmark = pytest.mark.unit
-
 from kunlun.audit.post_write_validator import PostWriteValidator, validate_draft
 
+pytestmark = pytest.mark.unit
 
 class TestPostWriteValidator:
     def setup_method(self):
@@ -30,7 +29,11 @@ class TestPostWriteValidator:
 
     def test_cliche_text_fails(self):
         """高套话密度文本应标记失败"""
-        text = "他仿佛突然明白了什么，竟然不禁笑了起来。\n\n他似乎忽然想起什么，猛地站了起来。\n\n宛如晴天霹雳，他好像突然被击中。"
+        text = (
+            "他仿佛突然明白了什么，竟然不禁笑了起来。\n\n"
+            "他似乎忽然想起什么，猛地站了起来。\n\n"
+            "宛如晴天霹雳，他好像突然被击中。"
+        )
         report = self.validator.validate(text)
         assert any("套话" in r.rule_name and not r.passed for r in report.results), "套话检测应触发"
 
@@ -51,7 +54,10 @@ class TestPostWriteValidator:
 
     def test_ai_ending_fails(self):
         """AI套话结尾检测"""
-        text = "这是开头的段落。\n\n这是中间的段落。\n\n这一切才刚刚开始，真正的考验还在后面等待着他们。"
+        text = (
+            "这是开头的段落。\n\n这是中间的段落。\n\n"
+            "这一切才刚刚开始，真正的考验还在后面等待着他们。"
+        )
         report = self.validator.validate(text)
         ai_result = [r for r in report.results if r.rule_name == "AI套话结尾"]
         assert ai_result and not ai_result[0].passed, "AI套话结尾应触发"

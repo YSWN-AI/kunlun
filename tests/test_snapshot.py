@@ -2,16 +2,15 @@
 测试: KG Snapshot 快照管理器
 """
 
-import pytest
-
-pytestmark = pytest.mark.integration
-
 import shutil
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from kunlun.kg.snapshot import KGSnapshot, SnapshotManager
 
+pytestmark = pytest.mark.integration
 
 class TestKGSnapshot:
     """快照数据结构"""

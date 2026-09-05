@@ -4,10 +4,9 @@
 
 import pytest
 
-pytestmark = pytest.mark.unit
-
 from kunlun.agents.architect import Architect
 
+pytestmark = pytest.mark.unit
 
 class TestArchitectBlueprint:
     """蓝图生成核心逻辑"""

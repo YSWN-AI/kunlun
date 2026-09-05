@@ -6,13 +6,13 @@ import pytest
 
 pytestmark = pytest.mark.integration
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, patch  # noqa: E402
 
-from kunlun.agents.sociologist import (
+from kunlun.agents.sociologist import (  # noqa: E402
     SocietyResult,
     SociologistAgent,
 )
-from kunlun.prompts.society import (
+from kunlun.prompts.society import (  # noqa: E402
     PROMPT_PARAMS,
     SOCIETY_PROMPTS,
     _lazy_load_extensions,

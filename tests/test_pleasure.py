@@ -6,7 +6,7 @@ import pytest
 
 pytestmark = pytest.mark.unit
 
-from kunlun.pleasure.engine import (
+from kunlun.pleasure.engine import (  # noqa: E402
     ArcPhase,
     PleasureArcPlan,
     PleasureArcPlanner,

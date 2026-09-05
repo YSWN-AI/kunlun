@@ -25,7 +25,7 @@ _gen_rate_limit = (
 async def stream_generate(
     book_id: str,
     chapter: int,
-    request: Request = None,  # type: ignore[assignment]
+    request: Request = None,  # type: ignore[assignment]  # noqa: ARG001
     prompt: str = "",
     mode: str = "single_fix",
     agent: str = "writer",

@@ -327,7 +327,8 @@ def _detect_logic_issues(text: str) -> tuple[float, list[str]]:
             if len(unique_nums) >= 2:
                 # 多个不同数字可能是正常的（不同场景），但需要提醒
                 issues.append(
-                    f"文本中出现{label}的多个不同数值({', '.join(sorted(unique_nums))})，需确认一致性"
+                    f"文本中出现{label}的多个不同数值"
+                    f"({', '.join(sorted(unique_nums))})，需确认一致性"
                 )
                 penalty += 0.03
                 break
@@ -342,7 +343,7 @@ def _detect_logic_issues(text: str) -> tuple[float, list[str]]:
     return min(0.20, penalty), issues[:5]
 
 
-def _generate_suggestions(dim: str, score: float, issues: list[str]) -> list[str]:
+def _generate_suggestions(dim: str, score: float, _issues: list[str]) -> list[str]:
     if score >= 0.85:
         return ["表现优秀，保持当前风格"]
     tips = {

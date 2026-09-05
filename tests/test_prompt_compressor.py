@@ -85,7 +85,7 @@ class TestPromptCompressor:
         assert result[0]["role"] == "system"
         assert result[1]["role"] == "user"
 
-    def test_preserve_patterns_registered(self, compressor):
+    def test_preserve_patterns_registered(self, compressor):  # noqa: ARG002
         """验证保留模式列表非空"""
         from kunlun.prompt_compressor import PromptCompressor
 

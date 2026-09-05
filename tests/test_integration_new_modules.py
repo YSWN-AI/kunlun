@@ -2,8 +2,6 @@
 
 import pytest
 
-pytestmark = pytest.mark.unit
-
 from kunlun.audit.ai_features import calculate_ai_score
 from kunlun.audit.output_contract import OutputContractValidator
 from kunlun.audit.post_write_validator import PostWriteValidator
@@ -11,6 +9,7 @@ from kunlun.context.budget import ContextBudgetAllocator
 from kunlun.gacha.param_variator import ParamVariator
 from kunlun.style.refiner import TextRefiner
 
+pytestmark = pytest.mark.unit
 
 class TestNewModulesIntegration:
     def test_ai_features_detect_ai_text(self):

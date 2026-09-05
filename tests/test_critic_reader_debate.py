@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -30,9 +30,9 @@ from kunlun.agents.debate_orchestrator import (
 )
 from kunlun.agents.message_bus import message_bus
 from kunlun.agents.reader import (
+    EXTENDED_READER_PROFILES,
     EnhancedReaderFeedback,
     ExtendedReaderType,
-    EXTENDED_READER_PROFILES,
     ReaderAgent,
 )
 from kunlun.debate_review.engine import (
@@ -312,7 +312,10 @@ def test_extended_reader_profiles_count():
 
 def test_extended_reader_profile_fields():
     """每种读者画像应包含必要字段"""
-    required_fields = ["name", "description", "cool_threshold", "patience", "pacing_preference", "forgiveness"]
+    required_fields = [
+        "name", "description", "cool_threshold", "patience",
+        "pacing_preference", "forgiveness",
+    ]
     for rtype, profile in EXTENDED_READER_PROFILES.items():
         for field_name in required_fields:
             assert field_name in profile, f"{rtype} 缺少字段 {field_name}"
@@ -711,7 +714,9 @@ def test_enhanced_reader_feedback_conversion():
         reader_name="小白读者",
         overall_score=7.5,
         continue_reading=True,
-        emotional_timeline=[{"paragraph_index": 0, "emotion_type": "兴奋", "intensity": 0.8, "snippet": "test"}],
+        emotional_timeline=[
+            {"paragraph_index": 0, "emotion_type": "兴奋", "intensity": 0.8, "snippet": "test"}
+        ],
     )
     rf = feedback.to_reader_feedback()
     assert rf.overall_score == 7.5

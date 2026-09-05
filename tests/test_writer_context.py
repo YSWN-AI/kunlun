@@ -9,7 +9,7 @@ import pytest
 
 pytestmark = pytest.mark.integration
 
-from kunlun.writer_context import (
+from kunlun.writer_context import (  # noqa: E402
     ChapterMemory,
     ChapterRanker,
     ContextAssembler,

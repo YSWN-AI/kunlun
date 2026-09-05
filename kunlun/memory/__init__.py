@@ -16,7 +16,12 @@ Usage:
         chapter=1,
         content="第一章内容...",
         summary="第一章摘要...",
-        events=[{"scene": "初登场", "summary": "...", "participants": ["主角"], "event_type": "transition"}],
+        events=[
+            {
+                "scene": "初登场", "summary": "...",
+                "participants": ["主角"], "event_type": "transition",
+            }
+        ],
         entities=[{"name": "主角", "entity_type": "character", "description": "..."}],
     )
 

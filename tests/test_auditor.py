@@ -4,10 +4,9 @@
 
 import pytest
 
-pytestmark = pytest.mark.unit
-
 from kunlun.agents.auditor import Auditor
 
+pytestmark = pytest.mark.unit
 
 class TestAuditorGateG1:
     """G1 弧线阶段审计"""
@@ -46,7 +45,10 @@ class TestAuditorGateG2:
         return Auditor()
 
     def test_normal_density(self, auditor):
-        text = "他去见了李师傅。李师傅是个退休的老木匠，手艺极好。师徒二人打了招呼，寒暄几句，便进了木工坊。"
+        text = (
+            "他去见了李师傅。李师傅是个退休的老木匠，手艺极好。"
+            "师徒二人打了招呼，寒暄几句，便进了木工坊。"
+        )
         result = auditor._audit_info_release(text)
         assert result["level"] == "PASS"
 

@@ -17,21 +17,16 @@
 """
 
 import json
-import os
 import tempfile
+from pathlib import Path
 
-import pytest
-
+from kunlun.style.drift_detector import DriftReport, StyleDriftDetector, drift_detector
 from kunlun.style.fingerprint import (
-    StyleAnalyzer,
     StyleFingerprint,
-    StyleInjector,
     style_analyzer,
     style_injector,
 )
 from kunlun.style.library import StyleLibrary, style_library
-from kunlun.style.drift_detector import DriftReport, StyleDriftDetector, drift_detector
-
 
 # ── 测试文本 ──
 
@@ -390,12 +385,14 @@ class TestStyleLibrary:
         fp = style_analyzer.analyze(LONG_STYLE_TEXT, name="saved_style")
         lib.add(fp)
 
-        with tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode="w", encoding="utf-8") as f:
+        with tempfile.NamedTemporaryFile(
+            suffix=".json", delete=False, mode="w", encoding="utf-8"
+        ) as f:
             filepath = f.name
 
         try:
             lib.save(filepath)
-            assert os.path.exists(filepath)
+            assert Path(filepath).exists()
 
             lib2 = StyleLibrary()
             lib2.load(filepath)
@@ -404,8 +401,8 @@ class TestStyleLibrary:
             assert loaded_fp is not None
             assert loaded_fp.avg_sentence_length > 0
         finally:
-            if os.path.exists(filepath):
-                os.unlink(filepath)
+            if Path(filepath).exists():
+                Path(filepath).unlink()
 
     def test_add_empty_name_skipped(self):
         lib = StyleLibrary()
@@ -571,7 +568,7 @@ class TestBackwardCompatibility:
     def test_save_load_fingerprint_new_fields(self):
         """save/load 应正确处理新增字段"""
         fp = style_analyzer.analyze(LONG_STYLE_TEXT, name="save_test")
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory():
             # 直接测试 JSON 序列化/反序列化
             data = {k: v for k, v in fp.__dict__.items() if not k.startswith("_")}
             if "top_words" in data:
@@ -579,8 +576,9 @@ class TestBackwardCompatibility:
             json_str = json.dumps(data, ensure_ascii=False)
             loaded_data = json.loads(json_str)
             fp2 = StyleFingerprint()
-            for k, v in loaded_data.items():
+            for k, raw_v in loaded_data.items():
                 if hasattr(fp2, k):
+                    v = raw_v
                     if k == "top_words" and isinstance(v, list):
                         v = [(item[0], item[1]) for item in v if isinstance(item, list)]
                     setattr(fp2, k, v)

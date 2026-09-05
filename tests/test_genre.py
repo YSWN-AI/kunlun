@@ -6,7 +6,7 @@ import pytest
 
 pytestmark = pytest.mark.unit
 
-from kunlun.genre.engine import (
+from kunlun.genre.engine import (  # noqa: E402
     TOP10_TEMPLATES,
     GenreCategory,
     GenreConfig,

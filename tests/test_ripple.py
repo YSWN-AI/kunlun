@@ -8,7 +8,7 @@ import pytest
 
 pytestmark = pytest.mark.integration
 
-from kunlun.ripple.detector import (
+from kunlun.ripple.detector import (  # noqa: E402
     RippleDetector,
     RippleImpact,
     RippleReport,

@@ -871,7 +871,7 @@ class GachaEngine:
             meta_path = Path(info.path) / "metadata.json"
             base_model_path = ""
             if meta_path.exists():
-                with open(meta_path, encoding="utf-8") as f:
+                with meta_path.open(encoding="utf-8") as f:
                     meta = json.load(f)
                 base_model_path = meta.get("base_model_path", "")
 

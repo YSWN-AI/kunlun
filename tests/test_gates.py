@@ -6,7 +6,7 @@ import pytest
 
 pytestmark = pytest.mark.unit
 
-from kunlun.audit.gates import (
+from kunlun.audit.gates import (  # noqa: E402
     AuditResult,
     GateG1Arc,
     GateG2InfoRelease,
@@ -16,7 +16,6 @@ from kunlun.audit.gates import (
     GateG6EmotionConsistency,
     GateG7DialogueEffectiveness,
     GateG8BattleRhythm,
-    GateG9AIRate,
     GateLevel,
     GateResult,
     audit_gates,

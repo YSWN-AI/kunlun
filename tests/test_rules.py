@@ -9,7 +9,7 @@ import pytest
 
 pytestmark = pytest.mark.integration
 
-from kunlun.rules.engine import (
+from kunlun.rules.engine import (  # noqa: E402
     UNIVERSAL_RULES,
     Rule,
     RuleCategory,

@@ -12,13 +12,13 @@ class TestLLMCache:
 
     @pytest.fixture
     def cache(self):
-        from kunlun.llm_cache import CacheMode, LLMCache
-
         # 清理持久化 SQLite 缓存，保证测试隔离
         # （Redis 不可用时 LLMCache 会走 SQLite 降级路径，残留数据会导致
         #  test_cache_miss 误命中上一次运行写入的条目）
         import sqlite3
         from pathlib import Path
+
+        from kunlun.llm_cache import CacheMode, LLMCache
 
         db_path = Path(__file__).resolve().parents[1] / "data" / "llm_cache.db"
         try:

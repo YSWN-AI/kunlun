@@ -582,7 +582,7 @@ class LLMCache:
         # 降级：简易 Jaccard 字符相似度
         return self._semantic_match_jaccard(query, threshold)
 
-    def _semantic_match_qdrant(self, query: str, threshold: float) -> CacheEntry | None:
+    def _semantic_match_qdrant(self, query: str, _threshold: float) -> CacheEntry | None:
         """使用 Qdrant 向量检索进行语义匹配"""
         from kunlun.kg.embedder import embedder
 
@@ -743,7 +743,7 @@ _llm_cache_instance: LLMCache | None = None
 
 def get_llm_cache() -> LLMCache:
     """获取全局单例（懒加载，首次调用时才初始化连接）"""
-    global _llm_cache_instance
+    global _llm_cache_instance  # noqa: PLW0603
     if _llm_cache_instance is None:
         _llm_cache_instance = LLMCache()
     return _llm_cache_instance

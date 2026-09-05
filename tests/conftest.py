@@ -13,7 +13,7 @@ project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root))
 
 
-def pytest_configure(config):
+def pytest_configure(config):  # noqa: ARG001
     """测试启动前：禁用速率限制，避免 TestClient 触发 slowapi 异常"""
     os.environ.setdefault("KUNLUN_RATE_LIMIT_PER_MINUTE", "0")
     from kunlun.config import settings
@@ -24,7 +24,7 @@ def pytest_configure(config):
 
 
 @pytest.fixture(autouse=True)
-def reset_singletons():
+def reset_singletons():  # noqa: PLR0912, PLR0915
     """每个测试后重置单例状态"""
     yield
     # 重置 KGClient 单例

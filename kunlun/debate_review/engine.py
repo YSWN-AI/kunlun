@@ -243,7 +243,7 @@ class RuleBasedQualityChecker:
         (r"修为.*炼气", r"修为.*筑基"),
     ]
 
-    def check(self, text: str, chapter: int = 0) -> list[ReviewIssue]:
+    def check(self, text: str, _chapter: int = 0) -> list[ReviewIssue]:
         issues = []
         sentences = re.split(r"(?<=[。！？])", text)
         sentences = [s.strip() for s in sentences if s.strip()]
@@ -286,7 +286,10 @@ class RuleBasedQualityChecker:
                         dimension=ReviewDimension.PACING,
                         severity=3,
                         location="全章",
-                        description=f"节奏拖沓：平均句长{avg_sentence_len:.0f}字，长句占比{long_ratio * 100:.0f}%",
+                        description=(
+                            f"节奏拖沓：平均句长{avg_sentence_len:.0f}字，"
+                            f"长句占比{long_ratio * 100:.0f}%"
+                        ),
                         suggestion="拆分长句，增加短句和对话，提升节奏",
                     )
                 )
@@ -443,7 +446,7 @@ class DebateReviewEngine:
         self.rule_checker = RuleBasedQualityChecker()
 
     def review(
-        self, text: str, chapter: int = 0, context: str = "", target_score: float = 85.0
+        self, text: str, chapter: int = 0, _context: str = "", target_score: float = 85.0
     ) -> DebateReviewResult:
         # 1. 规则-based初筛
         rule_issues = self.rule_checker.check(text, chapter)
@@ -455,7 +458,7 @@ class DebateReviewEngine:
         agreed_count = 0
 
         for issue in debate_issues[: self.max_rounds * 2]:  # 限制辩论数量
-            round_result = self._conduct_debate(issue, text, context)
+            round_result = self._conduct_debate(issue)
             debate_rounds.append(round_result)
             if round_result.issue_resolved:
                 issue.agreed = True
@@ -468,7 +471,7 @@ class DebateReviewEngine:
         total_score = self._calculate_total_score(dimension_scores, all_issues)
 
         # 5. 生成修订优先级
-        revision_priority = self._generate_revision_priority(all_issues, total_score, target_score)
+        revision_priority = self._generate_revision_priority(all_issues)
 
         # 6. 生成摘要
         summary = self._generate_summary(total_score, all_issues, target_score)
@@ -484,7 +487,7 @@ class DebateReviewEngine:
             summary=summary,
         )
 
-    def _conduct_debate(self, issue: ReviewIssue, text: str, context: str) -> DebateRound:
+    def _conduct_debate(self, issue: ReviewIssue) -> DebateRound:
         """进行一轮辩论"""
         # 反方论点（基于规则检测结果）
         critic_argument = (
@@ -493,7 +496,7 @@ class DebateReviewEngine:
         )
 
         # 正方回应（规则-based，判断问题是否成立）
-        defender_argument = self._generate_defense(issue, text)
+        defender_argument = self._generate_defense(issue)
 
         # 裁决（基于问题严重度和证据强度）
         is_valid = issue.severity >= 2 and len(issue.description) > 10
@@ -507,14 +510,29 @@ class DebateReviewEngine:
             issue_resolved=is_valid,
         )
 
-    def _generate_defense(self, issue: ReviewIssue, text: str) -> str:
+    def _generate_defense(self, issue: ReviewIssue) -> str:
         """生成正方辩护（规则-based）"""
         defenses = {
-            ReviewDimension.COOL_POINT: "正方认为：本章侧重铺垫和人物塑造，爽点将在后续章节集中爆发，当前密度合理。",
-            ReviewDimension.PACING: "正方认为：当前节奏符合情节需要，长句用于营造氛围，短句用于紧张场景，节奏变化合理。",
-            ReviewDimension.WRITING_QUALITY: "正方认为：相关用语是作者风格的一部分，不影响阅读体验，可保留。",
-            ReviewDimension.EMOTIONAL_ENGAGEMENT: "正方认为：情感表达偏向内敛，通过动作和细节间接传达，符合人物性格。",
-            ReviewDimension.PLOT_LOGIC: "正方认为：章末留白是有意为之，给读者想象空间，不一定要设置显性悬念。",
+            ReviewDimension.COOL_POINT: (
+                "正方认为：本章侧重铺垫和人物塑造，"
+                "爽点将在后续章节集中爆发，当前密度合理。"
+            ),
+            ReviewDimension.PACING: (
+                "正方认为：当前节奏符合情节需要，"
+                "长句用于营造氛围，短句用于紧张场景，节奏变化合理。"
+            ),
+            ReviewDimension.WRITING_QUALITY: (
+                "正方认为：相关用语是作者风格的一部分，"
+                "不影响阅读体验，可保留。"
+            ),
+            ReviewDimension.EMOTIONAL_ENGAGEMENT: (
+                "正方认为：情感表达偏向内敛，"
+                "通过动作和细节间接传达，符合人物性格。"
+            ),
+            ReviewDimension.PLOT_LOGIC: (
+                "正方认为：章末留白是有意为之，"
+                "给读者想象空间，不一定要设置显性悬念。"
+            ),
         }
         return defenses.get(issue.dimension, "正方认为：该问题影响较小，不影响整体质量。")
 
@@ -546,7 +564,7 @@ class DebateReviewEngine:
         return round(final_score, 1)
 
     def _generate_revision_priority(
-        self, issues: list[ReviewIssue], current_score: float, target_score: float
+        self, issues: list[ReviewIssue]
     ) -> list[dict[str, Any]]:
         """生成修订优先级列表"""
         sorted_issues = sorted(issues, key=lambda i: i.severity, reverse=True)
@@ -753,7 +771,7 @@ class ReaderSimulator:
             dislikes.append(f"有{len(severe_issues)}个明显问题")
 
         # 评论模拟
-        comments = self._generate_comments(reader_type, score, likes, dislikes)
+        comments = self._generate_comments(reader_type, score)
 
         # 情感反应
         emotional_response = self._generate_emotional_response(cool_satisfaction, score)
@@ -774,7 +792,7 @@ class ReaderSimulator:
         )
 
     def _generate_comments(
-        self, reader_type: ReaderType, score: float, likes: list[str], dislikes: list[str]
+        self, reader_type: ReaderType, score: float
     ) -> list[str]:
         """模拟读者评论"""
         if score >= 8:
@@ -859,7 +877,7 @@ class QualityAssessmentEngine:
 
         # 5. 生成综合修订建议
         recommendations = self._generate_recommendations(
-            debate_result, reader_result, combined_score, self.target_score
+            debate_result, reader_result
         )
 
         return {
@@ -879,24 +897,22 @@ class QualityAssessmentEngine:
         self,
         debate_result: DebateReviewResult,
         reader_result: ReaderSimulationResult,
-        current_score: float,
-        target: float,
     ) -> list[dict[str, Any]]:
         """生成综合修订建议"""
-        recommendations = []
+        recommendations: list[dict[str, Any]] = []
 
         # 基于辩论审校的建议
-        for priority in debate_result.revision_priority[:5]:
-            recommendations.append(
-                {
-                    "source": "debate",
-                    "priority": priority["priority"],
-                    "category": priority["dimension"],
-                    "issue": priority["description"],
-                    "suggestion": priority["suggestion"],
-                    "estimated_improvement": priority["estimated_improvement"],
-                }
-            )
+        recommendations.extend(
+            {
+                "source": "debate",
+                "priority": priority["priority"],
+                "category": priority["dimension"],
+                "issue": priority["description"],
+                "suggestion": priority["suggestion"],
+                "estimated_improvement": priority["estimated_improvement"],
+            }
+            for priority in debate_result.revision_priority[:5]
+        )
 
         # 基于读者模拟的建议
         if reader_result.drop_off_risk > 0.3:
@@ -924,7 +940,7 @@ class QualityAssessmentEngine:
             )
 
         # 按预估提升排序
-        recommendations.sort(key=lambda x: x["estimated_improvement"], reverse=True)
+        recommendations.sort(key=lambda x: float(x["estimated_improvement"]), reverse=True)
         for i, rec in enumerate(recommendations):
             rec["priority"] = i + 1
 

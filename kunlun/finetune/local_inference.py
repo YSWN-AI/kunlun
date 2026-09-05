@@ -46,7 +46,7 @@ class LocalInferenceEngine:
     @classmethod
     def get_instance(cls) -> LocalInferenceEngine:
         """获取全局单例"""
-        global _engine
+        global _engine  # noqa: PLW0603
         if _engine is None:
             _engine = cls()
         return _engine

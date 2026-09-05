@@ -224,7 +224,7 @@ async def generate_chapter(
 @_gen_rate_limit
 async def batch_generate(
     book_id: str,
-    request: Request,
+    request: Request,  # noqa: ARG001
     start: int = Query(default=1),
     end: int = Query(default=5),
     mode: str = Query(default="gacha_cascade"),

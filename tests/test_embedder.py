@@ -2,14 +2,12 @@
 测试: Embedder 文本嵌入器
 """
 
-import pytest
-
-pytestmark = pytest.mark.integration
-
 import numpy as np
+import pytest
 
 from kunlun.kg.embedder import EMBEDDING_DIM, Embedder, _embedding_cache
 
+pytestmark = pytest.mark.integration
 
 class TestEmbedder:
     """嵌入器基础测试"""

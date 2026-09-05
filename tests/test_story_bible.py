@@ -9,7 +9,7 @@ import pytest
 
 pytestmark = pytest.mark.integration
 
-from kunlun.story_bible.engine import (
+from kunlun.story_bible.engine import (  # noqa: E402
     BibleEntry,
     BibleParser,
     BibleSection,

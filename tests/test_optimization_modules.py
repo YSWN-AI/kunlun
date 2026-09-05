@@ -88,7 +88,7 @@ class TestG9AIRateGate:
             assert "strategies_used" in data
 
     def test_g9_registered_in_audit_gates(self):
-        from kunlun.audit.gates import audit_gates, AUDIT_GATES, GATE_WEIGHTS
+        from kunlun.audit.gates import AUDIT_GATES, GATE_WEIGHTS, audit_gates
         assert len(AUDIT_GATES) == 9
         assert "G9" in GATE_WEIGHTS
         assert GATE_WEIGHTS["G9"] > 0
@@ -193,7 +193,7 @@ class TestSixDimensionDashboard:
     """Quality六维仪表盘测试"""
 
     def test_importable(self):
-        from kunlun.quality.six_dim_dashboard import SixDimensionDashboard, six_dim_dashboard
+        from kunlun.quality.six_dim_dashboard import six_dim_dashboard
         assert six_dim_dashboard is not None
 
     def test_analyze_returns_report(self):
@@ -233,7 +233,10 @@ class TestSixDimensionDashboard:
         good_report = six_dim_dashboard.analyze(GOOD_TEXT)
         ai_report = six_dim_dashboard.analyze(AI_TEXT * 3)
         # AI模板文创新分应低于优质文本
-        assert ai_report.dimensions["innovation"].score <= good_report.dimensions["innovation"].score + 0.1
+        assert (
+            ai_report.dimensions["innovation"].score
+            <= good_report.dimensions["innovation"].score + 0.1
+        )
 
     def test_to_dict(self):
         from kunlun.quality import six_dim_dashboard
@@ -253,7 +256,7 @@ class TestVibeQualityFeedback:
     """Vibe即时质量反馈测试"""
 
     def test_importable(self):
-        from kunlun.vibe_writer.quality_feedback import VibeQualityFeedback, vibe_quality_feedback
+        from kunlun.vibe_writer.quality_feedback import vibe_quality_feedback
         assert vibe_quality_feedback is not None
 
     def test_analyze_returns_feedback(self):
@@ -266,7 +269,10 @@ class TestVibeQualityFeedback:
     def test_stuck_detection_no_dialogue(self):
         """长时间无对话应检测为卡文"""
         from kunlun.vibe_writer import vibe_quality_feedback
-        text = "林羽走在路上。他看到了山。山很高。他继续走。风吹过。树叶沙沙响。他觉得有点冷。于是加快了脚步。" * 20
+        text = (
+            "林羽走在路上。他看到了山。山很高。他继续走。"
+            "风吹过。树叶沙沙响。他觉得有点冷。于是加快了脚步。"
+        ) * 20
         fb = vibe_quality_feedback.analyze(text)
         # 超过800字无对话应触发卡文检测
         assert fb.word_count > 800
@@ -307,7 +313,7 @@ class TestVibeQualityFeedback:
 
     def test_vibe_writer_integration(self):
         """VibeWriter应集成质量反馈"""
-        from kunlun.vibe_writer import VibeWriter, VibeContext
+        from kunlun.vibe_writer import VibeContext, VibeWriter
         writer = VibeWriter(book_id="test")
         ctx = VibeContext(current_text=GOOD_TEXT, chapter_title="测试")
         writer.set_context(ctx)
@@ -324,7 +330,7 @@ class TestCoreOptimizationModules:
     """4个核心优化模块基本功能测试"""
 
     def test_ai_rate_importable(self):
-        from kunlun.ai_rate import detect_ai_rate, humanize_text, AIRateDetector
+        from kunlun.ai_rate import detect_ai_rate, humanize_text
         assert detect_ai_rate is not None
         assert humanize_text is not None
 
@@ -352,7 +358,7 @@ class TestCoreOptimizationModules:
         assert create_memory_manager is not None
 
     def test_debate_review_importable(self):
-        from kunlun.debate_review import debate_review, simulate_readers, full_quality_assessment
+        from kunlun.debate_review import debate_review, full_quality_assessment, simulate_readers
         assert debate_review is not None
         assert simulate_readers is not None
         assert full_quality_assessment is not None

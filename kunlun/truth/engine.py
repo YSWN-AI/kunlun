@@ -470,10 +470,11 @@ class TruthFileManager(BaseExtensionModule):
 
     def check_overdue_hooks(self, chapter: int) -> list[dict[str, Any]]:
         """检查逾期未揭示的伏笔"""
-        overdue = []
-        for hook_data in self._hooks.values():
-            if not hook_data["revealed"] and chapter > hook_data["reveal_chapter"]:
-                overdue.append(hook_data)
+        overdue = [
+            hook_data
+            for hook_data in self._hooks.values()
+            if not hook_data["revealed"] and chapter > hook_data["reveal_chapter"]
+        ]
         if overdue:
             logger.debug(f"发现 {len(overdue)} 个逾期伏笔")
         return overdue

@@ -2,10 +2,9 @@
 
 import pytest
 
-pytestmark = pytest.mark.unit
-
 from kunlun.vibe_writer import IntentRouter, VibeContext, VibeIntent, VibeWriter
 
+pytestmark = pytest.mark.unit
 
 class TestIntentRouter:
     def setup_method(self):

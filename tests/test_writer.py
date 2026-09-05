@@ -4,10 +4,9 @@
 
 import pytest
 
-pytestmark = pytest.mark.unit
-
 from kunlun.agents.writer import Writer
 
+pytestmark = pytest.mark.unit
 
 class TestWriterPromptBuilding:
     """提示词构建 - 验证蓝图结构化数据消费"""

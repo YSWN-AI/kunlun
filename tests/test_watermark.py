@@ -6,7 +6,7 @@ import pytest
 
 pytestmark = pytest.mark.unit
 
-from kunlun.watermark.engine import (
+from kunlun.watermark.engine import (  # noqa: E402
     WatermarkMethod,
     WatermarkPayload,
     WatermarkStrength,

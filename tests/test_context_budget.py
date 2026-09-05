@@ -4,7 +4,7 @@ import pytest
 
 pytestmark = pytest.mark.unit
 
-from kunlun.context.budget import (
+from kunlun.context.budget import (  # noqa: E402
     DEFAULT_BUDGET_ALLOCATION,
     ContextBudgetAllocator,
     create_context_budget,

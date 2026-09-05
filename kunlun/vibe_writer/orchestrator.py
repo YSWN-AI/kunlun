@@ -378,13 +378,6 @@ class VibeOrchestrator:
             logger.info(
                 f"VibeOrchestrator: 分段生成完成，{len(draft)}字，去重删除{dedup_removed}处"
             )
-            result = {
-                "best_text": draft,
-                "best_model": f"local:{self.local_model_name}",
-                "best_score": 1.0,
-                "segments": long_result.get("segments", []),
-                "dedup_removed": dedup_removed,
-            }
         else:
             # API模型模式：多模型级联抽卡（长文本也用分段生成）
             logger.info(f"VibeOrchestrator: 使用API模型分段生成第{chapter}章")
@@ -396,14 +389,6 @@ class VibeOrchestrator:
             )
             draft = long_result.get("text", "")
             dedup_removed = long_result.get("dedup_removed", 0)
-            result = {
-                "best_text": draft,
-                "best_model": "gacha_long_text",
-                "best_score": 1.0,
-                "segments": long_result.get("segments", []),
-                "dedup_removed": dedup_removed,
-            }
-
         # 保存章节文件
         ch_file = self._project.data_dir / "chapters" / f"ch{chapter:04d}.md"
         ch_file.write_text(draft, encoding="utf-8")

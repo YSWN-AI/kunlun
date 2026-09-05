@@ -29,7 +29,7 @@ class TestAllImports:
     ]
 
     @pytest.mark.parametrize("name,module,attrs", MODULES)
-    def test_module_import(self, name, module, attrs):
+    def test_module_import(self, name, module, attrs):  # noqa: ARG002
         mod = __import__(module, fromlist=attrs)
         for attr in attrs:
             obj = getattr(mod, attr)
@@ -42,7 +42,10 @@ class TestStructureAnalyzer:
     def test_analyze_chapter(self):
         from kunlun.structure import structure_analyzer
 
-        text = "突然，一道剑光从黑暗中斩来。林尘心头一紧，连忙侧身躲避。然而那剑光太快，他还是被擦中了肩膀。"
+        text = (
+            "突然，一道剑光从黑暗中斩来。林尘心头一紧，连忙侧身躲避。"
+            "然而那剑光太快，他还是被擦中了肩膀。"
+        )
         report = structure_analyzer.analyze_chapter(text, 5, 100)
         assert hasattr(report, "detected_beat_stc")
         assert hasattr(report, "on_track")

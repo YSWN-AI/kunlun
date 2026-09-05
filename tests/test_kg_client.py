@@ -2,16 +2,15 @@
 测试: KGClient 知识图谱客户端
 """
 
-import pytest
-
-pytestmark = pytest.mark.integration
-
 import shutil
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from kunlun.kg.client import KGClient
 
+pytestmark = pytest.mark.integration
 
 class TestKGClientNeo4j:
     """Neo4j 连接测试 (需要本地运行 Neo4j)"""

@@ -2,16 +2,15 @@
 测试: LearnAgent 偏好学习引擎
 """
 
-import pytest
-
-pytestmark = pytest.mark.integration
-
 import shutil
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from kunlun.learn.learner import LearnAgent, PreferenceVector
 
+pytestmark = pytest.mark.integration
 
 class TestPreferenceVector:
     """偏好向量"""

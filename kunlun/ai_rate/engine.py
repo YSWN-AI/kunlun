@@ -1096,7 +1096,8 @@ class HumanizeEngine:
         # 默认只使用经过验证有效的2种策略
         # replace_high_risk: 降AI率3-5% (替换20+处高危词)
         # remove_redundant: 降AI率2-3% (去除冗余修饰词)
-        # 已验证反效果的策略: split_long_paragraphs(+8%), add_human_phrases(+2%), vary_punctuation(+1%)
+        # 已验证反效果的策略:
+        # split_long_paragraphs(+8%), add_human_phrases(+2%), vary_punctuation(+1%)
         self.strategies = strategies or [
             HumanizeStrategy.REPLACE_HIGH_RISK,
             HumanizeStrategy.REMOVE_REDUNDANT,

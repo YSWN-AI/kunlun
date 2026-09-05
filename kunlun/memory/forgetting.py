@@ -134,7 +134,7 @@ class EbbinghausForgetting:
     def apply_forgetting(
         self,
         events: list[EpisodicEvent],
-        current_time: float | None = None,
+        _current_time: float | None = None,
     ) -> tuple[list[EpisodicEvent], list[EpisodicEvent]]:
         """批量应用遗忘曲线
 
