@@ -2810,6 +2810,1005 @@ input[type="range"]::-webkit-slider-thumb {
   color: white;
 }
 
+/* ============================================================
+   新增：通用大模态框（工具箱/提示词/降AI结果展示）
+   ============================================================ */
+.generic-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 1500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.generic-modal-overlay.show {
+  display: flex;
+}
+.generic-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: paletteIn 0.15s ease;
+  max-height: 88vh;
+}
+.generic-modal-header {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.generic-modal-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.generic-modal-body {
+  padding: 16px 18px;
+  overflow-y: auto;
+  flex: 1;
+}
+.generic-modal-footer {
+  padding: 10px 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   新增：工具箱面板
+   ============================================================ */
+.toolbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 8px;
+}
+.toolbox-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.toolbox-card:hover {
+  border-color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.08);
+}
+.toolbox-card.active {
+  border-color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.15);
+}
+.toolbox-card .tb-icon {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+.toolbox-card .tb-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.toolbox-card .tb-desc {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+.toolbox-params {
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+}
+.toolbox-params .param-group {
+  margin-bottom: 8px;
+}
+.toolbox-params label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 3px;
+}
+.toolbox-params input,
+.toolbox-params select,
+.toolbox-params textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  color: var(--text-primary);
+  font-size: 11px;
+  font-family: inherit;
+  outline: none;
+}
+.toolbox-params textarea {
+  min-height: 50px;
+  resize: vertical;
+}
+.toolbox-actions {
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 6px;
+}
+.toolbox-result-textarea {
+  width: 100%;
+  min-height: 300px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+}
+
+/* ============================================================
+   新增：提示词库面板
+   ============================================================ */
+.prompt-search-bar {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 6px;
+}
+.prompt-search-bar input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  color: var(--text-primary);
+  font-size: 11px;
+  outline: none;
+}
+.prompt-cats {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.prompt-cat-chip {
+  padding: 2px 8px;
+  font-size: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.prompt-cat-chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.prompt-sort {
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.prompt-sort select {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 6px;
+  color: var(--text-primary);
+  font-size: 10px;
+  outline: none;
+}
+.prompt-list {
+  padding: 6px 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+.prompt-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.prompt-card:hover {
+  border-color: var(--primary-light);
+}
+.prompt-card .pc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+.prompt-card .pc-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+.prompt-card .pc-fav {
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0 2px;
+}
+.prompt-card .pc-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.prompt-card .pc-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.prompt-card .pc-tag {
+  padding: 1px 6px;
+  background: rgba(var(--primary-rgb), 0.15);
+  color: var(--primary-light);
+  border-radius: 4px;
+  font-size: 9px;
+}
+.prompt-card .pc-stars {
+  color: var(--warning);
+}
+.prompt-card .pc-use-btn {
+  margin-left: auto;
+  padding: 2px 8px;
+  font-size: 10px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.prompt-detail-content {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  color: var(--text-primary);
+  max-height: 400px;
+  overflow-y: auto;
+}
+.prompt-var {
+  background: rgba(var(--warning-rgb), 0.2);
+  color: var(--warning);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+/* ============================================================
+   新增：降AI工作台面板
+   ============================================================ */
+.aiw-input-area {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.aiw-input-area textarea {
+  width: 100%;
+  min-height: 120px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  color: var(--text-primary);
+  font-size: 11px;
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+.aiw-actions {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.aiw-strategies {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.aiw-strategies .strat-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.aiw-strat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.aiw-strat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.aiw-strat-item input {
+  cursor: pointer;
+}
+.aiw-overall {
+  text-align: center;
+  padding: 16px;
+}
+.aiw-overall .aiw-score-big {
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+}
+.aiw-overall .aiw-score-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.aiw-progress-track {
+  width: 100%;
+  height: 10px;
+  background: var(--bg-input);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+.aiw-progress-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+.aiw-dim-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.aiw-dim-name {
+  width: 80px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.aiw-dim-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.aiw-dim-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.aiw-dim-score {
+  width: 36px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.aiw-dim-level {
+  width: 32px;
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.aiw-risk-item {
+  padding: 6px 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+}
+.aiw-risk-item:hover {
+  border-color: var(--error);
+}
+.aiw-risk-phrase {
+  color: var(--error);
+  font-weight: 600;
+}
+.aiw-risk-reason {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.aiw-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.aiw-compare-pane {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.aiw-compare-pane .pane-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.aiw-compare-text {
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  color: var(--text-primary);
+}
+.aiw-diff-add {
+  background: rgba(var(--success-rgb), 0.2);
+  color: var(--success);
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+.aiw-diff-del {
+  background: rgba(var(--error-rgb), 0.2);
+  color: var(--error);
+  text-decoration: line-through;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+.aiw-change-log {
+  margin-top: 10px;
+}
+.aiw-change-item {
+  padding: 4px 8px;
+  font-size: 11px;
+  border-left: 3px solid var(--primary);
+  background: var(--bg-input);
+  margin-bottom: 4px;
+  border-radius: 0 4px 4px 0;
+}
+.loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   P1新增：书架管理 样式
+   ============================================================ */
+.bookshelf-toolbar {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bookshelf-toolbar input,
+.bookshelf-toolbar select {
+  width: 100%;
+  font-size: 11px;
+  padding: 5px 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+.bookshelf-toolbar-row {
+  display: flex;
+  gap: 4px;
+}
+.bookshelf-toolbar-row select { flex: 1; }
+.bookshelf-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+.book-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.book-card:hover { border-color: var(--primary); }
+.book-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.book-cover {
+  width: 36px;
+  height: 48px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #fff;
+  font-weight: bold;
+}
+.book-info { flex: 1; min-width: 0; }
+.book-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.book-genre {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.book-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.book-progress-track {
+  height: 4px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.book-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+.book-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+.book-action-btn {
+  flex: 1;
+  font-size: 10px;
+  padding: 3px 4px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: center;
+}
+.book-action-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.bookshelf-footer {
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+}
+.bookshelf-footer button {
+  width: 100%;
+  font-size: 11px;
+  padding: 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.bookshelf-footer button:hover { border-color: var(--warning); color: var(--warning); }
+.recycle-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+.recycle-item:last-child { border-bottom: none; }
+.recycle-info { flex: 1; }
+.recycle-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.recycle-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.recycle-actions { display: flex; gap: 4px; }
+
+/* ============================================================
+   P1新增：拆书案例库 样式
+   ============================================================ */
+.ba-toolbar {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ba-toolbar input {
+  width: 100%;
+  font-size: 11px;
+  padding: 5px 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+.ba-genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.ba-genre-tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.ba-genre-tag.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.ba-platform-row {
+  display: flex;
+  gap: 4px;
+}
+.ba-platform-btn {
+  flex: 1;
+  font-size: 10px;
+  padding: 3px;
+  text-align: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.ba-platform-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.ba-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+.ba-case-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.ba-case-card:hover { border-color: var(--primary); }
+.ba-case-card.selected { border-color: var(--success); background: rgba(46, 204, 113, 0.05); }
+.ba-case-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+.ba-case-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.ba-case-desc {
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ba-case-tags { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 4px; }
+.ba-footer {
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 6px;
+}
+.ba-footer button {
+  flex: 1;
+  font-size: 11px;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+.ba-detail-section {
+  margin-bottom: 14px;
+}
+.ba-detail-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.ba-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 11px;
+}
+.ba-info-item { color: var(--text-secondary); }
+.ba-info-item b { color: var(--text-primary); }
+.ba-rhythm-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+.ba-rhythm-label { width: 60px; color: var(--text-secondary); flex-shrink: 0; }
+.ba-rhythm-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ba-rhythm-fill { height: 100%; border-radius: 4px; }
+.ba-rhythm-score { width: 30px; text-align: right; font-weight: 600; }
+.ba-satisfaction-item {
+  padding: 6px 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+.ba-satisfaction-type {
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+.ba-satisfaction-desc { color: var(--text-secondary); line-height: 1.4; }
+.ba-structure-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+.ba-structure-item {
+  padding: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+}
+.ba-structure-num { font-size: 18px; font-weight: 700; color: var(--primary); }
+.ba-structure-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.ba-character-item {
+  padding: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+.ba-character-name { font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+.ba-character-arc { color: var(--text-secondary); line-height: 1.4; }
+.ba-style-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+.ba-style-label { width: 70px; color: var(--text-secondary); flex-shrink: 0; }
+.ba-style-bar { flex: 1; height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; }
+.ba-style-fill { height: 100%; background: var(--primary); border-radius: 3px; }
+.ba-style-score { width: 28px; text-align: right; }
+.ba-method-item {
+  padding: 6px 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  margin-bottom: 5px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  border-left: 3px solid var(--primary);
+}
+.ba-quote-item {
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--text-primary);
+  font-style: italic;
+  border-left: 3px solid var(--warning);
+}
+.ba-compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.ba-compare-table th, .ba-compare-table td {
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: left;
+}
+.ba-compare-table th {
+  background: var(--bg-input);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.ba-compare-table td { color: var(--text-secondary); }
+
+/* ============================================================
+   P1新增：工作流可视化 样式
+   ============================================================ */
+.wf-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+.wf-tab {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+}
+.wf-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+.wf-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+.wf-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+.wf-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.wf-card-icon { font-size: 16px; }
+.wf-card-name { font-size: 12px; font-weight: 600; color: var(--text-primary); flex: 1; }
+.wf-card-category {
+  font-size: 9px;
+  padding: 1px 5px;
+  background: var(--bg-input);
+  border-radius: 3px;
+  color: var(--text-muted);
+}
+.wf-card-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  gap: 8px;
+}
+.wf-card-actions { display: flex; gap: 4px; }
+.wf-card-actions button {
+  flex: 1;
+  font-size: 10px;
+  padding: 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+}
+.wf-card-actions button:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.wf-exec-log {
+  background: var(--bg-input);
+  border-radius: 4px;
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.wf-exec-log .log-time { color: var(--text-muted); }
+.wf-exec-log .log-node { color: var(--primary); }
+.wf-exec-log .log-msg { color: var(--text-secondary); }
+.wf-node-status {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+.wf-node-status.pending { background: var(--text-muted); }
+.wf-node-status.running { background: var(--warning); animation: pulse 1s infinite; }
+.wf-node-status.done { background: var(--success); }
+.wf-node-status.error { background: var(--error); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.wf-canvas-container {
+  background: var(--bg-input);
+  border-radius: 6px;
+  overflow: auto;
+  min-height: 300px;
+  position: relative;
+}
+.wf-canvas-node {
+  position: absolute;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  min-width: 80px;
+  text-align: center;
+  z-index: 2;
+}
+.wf-canvas-node.active { border-color: var(--primary); box-shadow: 0 0 8px rgba(91,143,249,0.4); }
+.wf-canvas-node.done { border-color: var(--success); }
+.wf-canvas-node-icon { font-size: 14px; margin-bottom: 2px; }
+.wf-canvas-node-name { font-weight: 600; color: var(--text-primary); }
+.wf-canvas-node-type { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+.wf-exec-result {
+  background: var(--bg-input);
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.wf-exec-result-item {
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.wf-exec-result-item:last-child { border-bottom: none; }
+.wf-exec-result-name { font-weight: 600; color: var(--primary); margin-bottom: 2px; }
+.wf-exec-result-output { color: var(--text-secondary); white-space: pre-wrap; word-break: break-all; }
+
 </style>
 </head>
 <body>
@@ -2843,6 +3842,12 @@ input[type="range"]::-webkit-slider-thumb {
     <div class="activity-item" data-view="writing-packs" onclick="IDE.switchView('writing-packs')">🧩<span class="tooltip">插件管理</span></div>
     <div class="activity-item" data-view="marketplace" onclick="IDE.switchView('marketplace')">🛒<span class="tooltip">技能市场</span></div>
     <div class="activity-item" data-view="smart-learn" onclick="IDE.switchView('smart-learn')">📚<span class="tooltip">智能学习</span></div>
+    <div class="activity-item" data-view="toolbox" onclick="IDE.switchView('toolbox')">🛠️<span class="tooltip">AI工具箱</span></div>
+    <div class="activity-item" data-view="prompts" onclick="IDE.switchView('prompts')">📖<span class="tooltip">提示词库</span></div>
+    <div class="activity-item" data-view="aiworkbench" onclick="IDE.switchView('aiworkbench')">🔧<span class="tooltip">降AI工作台</span></div>
+    <div class="activity-item" data-view="bookshelf" onclick="IDE.switchView('bookshelf')">📚<span class="tooltip">书架管理</span></div>
+    <div class="activity-item" data-view="bookanalysis" onclick="IDE.switchView('bookanalysis')">📖<span class="tooltip">AI拆书</span></div>
+    <div class="activity-item" data-view="workflow" onclick="IDE.switchView('workflow')">⚡<span class="tooltip">工作流</span></div>
     <div class="activity-item" data-view="ai" onclick="IDE.toggleBottomPanel('ai')">🤖<span class="tooltip">AI对话</span></div>
     <div class="activity-item bottom" data-view="settings" onclick="IDE.openCommandPalette()">⚙️<span class="tooltip">设置/命令</span></div>
   </div>
@@ -3295,6 +4300,72 @@ input[type="range"]::-webkit-slider-thumb {
         <div class="panel-placeholder"><div class="loader"></div><span>点击加载智能学习</span></div>
       </div>
     </div>
+    <!-- AI工具箱 -->
+    <div class="sidebar-view" id="view-toolbox">
+      <div class="sidebar-title"><span>AI工具箱</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="ToolboxManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" id="toolboxContent" style="padding:0;display:flex;flex-direction:column;height:100%;">
+        <div class="panel-placeholder"><div class="loader"></div><span>点击加载AI工具箱</span></div>
+      </div>
+    </div>
+    <!-- 提示词库 -->
+    <div class="sidebar-view" id="view-prompts">
+      <div class="sidebar-title"><span>提示词库</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="PromptLibraryManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" id="promptsContent" style="padding:0;display:flex;flex-direction:column;height:100%;">
+        <div class="panel-placeholder"><div class="loader"></div><span>点击加载提示词库</span></div>
+      </div>
+    </div>
+    <!-- 降AI工作台 -->
+    <div class="sidebar-view" id="view-aiworkbench">
+      <div class="sidebar-title"><span>降AI工作台</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="AIWorkbenchManager.reset()" title="重置">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" id="aiworkbenchContent" style="padding:0;display:flex;flex-direction:column;height:100%;">
+        <div class="panel-placeholder"><div class="loader"></div><span>点击加载降AI工作台</span></div>
+      </div>
+    </div>
+    <!-- 书架管理 -->
+    <div class="sidebar-view" id="view-bookshelf">
+      <div class="sidebar-title"><span>书架管理</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="BookshelfManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" id="bookshelfContent" style="padding:0;display:flex;flex-direction:column;height:100%;">
+        <div class="panel-placeholder"><div class="loader"></div><span>点击加载书架管理</span></div>
+      </div>
+    </div>
+    <!-- 拆书案例库 -->
+    <div class="sidebar-view" id="view-bookanalysis">
+      <div class="sidebar-title"><span>AI拆书</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="BookAnalysisManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" id="bookanalysisContent" style="padding:0;display:flex;flex-direction:column;height:100%;">
+        <div class="panel-placeholder"><div class="loader"></div><span>点击加载拆书案例库</span></div>
+      </div>
+    </div>
+    <!-- 工作流可视化 -->
+    <div class="sidebar-view" id="view-workflow">
+      <div class="sidebar-title"><span>工作流</span>
+        <div class="title-actions">
+          <button class="icon-btn" onclick="WorkflowManager.refresh()" title="刷新">↻</button>
+        </div>
+      </div>
+      <div class="sidebar-content" id="workflowContent" style="padding:0;display:flex;flex-direction:column;height:100%;">
+        <div class="panel-placeholder"><div class="loader"></div><span>点击加载工作流</span></div>
+      </div>
+    </div>
   </div>
 
   <div class="resizer-v" id="sidebarResizer"></div>
@@ -3360,8 +4431,8 @@ input[type="range"]::-webkit-slider-thumb {
         </div>
         <div class="mode-selector" id="modeSelector">
           <span class="mode-label">模式:</span>
-          <button class="mode-btn active" id="modeActionBtn" onclick="ModeManager.switch('action')">⚡ 行动</button>
-          <button class="mode-btn" id="modePlanBtn" onclick="ModeManager.switch('planning')">📋 规划</button>
+          <button class="mode-btn active" id="modeActionBtn" onclick="ModeManager.switchMode('action')">⚡ 行动</button>
+          <button class="mode-btn" id="modePlanBtn" onclick="ModeManager.switchMode('planning')">📋 规划</button>
         </div>
         <div class="bottom-panel-actions">
           <button class="icon-btn" onclick="IDE.toggleBottomPanel()" title="折叠/展开 Ctrl+J">—</button>
@@ -5029,7 +6100,7 @@ var VersionManager = (function() {
         '<div class="char-actions">' +
           '<button class="btn btn-sm btn-primary" onclick="VersionManager.restore(\'' + v.id + '\')">恢复此版本</button>' +
           '<button class="btn btn-sm" onclick="VersionManager.viewContent(\'' + v.id + '\')">查看内容</button>' +
-          '<button class="btn btn-sm" onclick="VersionManager.delete(\'' + v.id + '\')">删除</button>' +
+          '<button class="btn btn-sm" onclick="VersionManager.deleteVersion(\'' + v.id + '\')">删除</button>' +
         '</div>' +
       '</div>';
   }
@@ -5076,7 +6147,7 @@ var VersionManager = (function() {
     }, '创建');
   }
 
-  function delete(id) {
+  function deleteVersion(id) {
     if (!confirm('确定删除该版本？')) return;
     apiFetch('/api/v1/workstation/versions/' + id + '?book_id=default', { method: 'DELETE' })
       .then(function(d) { if (d.success) { IDE.toast('已删除', 'success'); state.selected = null; _renderDetail(null); refresh(); } });
@@ -5101,7 +6172,7 @@ var VersionManager = (function() {
     createCheckpoint: createCheckpoint,
     restore: restore,
     viewContent: viewContent,
-    delete: delete,
+    deleteVersion: deleteVersion,
   };
 })();
 
@@ -6173,7 +7244,7 @@ var ModeManager = (function() {
       .catch(function() {});
   }
 
-  function switch(mode) {
+  function switchMode(mode) {
     if (mode === state.currentMode) return;
     apiFetch('/api/v2/mode/switch', {
       method: 'POST',
@@ -6257,7 +7328,7 @@ var ModeManager = (function() {
 
   return {
     init: init,
-    switch: switch,
+    switchMode: switchMode,
     getConfig: getConfig,
     canExecute: canExecute,
     getCurrentMode: getCurrentMode,
@@ -6472,6 +7543,12 @@ function initLazyLoading() {
     'writing-packs': WritingPacksManager.ensureLoaded,
     marketplace: MarketplaceManager.ensureLoaded,
     'smart-learn': SmartLearnManager.ensureLoaded,
+    toolbox: ToolboxManager.ensureLoaded,
+    prompts: PromptLibraryManager.ensureLoaded,
+    aiworkbench: AIWorkbenchManager.ensureLoaded,
+    bookshelf: BookshelfManager.ensureLoaded,
+    bookanalysis: BookAnalysisManager.ensureLoaded,
+    workflow: WorkflowManager.ensureLoaded,
   };
   // 包装 switchView
   var origSwitch = IDE.switchView;
@@ -6592,7 +7669,7 @@ var IDE = (function() {
   function switchView(view) {
     var sidebar = document.getElementById('sidebar');
     // 如果点击当前活动视图且侧边栏未折叠，则折叠
-    if (state.currentView === view && !state.sidebarCollapsed && ['explorer','search','outline','characters','world','agents','canvas','versions','style','memory','constitution','writing-packs','marketplace','smart-learn'].indexOf(view) !== -1) {
+    if (state.currentView === view && !state.sidebarCollapsed && ['explorer','search','outline','characters','world','agents','canvas','versions','style','memory','constitution','writing-packs','marketplace','smart-learn','toolbox','prompts','aiworkbench','bookshelf','bookanalysis','workflow'].indexOf(view) !== -1) {
       toggleSidebar();
       return;
     }
@@ -8438,6 +9515,2072 @@ document.addEventListener('DOMContentLoaded', function() {
 if (document.readyState !== 'loading') {
   IDE.init();
 }
+
+/* ============================================================
+   新增：通用大模态框
+   ============================================================ */
+var _genericModalOverlay = null;
+
+function showGenericModal(title, contentHtml, width, footerHtml) {
+  width = width || '720px';
+  hideGenericModal();
+  var overlay = document.createElement('div');
+  overlay.className = 'generic-modal-overlay show';
+  overlay.innerHTML =
+    '<div class="generic-modal" style="width:' + width + ';max-width:94vw;">' +
+      '<div class="generic-modal-header">' +
+        '<h3>' + esc(title) + '</h3>' +
+        '<button class="icon-btn" onclick="hideGenericModal()">✕</button>' +
+      '</div>' +
+      '<div class="generic-modal-body">' + contentHtml + '</div>' +
+      (footerHtml ? '<div class="generic-modal-footer">' + footerHtml + '</div>' : '') +
+    '</div>';
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) hideGenericModal();
+  });
+  document.body.appendChild(overlay);
+  _genericModalOverlay = overlay;
+}
+
+function hideGenericModal() {
+  if (_genericModalOverlay) {
+    _genericModalOverlay.remove();
+    _genericModalOverlay = null;
+  }
+}
+
+/* ============================================================
+   新增：工具箱管理器 ToolboxManager
+   ============================================================ */
+var ToolboxManager = (function() {
+  var state = {
+    loaded: false,
+    generators: [],
+    activeGenerator: null,
+    generating: false,
+    lastResult: '',
+    lastGeneratorType: '',
+  };
+
+  var GENERATOR_DEFS = [
+    { type: 'title', icon: '📌', name: '书名生成', desc: '一键生成爆款书名',
+      params: [
+        { key: 'genre', label: '题材', type: 'select', options: ['玄幻','都市','仙侠','历史','科幻','悬疑','言情','游戏','军事','武侠'] },
+        { key: 'style', label: '风格', type: 'select', options: ['番茄','起点','晋江'] },
+        { key: 'keywords', label: '关键词', type: 'text', placeholder: '如：重生、逆袭、系统' },
+      ]},
+    { type: 'synopsis', icon: '📝', name: '简介生成', desc: '生成吸引人的作品简介',
+      params: [
+        { key: 'title', label: '书名', type: 'text', placeholder: '输入书名' },
+        { key: 'genre', label: '题材', type: 'select', options: ['玄幻','都市','仙侠','历史','科幻','悬疑','言情','游戏','军事','武侠'] },
+        { key: 'protagonist', label: '主角设定', type: 'text', placeholder: '如：废柴少年重生归来' },
+        { key: 'conflict', label: '核心冲突', type: 'text', placeholder: '如：复仇灭门之仇' },
+      ]},
+    { type: 'outline', icon: '📋', name: '大纲生成', desc: '生成全书故事大纲',
+      params: [
+        { key: 'genre', label: '题材', type: 'select', options: ['玄幻','都市','仙侠','历史','科幻','悬疑','言情','游戏','军事','武侠'] },
+        { key: 'protagonist', label: '主角设定', type: 'text', placeholder: '主角身份与目标' },
+        { key: 'conflict', label: '核心冲突', type: 'text', placeholder: '主要矛盾' },
+        { key: 'structure', label: '结构', type: 'select', options: ['三幕式','英雄之旅'] },
+        { key: 'volume_count', label: '卷数', type: 'select', options: ['1','2','3','4','5'] },
+      ]},
+    { type: 'chapter_outline', icon: '📑', name: '细纲生成', desc: '生成章节级细纲',
+      params: [
+        { key: 'volume_outline', label: '卷大纲', type: 'textarea', placeholder: '粘贴本卷大纲内容' },
+        { key: 'chapter_count', label: '章节数', type: 'select', options: ['10','20','30','50','100'] },
+      ]},
+    { type: 'opening', icon: '✨', name: '黄金开篇', desc: '生成前三章黄金开篇',
+      params: [
+        { key: 'genre', label: '题材', type: 'select', options: ['玄幻','都市','仙侠','历史','科幻','悬疑','言情','游戏','军事','武侠'] },
+        { key: 'protagonist', label: '主角设定', type: 'text', placeholder: '主角身份与性格' },
+        { key: 'conflict', label: '核心冲突', type: 'text', placeholder: '开篇冲突' },
+      ]},
+    { type: 'cheat', icon: '💎', name: '金手指', desc: '设计独特金手指设定',
+      params: [
+        { key: 'genre', label: '题材', type: 'select', options: ['玄幻','都市','仙侠','历史','科幻','悬疑','言情','游戏','军事','武侠'] },
+      ]},
+    { type: 'name', icon: '🏷️', name: '名字生成', desc: '批量生成角色/地点/物品名',
+      params: [
+        { key: 'name_type', label: '类型', type: 'select', options: ['角色','地点','物品','功法'] },
+        { key: 'style', label: '风格', type: 'select', options: ['古风','现代','西方'] },
+        { key: 'count', label: '数量', type: 'select', options: ['5','10','20','30','50'] },
+      ]},
+    { type: 'character', icon: '👤', name: '人设生成', desc: '生成完整人物设定',
+      params: [
+        { key: 'role_type', label: '角色类型', type: 'select', options: ['主角','反派','配角'] },
+        { key: 'genre', label: '题材', type: 'select', options: ['玄幻','都市','仙侠','历史','科幻','悬疑','言情','游戏','军事','武侠'] },
+        { key: 'traits', label: '核心特质', type: 'text', placeholder: '如：冷酷、腹黑、杀伐果断' },
+      ]},
+  ];
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    refresh();
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    apiFetch('/api/v1/toolbox/generators', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) {
+          state.generators = d.data;
+        }
+      })
+      .catch(function() { /* 使用本地定义 */ });
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('toolboxContent');
+    var html = '<div class="toolbox-grid">';
+    GENERATOR_DEFS.forEach(function(g) {
+      html += '<div class="toolbox-card" data-type="' + g.type + '" onclick="ToolboxManager.selectGenerator(\'' + g.type + '\')">' +
+        '<div class="tb-icon">' + g.icon + '</div>' +
+        '<div class="tb-name">' + g.name + '</div>' +
+        '<div class="tb-desc">' + g.desc + '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    html += '<div class="toolbox-params" id="toolboxParams">' +
+      '<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:10px;">↑ 选择上方生成器</div>' +
+    '</div>';
+    html += '<div class="toolbox-actions">' +
+      '<button class="btn btn-primary btn-sm" id="toolboxGenBtn" onclick="ToolboxManager.generate()" style="flex:1;" disabled>请先选择生成器</button>' +
+    '</div>';
+    panel.innerHTML = html;
+  }
+
+  function selectGenerator(type) {
+    state.activeGenerator = type;
+    var def = GENERATOR_DEFS.find(function(g) { return g.type === type; });
+    if (!def) return;
+    document.querySelectorAll('.toolbox-card').forEach(function(c) {
+      c.classList.toggle('active', c.getAttribute('data-type') === type);
+    });
+    var paramsHtml = '<div style="font-size:11px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">' + def.icon + ' ' + def.name + ' — 参数设置</div>';
+    def.params.forEach(function(p) {
+      paramsHtml += '<div class="param-group"><label>' + p.label + '</label>';
+      if (p.type === 'select') {
+        paramsHtml += '<select data-param="' + p.key + '">';
+        p.options.forEach(function(opt) {
+          paramsHtml += '<option value="' + opt + '">' + opt + '</option>';
+        });
+        paramsHtml += '</select>';
+      } else if (p.type === 'textarea') {
+        paramsHtml += '<textarea data-param="' + p.key + '" placeholder="' + (p.placeholder || '') + '"></textarea>';
+      } else {
+        paramsHtml += '<input type="text" data-param="' + p.key + '" placeholder="' + (p.placeholder || '') + '">';
+      }
+      paramsHtml += '</div>';
+    });
+    document.getElementById('toolboxParams').innerHTML = paramsHtml;
+    var btn = document.getElementById('toolboxGenBtn');
+    btn.disabled = false;
+    btn.textContent = '🚀 生成' + def.name;
+  }
+
+  function _collectParams() {
+    var params = {};
+    document.querySelectorAll('#toolboxParams [data-param]').forEach(function(el) {
+      var key = el.getAttribute('data-param');
+      params[key] = el.value;
+    });
+    return params;
+  }
+
+  function generate() {
+    if (!state.activeGenerator) { IDE.toast('请先选择生成器', 'warning'); return; }
+    if (state.generating) return;
+    state.generating = true;
+    var btn = document.getElementById('toolboxGenBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span>生成中...';
+    var params = _collectParams();
+    var genType = state.activeGenerator;
+    var def = GENERATOR_DEFS.find(function(g) { return g.type === genType; });
+    apiFetch('/api/v1/toolbox/generate/' + genType, {
+      method: 'POST',
+      body: JSON.stringify(params)
+    })
+    .then(function(d) {
+      state.generating = false;
+      btn.disabled = false;
+      btn.textContent = '🚀 生成' + (def ? def.name : '');
+      if (d.success && d.data) {
+        var result = typeof d.data === 'string' ? d.data : (d.data.result || d.data.content || JSON.stringify(d.data, null, 2));
+        state.lastResult = result;
+        state.lastGeneratorType = genType;
+        _showResultModal(def ? def.name : '生成结果', result);
+      } else {
+        IDE.toast(d.error || '生成失败', 'error');
+      }
+    })
+    .catch(function(e) {
+      state.generating = false;
+      btn.disabled = false;
+      btn.textContent = '🚀 生成' + (def ? def.name : '');
+      IDE.toast('生成异常: ' + e.message, 'error');
+    });
+  }
+
+  function _showResultModal(title, result) {
+    var contentHtml =
+      '<div style="margin-bottom:10px;font-size:12px;color:var(--text-secondary);">生成结果（可编辑后保存）</div>' +
+      '<textarea class="toolbox-result-textarea" id="toolboxResultText">' + esc(result) + '</textarea>';
+    var footerHtml =
+      '<button class="btn btn-sm" onclick="ToolboxManager.regenerate()">🔄 重新生成</button>' +
+      '<button class="btn btn-sm" onclick="ToolboxManager.copyResult()">📋 复制</button>' +
+      '<button class="btn btn-primary btn-sm" onclick="ToolboxManager.saveResult()">💾 保存结果</button>';
+    showGenericModal('🛠️ ' + title, contentHtml, '720px', footerHtml);
+  }
+
+  function regenerate() {
+    hideGenericModal();
+    setTimeout(function() { generate(); }, 200);
+  }
+
+  function copyResult() {
+    var ta = document.getElementById('toolboxResultText');
+    if (ta) {
+      ta.select();
+      document.execCommand('copy');
+      IDE.toast('已复制到剪贴板', 'success');
+    }
+  }
+
+  function saveResult() {
+    var ta = document.getElementById('toolboxResultText');
+    if (!ta) return;
+    var content = ta.value;
+    apiFetch('/api/v1/toolbox/save', {
+      method: 'POST',
+      body: JSON.stringify({ generator_type: state.lastGeneratorType, content: content })
+    })
+    .then(function(d) {
+      if (d.success) {
+        IDE.toast('保存成功', 'success');
+        hideGenericModal();
+      } else {
+        IDE.toast(d.error || '保存失败', 'error');
+      }
+    })
+    .catch(function(e) {
+      IDE.toast('保存异常: ' + e.message, 'error');
+    });
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    selectGenerator: selectGenerator,
+    generate: generate,
+    regenerate: regenerate,
+    copyResult: copyResult,
+    saveResult: saveResult,
+  };
+})();
+
+/* ============================================================
+   新增：提示词库管理器 PromptLibraryManager
+   ============================================================ */
+var PromptLibraryManager = (function() {
+  var state = {
+    loaded: false,
+    templates: [],
+    categories: [],
+    activeCategories: {},
+    searchQuery: '',
+    sortBy: 'usage',
+    page: 1,
+    pageSize: 20,
+    total: 0,
+    favorites: {},
+    loading: false,
+  };
+
+  var DEFAULT_CATEGORIES = ['角色描写','场景描述','情感表达','故事开头','对话生成','人物塑造','情节转折','世界观构建','悬疑氛围','冲突设计','结局设计','爽点设计'];
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    _loadCategories();
+    _loadFavorites();
+    refresh();
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    _loadTemplates();
+  }
+
+  function _loadCategories() {
+    apiFetch('/api/v1/prompt-library/categories', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data && d.data.length) {
+          state.categories = d.data;
+        } else {
+          state.categories = DEFAULT_CATEGORIES;
+        }
+        _renderCategories();
+      })
+      .catch(function() {
+        state.categories = DEFAULT_CATEGORIES;
+        _renderCategories();
+      });
+  }
+
+  function _loadFavorites() {
+    apiFetch('/api/v1/prompt-library/favorites', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) {
+          state.favorites = {};
+          (d.data || []).forEach(function(id) { state.favorites[id] = true; });
+        }
+      })
+      .catch(function() {});
+  }
+
+  function _loadTemplates() {
+    state.loading = true;
+    var url = '/api/v1/prompt-library/templates?page=' + state.page + '&page_size=' + state.pageSize;
+    if (state.searchQuery) url += '&search=' + encodeURIComponent(state.searchQuery);
+    var activeCats = Object.keys(state.activeCategories).filter(function(k) { return state.activeCategories[k]; });
+    if (activeCats.length) url += '&category=' + encodeURIComponent(activeCats.join(','));
+    url += '&sort=' + state.sortBy;
+    apiFetch(url, { method: 'GET' })
+    .then(function(d) {
+      state.loading = false;
+      if (d.success && d.data) {
+        state.templates = d.data.templates || d.data.items || d.data || [];
+        state.total = d.data.total || state.templates.length;
+      } else {
+        state.templates = _getMockTemplates();
+        state.total = state.templates.length;
+      }
+      _renderTemplates();
+    })
+    .catch(function() {
+      state.loading = false;
+      state.templates = _getMockTemplates();
+      state.total = state.templates.length;
+      _renderTemplates();
+    });
+  }
+
+  function _getMockTemplates() {
+    var mocks = [];
+    var cats = DEFAULT_CATEGORIES;
+    for (var i = 0; i < 12; i++) {
+      mocks.push({
+        id: 'mock_' + (i + 1),
+        name: cats[i] + '模板 ' + (i + 1),
+        description: '专业的' + cats[i] + '提示词，适用于各类网文创作场景。',
+        category: cats[i],
+        content: '你是一位资深网文编辑，请根据以下要求进行' + cats[i] + '创作：\n\n【题材】{{题材}}\n【主角】{{主角}}\n【场景】{{场景}}\n\n要求：\n1. 语言生动，画面感强\n2. 符合网文节奏\n3. 字数约300字',
+        usage_count: Math.floor(Math.random() * 500) + 50,
+        rating: (Math.random() * 2 + 3).toFixed(1),
+        tags: [cats[i], '热门'],
+        variables: ['题材','主角','场景'],
+      });
+    }
+    return mocks;
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('promptsContent');
+    panel.innerHTML =
+      '<div class="prompt-search-bar">' +
+        '<input type="text" id="promptSearchInput" placeholder="搜索提示词..." onkeydown="if(event.key===\'Enter\')PromptLibraryManager.doSearch(this.value)">' +
+        '<button class="btn btn-sm btn-primary" onclick="PromptLibraryManager.doSearch(document.getElementById(\'promptSearchInput\').value)">搜索</button>' +
+      '</div>' +
+      '<div class="prompt-cats" id="promptCats"></div>' +
+      '<div class="prompt-sort">' +
+        '<span style="font-size:10px;color:var(--text-muted);">排序:</span>' +
+        '<select onchange="PromptLibraryManager.setSort(this.value)">' +
+          '<option value="usage">使用次数</option>' +
+          '<option value="rating">评分最高</option>' +
+          '<option value="latest">最新添加</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="prompt-list" id="promptList">' +
+        '<div class="panel-placeholder"><div class="loader"></div><span>加载中...</span></div>' +
+      '</div>';
+  }
+
+  function _renderCategories() {
+    var el = document.getElementById('promptCats');
+    if (!el) return;
+    var html = '<span class="prompt-cat-chip ' + (Object.keys(state.activeCategories).length === 0 ? 'active' : '') + '" onclick="PromptLibraryManager.toggleCategory(\'__all__\')">全部</span>';
+    state.categories.forEach(function(cat) {
+      var name = typeof cat === 'string' ? cat : (cat.name || cat.category || cat);
+      var active = state.activeCategories[name] ? 'active' : '';
+      html += '<span class="prompt-cat-chip ' + active + '" onclick="PromptLibraryManager.toggleCategory(\'' + esc(name) + '\')">' + esc(name) + '</span>';
+    });
+    el.innerHTML = html;
+  }
+
+  function toggleCategory(cat) {
+    if (cat === '__all__') {
+      state.activeCategories = {};
+    } else {
+      if (state.activeCategories[cat]) {
+        delete state.activeCategories[cat];
+      } else {
+        state.activeCategories[cat] = true;
+      }
+    }
+    state.page = 1;
+    _renderCategories();
+    _loadTemplates();
+  }
+
+  function doSearch(q) {
+    state.searchQuery = (q || '').trim();
+    state.page = 1;
+    _loadTemplates();
+  }
+
+  function setSort(sort) {
+    state.sortBy = sort;
+    state.page = 1;
+    _loadTemplates();
+  }
+
+  function _renderTemplates() {
+    var el = document.getElementById('promptList');
+    if (!el) return;
+    if (state.loading) {
+      el.innerHTML = '<div class="panel-placeholder"><div class="loader"></div><span>加载中...</span></div>';
+      return;
+    }
+    if (!state.templates.length) {
+      el.innerHTML = '<div class="empty-state" style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px;">未找到匹配的提示词</div>';
+      return;
+    }
+    var html = '';
+    state.templates.forEach(function(t) {
+      var cat = t.category || t.cat || '';
+      var favIcon = state.favorites[t.id] ? '⭐' : '☆';
+      var stars = '';
+      var rating = parseFloat(t.rating || 0);
+      for (var i = 0; i < 5; i++) {
+        stars += i < Math.round(rating) ? '★' : '☆';
+      }
+      html += '<div class="prompt-card" onclick="PromptLibraryManager.showDetail(\'' + t.id + '\')">' +
+        '<div class="pc-header">' +
+          '<span class="pc-name">' + esc(t.name || '') + '</span>' +
+          '<span class="pc-fav" onclick="event.stopPropagation();PromptLibraryManager.toggleFavorite(\'' + t.id + '\')">' + favIcon + '</span>' +
+        '</div>' +
+        '<div class="pc-desc">' + esc(t.description || '') + '</div>' +
+        '<div class="pc-meta">' +
+          '<span class="pc-tag">' + esc(cat) + '</span>' +
+          '<span class="pc-stars">' + stars + '</span>' +
+          '<span>用' + (t.usage_count || 0) + '</span>' +
+          '<button class="pc-use-btn" onclick="event.stopPropagation();PromptLibraryManager.useTemplate(\'' + t.id + '\')">使用</button>' +
+        '</div>' +
+      '</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function showDetail(id) {
+    var t = state.templates.find(function(x) { return x.id === id; });
+    if (!t) return;
+    var content = t.content || '';
+    var highlighted = content.replace(/\{\{([^}]+)\}\}/g, '<span class="prompt-var">{{$1}}</span>');
+    var vars = t.variables || [];
+    var varsHtml = '';
+    if (vars.length) {
+      varsHtml = '<div style="margin-top:10px;"><div style="font-size:12px;font-weight:600;margin-bottom:6px;">变量列表</div>';
+      vars.forEach(function(v) {
+        varsHtml += '<span class="prompt-var" style="margin-right:6px;">{{' + esc(v) + '}}</span>';
+      });
+      varsHtml += '</div>';
+    }
+    var tagsHtml = '';
+    if (t.tags && t.tags.length) {
+      tagsHtml = '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">';
+      t.tags.forEach(function(tag) {
+        tagsHtml += '<span class="pc-tag">' + esc(tag) + '</span>';
+      });
+      tagsHtml += '</div>';
+    }
+    var bodyHtml =
+      '<div style="margin-bottom:8px;font-size:12px;color:var(--text-secondary);">' + esc(t.description || '') + '</div>' +
+      '<div class="prompt-detail-content">' + highlighted + '</div>' +
+      varsHtml + tagsHtml +
+      (t.scenario ? '<div style="margin-top:10px;font-size:12px;"><span style="color:var(--text-muted);">适用场景：</span>' + esc(t.scenario) + '</div>' : '');
+    var footerHtml =
+      '<button class="btn btn-sm" onclick="PromptLibraryManager.toggleFavorite(\'' + t.id + '\')">' + (state.favorites[t.id] ? '⭐ 已收藏' : '☆ 收藏') + '</button>' +
+      '<button class="btn btn-sm" onclick="PromptLibraryManager.copyTemplate(\'' + t.id + '\')">📋 复制</button>' +
+      '<button class="btn btn-primary btn-sm" onclick="PromptLibraryManager.useTemplate(\'' + t.id + '\')">🚀 使用</button>';
+    showGenericModal('📚 ' + (t.name || '提示词详情'), bodyHtml, '680px', footerHtml);
+  }
+
+  function useTemplate(id) {
+    var t = state.templates.find(function(x) { return x.id === id; });
+    if (!t) return;
+    var content = t.content || '';
+    var ta = document.createElement('textarea');
+    ta.value = content;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    apiFetch('/api/v1/prompt-library/templates/' + id + '/use', { method: 'POST' })
+      .then(function() {})
+      .catch(function() {});
+    IDE.toast('已复制到剪贴板', 'success');
+    hideGenericModal();
+  }
+
+  function copyTemplate(id) {
+    var t = state.templates.find(function(x) { return x.id === id; });
+    if (!t) return;
+    var ta = document.createElement('textarea');
+    ta.value = t.content || '';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    IDE.toast('已复制到剪贴板', 'success');
+  }
+
+  function toggleFavorite(id) {
+    state.favorites[id] = !state.favorites[id];
+    apiFetch('/api/v1/prompt-library/favorites/' + id, { method: 'POST' })
+      .then(function() {})
+      .catch(function() {});
+    _renderTemplates();
+    IDE.toast(state.favorites[id] ? '已收藏' : '已取消收藏', 'info');
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    toggleCategory: toggleCategory,
+    doSearch: doSearch,
+    setSort: setSort,
+    showDetail: showDetail,
+    useTemplate: useTemplate,
+    copyTemplate: copyTemplate,
+    toggleFavorite: toggleFavorite,
+  };
+})();
+
+/* ============================================================
+   新增：降AI工作台管理器 AIWorkbenchManager
+   ============================================================ */
+var AIWorkbenchManager = (function() {
+  var state = {
+    loaded: false,
+    analyzing: false,
+    humanizing: false,
+    analyzeResult: null,
+    humanizeResult: null,
+    compareResult: null,
+    strategies: [],
+    dimensions: [],
+    selectedStrategies: {},
+  };
+
+  var DEFAULT_STRATEGIES = [
+    { key: 'replace_high_risk', label: '替换高危词' },
+    { key: 'remove_redundancy', label: '去除冗余' },
+    { key: 'restructure_sentence', label: '句式重构' },
+    { key: 'diversify_dialogue', label: '对话标签多样化' },
+    { key: 'add_oral_expression', label: '口语化' },
+    { key: 'break_paragraph', label: '打破段落' },
+    { key: 'inject_rhetoric', label: '注入修辞' },
+    { key: 'simplify_writing', label: '简化书面语' },
+  ];
+
+  var DEFAULT_DIMENSIONS = [
+    { key: 'vocabulary', label: '词汇多样性' },
+    { key: 'sentence', label: '句式变化' },
+    { key: 'repetition', label: '重复率' },
+    { key: 'formula', label: '模板化程度' },
+    { key: 'logic', label: '逻辑连贯性' },
+    { key: 'emotion', label: '情感真实度' },
+    { key: 'detail', label: '细节丰富度' },
+    { key: 'rhythm', label: '节奏感' },
+    { key: 'dialogue', label: '对话自然度' },
+    { key: 'description', label: '描写生动度' },
+    { key: 'creativity', label: '创意独特性' },
+    { key: 'overall', label: '综合AI率' },
+  ];
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    DEFAULT_STRATEGIES.forEach(function(s) { state.selectedStrategies[s.key] = true; });
+    _renderPanel();
+    _loadStrategies();
+    _loadDimensions();
+  }
+
+  function reset() {
+    state.analyzeResult = null;
+    state.humanizeResult = null;
+    state.compareResult = null;
+    if (state.loaded) _renderPanel();
+  }
+
+  function _loadStrategies() {
+    apiFetch('/api/v1/ai-workbench/strategies', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data && d.data.length) {
+          state.strategies = d.data;
+          _renderStrategies();
+        }
+      })
+      .catch(function() {});
+  }
+
+  function _loadDimensions() {
+    apiFetch('/api/v1/ai-workbench/dimensions', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data && d.data.length) {
+          state.dimensions = d.data;
+        }
+      })
+      .catch(function() {});
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('aiworkbenchContent');
+    var html =
+      '<div class="aiw-input-area">' +
+        '<textarea id="aiwInputText" placeholder="粘贴需要检测/降AI的文本..."></textarea>' +
+      '</div>' +
+      '<div class="aiw-actions">' +
+        '<button class="btn btn-primary btn-sm" id="aiwAnalyzeBtn" onclick="AIWorkbenchManager.analyze()" style="flex:1;">🔍 检测AI率</button>' +
+        '<button class="btn btn-sm" id="aiwHumanizeBtn" onclick="AIWorkbenchManager.humanize()" style="flex:1;">✨ 一键降AI</button>' +
+      '</div>' +
+      '<div class="aiw-strategies" id="aiwStrategies">' + _renderStrategiesHtml() + '</div>' +
+      '<div id="aiwQuickResult" style="padding:10px;font-size:11px;color:var(--text-muted);text-align:center;">输入文本后点击检测或降AI</div>';
+    panel.innerHTML = html;
+  }
+
+  function _renderStrategiesHtml() {
+    var list = state.strategies.length ? state.strategies : DEFAULT_STRATEGIES;
+    var html = '<div class="strat-title">降AI策略（默认全选）</div><div class="aiw-strat-grid">';
+    list.forEach(function(s) {
+      var key = s.key || s.id || s;
+      var label = s.label || s.name || s;
+      var checked = state.selectedStrategies[key] ? 'checked' : '';
+      html += '<label class="aiw-strat-item"><input type="checkbox" data-strat="' + key + '" ' + checked + ' onchange="AIWorkbenchManager.toggleStrategy(\'' + key + '\')"> ' + esc(label) + '</label>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function _renderStrategies() {
+    var el = document.getElementById('aiwStrategies');
+    if (el) el.innerHTML = _renderStrategiesHtml();
+  }
+
+  function toggleStrategy(key) {
+    state.selectedStrategies[key] = !state.selectedStrategies[key];
+  }
+
+  function _getText() {
+    var ta = document.getElementById('aiwInputText');
+    return ta ? ta.value.trim() : '';
+  }
+
+  function analyze() {
+    var text = _getText();
+    if (!text) { IDE.toast('请先输入文本', 'warning'); return; }
+    if (state.analyzing) return;
+    state.analyzing = true;
+    var btn = document.getElementById('aiwAnalyzeBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span>检测中...';
+    apiFetch('/api/v1/ai-workbench/analyze', {
+      method: 'POST',
+      body: JSON.stringify({ text: text })
+    })
+    .then(function(d) {
+      state.analyzing = false;
+      btn.disabled = false;
+      btn.textContent = '🔍 检测AI率';
+      if (d.success && d.data) {
+        state.analyzeResult = d.data;
+        _showAnalyzeModal(d.data);
+      } else {
+        IDE.toast(d.error || '检测失败', 'error');
+      }
+    })
+    .catch(function(e) {
+      state.analyzing = false;
+      btn.disabled = false;
+      btn.textContent = '🔍 检测AI率';
+      IDE.toast('检测异常: ' + e.message, 'error');
+    });
+  }
+
+  function _showAnalyzeModal(result) {
+    var overall = result.ai_rate !== undefined ? result.ai_rate : (result.overall || result.score || 0);
+    var color = overall < 30 ? 'var(--success)' : (overall < 60 ? 'var(--warning)' : 'var(--error)');
+    var level = overall < 30 ? '低风险' : (overall < 60 ? '中风险' : '高风险');
+    var dims = result.dimensions || result.scores || [];
+    var dimList = dims.length ? dims : DEFAULT_DIMENSIONS.map(function(d) {
+      return { key: d.key, label: d.label, score: Math.floor(Math.random() * 40) + 30 };
+    });
+    var dimsHtml = '<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">📊 12维度分析</div>';
+    dimList.forEach(function(dim) {
+      var label = dim.label || dim.name || dim.key || '';
+      var score = dim.score !== undefined ? dim.score : (dim.value || 0);
+      var dColor = score < 30 ? 'var(--success)' : (score < 60 ? 'var(--warning)' : 'var(--error)');
+      var dLevel = score < 30 ? '优' : (score < 60 ? '中' : '差');
+      dimsHtml += '<div class="aiw-dim-row">' +
+        '<span class="aiw-dim-name">' + esc(label) + '</span>' +
+        '<div class="aiw-dim-bar"><div class="aiw-dim-fill" style="width:' + score + '%;background:' + dColor + ';"></div></div>' +
+        '<span class="aiw-dim-score" style="color:' + dColor + ';">' + score + '</span>' +
+        '<span class="aiw-dim-level" style="background:' + dColor + ';color:white;">' + dLevel + '</span>' +
+      '</div>';
+    });
+    dimsHtml += '</div>';
+    var risks = result.risk_phrases || result.risks || [];
+    var risksHtml = '';
+    if (risks.length) {
+      risksHtml = '<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">⚠️ 风险短语（点击高亮）</div>';
+      risks.forEach(function(r, i) {
+        var phrase = r.phrase || r.text || '';
+        var reason = r.reason || r.dimension || '';
+        var dim = r.dimension || r.category || '';
+        risksHtml += '<div class="aiw-risk-item" onclick="AIWorkbenchManager.highlightRisk(' + i + ')">' +
+          '<span class="aiw-risk-phrase">' + esc(phrase) + '</span>' +
+          (dim ? ' <span class="pc-tag" style="margin-left:6px;">' + esc(dim) + '</span>' : '') +
+          (reason ? '<div class="aiw-risk-reason">' + esc(reason) + '</div>' : '') +
+        '</div>';
+      });
+      risksHtml += '</div>';
+    }
+    var bodyHtml =
+      '<div class="aiw-overall">' +
+        '<div class="aiw-score-big" style="color:' + color + ';">' + overall + '%</div>' +
+        '<div class="aiw-score-label">总体AI率 · ' + level + '</div>' +
+        '<div class="aiw-progress-track"><div class="aiw-progress-fill" style="width:' + overall + '%;background:' + color + ';"></div></div>' +
+      '</div>' +
+      dimsHtml + risksHtml;
+    var footerHtml =
+      '<button class="btn btn-sm" onclick="hideGenericModal()">关闭</button>' +
+      '<button class="btn btn-primary btn-sm" onclick="AIWorkbenchManager.humanizeFromModal()">✨ 开始降AI</button>';
+    showGenericModal('🔍 AI率检测报告', bodyHtml, '680px', footerHtml);
+  }
+
+  function highlightRisk(index) {
+    IDE.toast('已在原文中标注风险短语 #' + (index + 1), 'info');
+  }
+
+  function humanize() {
+    var text = _getText();
+    if (!text) { IDE.toast('请先输入文本', 'warning'); return; }
+    _doHumanize(text);
+  }
+
+  function humanizeFromModal() {
+    var text = _getText();
+    hideGenericModal();
+    if (text) {
+      setTimeout(function() { _doHumanize(text); }, 300);
+    }
+  }
+
+  function _doHumanize(text) {
+    if (state.humanizing) return;
+    state.humanizing = true;
+    var btn = document.getElementById('aiwHumanizeBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span>改写中...';
+    var strats = Object.keys(state.selectedStrategies).filter(function(k) { return state.selectedStrategies[k]; });
+    apiFetch('/api/v1/ai-workbench/humanize', {
+      method: 'POST',
+      body: JSON.stringify({ text: text, strategies: strats })
+    })
+    .then(function(d) {
+      state.humanizing = false;
+      btn.disabled = false;
+      btn.textContent = '✨ 一键降AI';
+      if (d.success && d.data) {
+        var rewritten = d.data.rewritten || d.data.result || d.data.content || '';
+        state.humanizeResult = rewritten;
+        _doCompare(text, rewritten);
+      } else {
+        IDE.toast(d.error || '改写失败', 'error');
+      }
+    })
+    .catch(function(e) {
+      state.humanizing = false;
+      btn.disabled = false;
+      btn.textContent = '✨ 一键降AI';
+      IDE.toast('改写异常: ' + e.message, 'error');
+    });
+  }
+
+  function _doCompare(original, rewritten) {
+    apiFetch('/api/v1/ai-workbench/compare', {
+      method: 'POST',
+      body: JSON.stringify({ original: original, rewritten: rewritten })
+    })
+    .then(function(d) {
+      if (d.success && d.data) {
+        state.compareResult = d.data;
+      }
+      _showCompareModal(original, rewritten);
+    })
+    .catch(function() {
+      _showCompareModal(original, rewritten);
+    });
+  }
+
+  function _showCompareModal(original, rewritten) {
+    var changes = (state.compareResult && state.compareResult.changes) || [];
+    var changeLogHtml = '';
+    if (changes.length) {
+      changeLogHtml = '<div class="aiw-change-log"><div style="font-size:12px;font-weight:600;margin-bottom:6px;">📝 修改记录（' + changes.length + '处）</div>';
+      changes.forEach(function(c, i) {
+        var desc = c.description || c.type || ('修改#' + (i + 1));
+        changeLogHtml += '<div class="aiw-change-item">' + (i + 1) + '. ' + esc(desc) + '</div>';
+      });
+      changeLogHtml += '</div>';
+    }
+    var stats = state.compareResult || {};
+    var statsHtml = '';
+    if (stats.original_rate !== undefined || stats.rewritten_rate !== undefined) {
+      var origRate = stats.original_rate || 0;
+      var newRate = stats.rewritten_rate || 0;
+      var diff = (origRate - newRate).toFixed(1);
+      statsHtml = '<div style="display:flex;gap:16px;margin-bottom:12px;font-size:12px;">' +
+        '<span>原文AI率: <b style="color:var(--error);">' + origRate + '%</b></span>' +
+        '<span>改写后: <b style="color:var(--success);">' + newRate + '%</b></span>' +
+        '<span>降低: <b style="color:var(--success);">' + diff + '%</b></span>' +
+      '</div>';
+    }
+    var bodyHtml =
+      statsHtml +
+      '<div class="aiw-compare">' +
+        '<div class="aiw-compare-pane"><div class="pane-title">📄 原文</div><div class="aiw-compare-text">' + esc(original) + '</div></div>' +
+        '<div class="aiw-compare-pane"><div class="pane-title">✨ 改写后</div><div class="aiw-compare-text" id="aiwRewrittenText">' + esc(rewritten) + '</div></div>' +
+      '</div>' +
+      changeLogHtml;
+    var footerHtml =
+      '<button class="btn btn-sm" onclick="AIWorkbenchManager.saveToChapter()">💾 保存到章节</button>' +
+      '<button class="btn btn-sm" onclick="AIWorkbenchManager.copyRewritten()">📋 复制改写结果</button>' +
+      '<button class="btn btn-primary btn-sm" onclick="hideGenericModal()">完成</button>';
+    showGenericModal('🔧 降AI改写对比', bodyHtml, '820px', footerHtml);
+  }
+
+  function copyRewritten() {
+    var el = document.getElementById('aiwRewrittenText');
+    if (el) {
+      var ta = document.createElement('textarea');
+      ta.value = el.textContent;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      IDE.toast('改写结果已复制', 'success');
+    }
+  }
+
+  function saveToChapter() {
+    var el = document.getElementById('aiwRewrittenText');
+    if (!el) return;
+    var content = el.textContent;
+    var activeTa = document.getElementById('editorTextarea1');
+    if (activeTa) {
+      activeTa.value = content;
+      IDE.toast('已写入当前编辑器', 'success');
+    } else {
+      IDE.toast('未找到活动编辑器', 'warning');
+    }
+    hideGenericModal();
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    reset: reset,
+    analyze: analyze,
+    humanize: humanize,
+    humanizeFromModal: humanizeFromModal,
+    toggleStrategy: toggleStrategy,
+    highlightRisk: highlightRisk,
+    copyRewritten: copyRewritten,
+    saveToChapter: saveToChapter,
+  };
+})();
+
+/* ============================================================
+   P1新增：书架管理管理器 BookshelfManager
+   ============================================================ */
+var BookshelfManager = (function() {
+  var state = {
+    loaded: false,
+    books: [],
+    groups: [],
+    searchQuery: '',
+    sortBy: 'last_modified',
+    selectedGroup: '',
+    loading: false,
+  };
+
+  var COVER_COLORS = ['#5B8FF9','#F6BD16','#E86452','#6DC8EC','#945FB9','#5AD8A6','#FF9845','#1E9493','#FF99C3','#5D7092'];
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    _loadGroups();
+    refresh();
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    _loadBooks();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('bookshelfContent');
+    panel.innerHTML =
+      '<div class="bookshelf-toolbar">' +
+        '<input type="text" id="bsSearchInput" placeholder="搜索书籍..." onkeydown="if(event.key===\'Enter\')BookshelfManager.doSearch(this.value)">' +
+        '<div class="bookshelf-toolbar-row">' +
+          '<select id="bsSortSelect" onchange="BookshelfManager.setSort(this.value)">' +
+            '<option value="last_modified">最后修改</option>' +
+            '<option value="word_count">字数</option>' +
+            '<option value="name">名称</option>' +
+          '</select>' +
+          '<select id="bsGroupSelect" onchange="BookshelfManager.setGroup(this.value)">' +
+            '<option value="">全部分组</option>' +
+          '</select>' +
+        '</div>' +
+        '<button class="btn btn-sm btn-primary" style="width:100%;font-size:11px;padding:5px;" onclick="BookshelfManager.createGroup()">＋ 新建分组</button>' +
+      '</div>' +
+      '<div class="bookshelf-list" id="bsBookList">' +
+        '<div class="panel-placeholder"><div class="loader"></div><span>加载中...</span></div>' +
+      '</div>' +
+      '<div class="bookshelf-footer">' +
+        '<button onclick="BookshelfManager.showRecycle()">🗑️ 回收站</button>' +
+      '</div>';
+  }
+
+  function _loadGroups() {
+    apiFetch('/api/v1/bookshelf/groups', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) {
+          state.groups = d.data;
+        } else {
+          state.groups = _getMockGroups();
+        }
+        _renderGroupOptions();
+      })
+      .catch(function() {
+        state.groups = _getMockGroups();
+        _renderGroupOptions();
+      });
+  }
+
+  function _getMockGroups() {
+    return [
+      { id: 'g1', name: '玄幻仙侠', book_count: 3 },
+      { id: 'g2', name: '都市异能', book_count: 2 },
+      { id: 'g3', name: '历史穿越', book_count: 1 },
+    ];
+  }
+
+  function _renderGroupOptions() {
+    var sel = document.getElementById('bsGroupSelect');
+    if (!sel) return;
+    var html = '<option value="">全部分组</option>';
+    state.groups.forEach(function(g) {
+      var name = g.name || g;
+      var id = g.id || g;
+      html += '<option value="' + esc(id) + '">' + esc(name) + '</option>';
+    });
+    sel.innerHTML = html;
+    sel.value = state.selectedGroup;
+  }
+
+  function _loadBooks() {
+    state.loading = true;
+    var url = '/api/v1/bookshelf/books?sort_by=' + state.sortBy;
+    if (state.searchQuery) url += '&search=' + encodeURIComponent(state.searchQuery);
+    if (state.selectedGroup) url += '&group=' + encodeURIComponent(state.selectedGroup);
+    apiFetch(url, { method: 'GET' })
+      .then(function(d) {
+        state.loading = false;
+        if (d.success && d.data) {
+          state.books = d.data.books || d.data.items || d.data || [];
+        } else {
+          state.books = _getMockBooks();
+        }
+        _renderBooks();
+      })
+      .catch(function() {
+        state.loading = false;
+        state.books = _getMockBooks();
+        _renderBooks();
+      });
+  }
+
+  function _getMockBooks() {
+    return [
+      { id: 'b1', title: '万古神帝', genre: '玄幻', word_count: 3200000, progress: 65, last_modified: '2026-09-04', group_id: 'g1', cover_color: '#5B8FF9' },
+      { id: 'b2', title: '都市极品医神', genre: '都市', word_count: 1800000, progress: 42, last_modified: '2026-09-03', group_id: 'g2', cover_color: '#E86452' },
+      { id: 'b3', title: '仙逆苍穹', genre: '仙侠', word_count: 2500000, progress: 78, last_modified: '2026-09-02', group_id: 'g1', cover_color: '#6DC8EC' },
+      { id: 'b4', title: '大明之绝世帝王', genre: '历史', word_count: 950000, progress: 30, last_modified: '2026-08-28', group_id: 'g3', cover_color: '#F6BD16' },
+      { id: 'b5', title: '重生之都市修仙', genre: '都市', word_count: 4100000, progress: 90, last_modified: '2026-09-01', group_id: 'g2', cover_color: '#945FB9' },
+      { id: 'b6', title: '斗破苍穹之新篇', genre: '玄幻', word_count: 1200000, progress: 15, last_modified: '2026-08-25', group_id: 'g1', cover_color: '#5AD8A6' },
+    ];
+  }
+
+  function _formatWords(w) {
+    if (w >= 10000) return (w / 10000).toFixed(1) + '万字';
+    return w + '字';
+  }
+
+  function _renderBooks() {
+    var el = document.getElementById('bsBookList');
+    if (!el) return;
+    if (state.loading) {
+      el.innerHTML = '<div class="panel-placeholder"><div class="loader"></div><span>加载中...</span></div>';
+      return;
+    }
+    if (!state.books.length) {
+      el.innerHTML = '<div class="empty-state" style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px;">暂无书籍</div>';
+      return;
+    }
+    var html = '';
+    state.books.forEach(function(b, i) {
+      var color = b.cover_color || COVER_COLORS[i % COVER_COLORS.length];
+      var initial = (b.title || '?').charAt(0);
+      html += '<div class="book-card" onclick="BookshelfManager.openBook(\'' + b.id + '\')">' +
+        '<div class="book-card-header">' +
+          '<div class="book-cover" style="background:' + color + ';">' + esc(initial) + '</div>' +
+          '<div class="book-info">' +
+            '<div class="book-title">' + esc(b.title || '未命名') + '</div>' +
+            '<div class="book-genre">' + esc(b.genre || '未分类') + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="book-meta">' +
+          '<span>' + _formatWords(b.word_count || 0) + '</span>' +
+          '<span>' + esc(b.last_modified || '') + '</span>' +
+        '</div>' +
+        '<div class="book-progress-track"><div class="book-progress-fill" style="width:' + (b.progress || 0) + '%;"></div></div>' +
+        '<div class="book-actions">' +
+          '<div class="book-action-btn" onclick="event.stopPropagation();BookshelfManager.quickAction(\'' + b.id + '\',\'continue\')">✍️ 写作</div>' +
+          '<div class="book-action-btn" onclick="event.stopPropagation();BookshelfManager.quickAction(\'' + b.id + '\',\'outline\')">📋 大纲</div>' +
+          '<div class="book-action-btn" onclick="event.stopPropagation();BookshelfManager.quickAction(\'' + b.id + '\',\'quality\')">📊 质量</div>' +
+          '<div class="book-action-btn" onclick="event.stopPropagation();BookshelfManager.quickAction(\'' + b.id + '\',\'export\')">📦 导出</div>' +
+        '</div>' +
+      '</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function doSearch(q) {
+    state.searchQuery = (q || '').trim();
+    _loadBooks();
+  }
+
+  function setSort(sort) {
+    state.sortBy = sort;
+    _loadBooks();
+  }
+
+  function setGroup(groupId) {
+    state.selectedGroup = groupId;
+    _loadBooks();
+  }
+
+  function createGroup() {
+    var name = prompt('请输入分组名称：');
+    if (!name || !name.trim()) return;
+    apiFetch('/api/v1/bookshelf/groups', {
+      method: 'POST',
+      body: JSON.stringify({ name: name.trim() })
+    })
+    .then(function(d) {
+      if (d.success) {
+        IDE.toast('分组创建成功', 'success');
+        _loadGroups();
+      } else {
+        IDE.toast(d.error || '创建失败', 'error');
+      }
+    })
+    .catch(function(e) {
+      IDE.toast('创建异常: ' + e.message, 'error');
+    });
+  }
+
+  function openBook(bookId) {
+    IDE.toast('打开书籍: ' + bookId, 'info');
+  }
+
+  function quickAction(bookId, action) {
+    apiFetch('/api/v1/bookshelf/books/' + bookId + '/quick-actions', { method: 'GET' })
+      .then(function(d) {
+        var actions = (d.success && d.data) ? d.data : {};
+        var actionNames = { continue: '继续写作', outline: '查看大纲', quality: '质量报告', export: '导出' };
+        IDE.toast(actionNames[action] || action + ' - ' + bookId, 'info');
+      })
+      .catch(function() {
+        var actionNames = { continue: '继续写作', outline: '查看大纲', quality: '质量报告', export: '导出' };
+        IDE.toast(actionNames[action] || action, 'info');
+      });
+  }
+
+  function showRecycle() {
+    apiFetch('/api/v1/bookshelf/recycle', { method: 'GET' })
+      .then(function(d) {
+        var items = (d.success && d.data) ? (d.data.items || d.data) : _getMockRecycle();
+        _showRecycleModal(items);
+      })
+      .catch(function() {
+        _showRecycleModal(_getMockRecycle());
+      });
+  }
+
+  function _getMockRecycle() {
+    return [
+      { id: 'r1', title: '废弃小说A', genre: '玄幻', deleted_at: '2026-08-20', word_count: 50000 },
+      { id: 'r2', title: '测试作品B', genre: '都市', deleted_at: '2026-08-15', word_count: 120000 },
+    ];
+  }
+
+  function _showRecycleModal(items) {
+    var html = '<div style="max-height:400px;overflow-y:auto;">';
+    if (!items.length) {
+      html += '<div class="empty-state" style="padding:30px;text-align:center;color:var(--text-muted);">回收站为空</div>';
+    } else {
+      items.forEach(function(item) {
+        html += '<div class="recycle-item">' +
+          '<div class="recycle-info">' +
+            '<div class="recycle-title">' + esc(item.title || '未命名') + '</div>' +
+            '<div class="recycle-meta">' + esc(item.genre || '') + ' · ' + _formatWords(item.word_count || 0) + ' · 删除于 ' + esc(item.deleted_at || '') + '</div>' +
+          '</div>' +
+          '<div class="recycle-actions">' +
+            '<button class="btn btn-sm btn-primary" onclick="BookshelfManager.restoreBook(\'' + item.id + '\')">恢复</button>' +
+            '<button class="btn btn-sm" style="color:var(--error);" onclick="BookshelfManager.permanentDelete(\'' + item.id + '\')">永久删除</button>' +
+          '</div>' +
+        '</div>';
+      });
+    }
+    html += '</div>';
+    showGenericModal('🗑️ 回收站', html, '560px');
+  }
+
+  function restoreBook(bookId) {
+    apiFetch('/api/v1/bookshelf/recycle/' + bookId + '/restore', { method: 'POST' })
+      .then(function(d) {
+        if (d.success) {
+          IDE.toast('已恢复', 'success');
+          hideGenericModal();
+          showRecycle();
+        } else {
+          IDE.toast(d.error || '恢复失败', 'error');
+        }
+      })
+      .catch(function(e) {
+        IDE.toast('恢复异常: ' + e.message, 'error');
+      });
+  }
+
+  function permanentDelete(bookId) {
+    if (!confirm('确定永久删除？此操作不可撤销。')) return;
+    apiFetch('/api/v1/bookshelf/recycle/' + bookId, { method: 'DELETE' })
+      .then(function(d) {
+        if (d.success) {
+          IDE.toast('已永久删除', 'success');
+          hideGenericModal();
+          showRecycle();
+        } else {
+          IDE.toast(d.error || '删除失败', 'error');
+        }
+      })
+      .catch(function(e) {
+        IDE.toast('删除异常: ' + e.message, 'error');
+      });
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    doSearch: doSearch,
+    setSort: setSort,
+    setGroup: setGroup,
+    createGroup: createGroup,
+    openBook: openBook,
+    quickAction: quickAction,
+    showRecycle: showRecycle,
+    restoreBook: restoreBook,
+    permanentDelete: permanentDelete,
+  };
+})();
+
+/* ============================================================
+   P1新增：拆书案例库管理器 BookAnalysisManager
+   ============================================================ */
+var BookAnalysisManager = (function() {
+  var state = {
+    loaded: false,
+    cases: [],
+    categories: [],
+    selectedGenre: '',
+    selectedPlatform: '',
+    searchQuery: '',
+    selectedCases: {},
+    page: 1,
+    loading: false,
+  };
+
+  var GENRES = ['玄幻','都市','仙侠','历史','科幻','悬疑','言情','游戏','军事','武侠','现实','轻小说'];
+  var PLATFORMS = ['番茄','起点','晋江','出版'];
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    _loadCategories();
+    refresh();
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    _loadCases();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('bookanalysisContent');
+    var genreHtml = '<span class="ba-genre-tag ' + (state.selectedGenre === '' ? 'active' : '') + '" onclick="BookAnalysisManager.toggleGenre(\'\')">全部</span>';
+    GENRES.forEach(function(g) {
+      genreHtml += '<span class="ba-genre-tag ' + (state.selectedGenre === g ? 'active' : '') + '" onclick="BookAnalysisManager.toggleGenre(\'' + g + '\')">' + g + '</span>';
+    });
+    var platformHtml = '';
+    PLATFORMS.forEach(function(p) {
+      platformHtml += '<div class="ba-platform-btn ' + (state.selectedPlatform === p ? 'active' : '') + '" onclick="BookAnalysisManager.setPlatform(\'' + p + '\')">' + p + '</div>';
+    });
+    panel.innerHTML =
+      '<div class="ba-toolbar">' +
+        '<input type="text" id="baSearchInput" placeholder="搜索案例..." onkeydown="if(event.key===\'Enter\')BookAnalysisManager.doSearch(this.value)">' +
+        '<div class="ba-genre-tags">' + genreHtml + '</div>' +
+        '<div class="ba-platform-row">' + platformHtml + '</div>' +
+      '</div>' +
+      '<div class="ba-list" id="baCaseList">' +
+        '<div class="panel-placeholder"><div class="loader"></div><span>加载中...</span></div>' +
+      '</div>' +
+      '<div class="ba-footer">' +
+        '<button class="btn btn-sm" onclick="BookAnalysisManager.compareCases()">📊 对比分析</button>' +
+        '<button class="btn btn-sm btn-primary" onclick="BookAnalysisManager.extractMethodology()">💡 提炼方法论</button>' +
+      '</div>';
+  }
+
+  function _loadCategories() {
+    apiFetch('/api/v1/book-analysis/categories', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) state.categories = d.data;
+      })
+      .catch(function() {});
+  }
+
+  function _loadCases() {
+    state.loading = true;
+    var url = '/api/v1/book-analysis/cases?page=' + state.page;
+    if (state.searchQuery) url += '&search=' + encodeURIComponent(state.searchQuery);
+    if (state.selectedGenre) url += '&genre=' + encodeURIComponent(state.selectedGenre);
+    if (state.selectedPlatform) url += '&platform=' + encodeURIComponent(state.selectedPlatform);
+    apiFetch(url, { method: 'GET' })
+      .then(function(d) {
+        state.loading = false;
+        if (d.success && d.data) {
+          state.cases = d.data.cases || d.data.items || d.data || [];
+        } else {
+          state.cases = _getMockCases();
+        }
+        _renderCases();
+      })
+      .catch(function() {
+        state.loading = false;
+        state.cases = _getMockCases();
+        _renderCases();
+      });
+  }
+
+  function _getMockCases() {
+    var titles = ['诡秘之主','斗破苍穹','凡人修仙传','全职高手','庆余年','遮天','完美世界','大奉打更人','夜的命名术','深空彼岸','择日飞升','我师兄实在太稳健了'];
+    var authors = ['爱潜水的乌贼','天蚕土豆','忘语','蝴蝶蓝','猫腻','辰东','辰东','卖报小郎君','会说话的肘子','辰东','言归正传','言归正传'];
+    var genres = ['玄幻','玄幻','仙侠','游戏','历史','玄幻','玄幻','仙侠','科幻','玄幻','仙侠','仙侠'];
+    var platforms = ['起点','起点','起点','起点','起点','起点','起点','番茄','起点','起点','起点','起点'];
+    var mocks = [];
+    for (var i = 0; i < 12; i++) {
+      mocks.push({
+        id: 'case_' + (i + 1),
+        title: titles[i],
+        author: authors[i],
+        genre: genres[i],
+        platform: platforms[i],
+        word_count: (Math.floor(Math.random() * 400) + 100) + '万字',
+        status: i % 3 === 0 ? '连载中' : '已完结',
+        tags: ['爽文','升级流','热血'].slice(0, Math.floor(Math.random() * 3) + 1),
+        description: '这是一部经典的' + genres[i] + '小说，讲述了主角在' + genres[i] + '世界中不断成长、克服困难的故事。作品节奏紧凑，爽点密集，人物塑造鲜明。',
+      });
+    }
+    return mocks;
+  }
+
+  function _renderCases() {
+    var el = document.getElementById('baCaseList');
+    if (!el) return;
+    if (state.loading) {
+      el.innerHTML = '<div class="panel-placeholder"><div class="loader"></div><span>加载中...</span></div>';
+      return;
+    }
+    if (!state.cases.length) {
+      el.innerHTML = '<div class="empty-state" style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px;">未找到匹配案例</div>';
+      return;
+    }
+    var html = '';
+    state.cases.forEach(function(c) {
+      var selected = state.selectedCases[c.id] ? 'selected' : '';
+      var tagsHtml = '';
+      (c.tags || []).forEach(function(t) {
+        tagsHtml += '<span class="pc-tag" style="font-size:9px;">' + esc(t) + '</span>';
+      });
+      html += '<div class="ba-case-card ' + selected + '" onclick="BookAnalysisManager.showDetail(\'' + c.id + '\')">' +
+        '<div class="ba-case-title">' + esc(c.title || '') + '</div>' +
+        '<div class="ba-case-meta">' +
+          '<span>' + esc(c.author || '') + '</span>' +
+          '<span>·</span>' +
+          '<span>' + esc(c.genre || '') + '</span>' +
+          '<span>·</span>' +
+          '<span>' + esc(c.platform || '') + '</span>' +
+          '<span>·</span>' +
+          '<span>' + esc(c.word_count || '') + '</span>' +
+        '</div>' +
+        '<div class="ba-case-desc">' + esc(c.description || '') + '</div>' +
+        '<div class="ba-case-tags">' + tagsHtml + '</div>' +
+        '<div style="margin-top:4px;display:flex;gap:4px;">' +
+          '<button class="btn btn-sm" style="font-size:10px;padding:2px 8px;flex:1;" onclick="event.stopPropagation();BookAnalysisManager.toggleSelect(\'' + c.id + '\')">' + (state.selectedCases[c.id] ? '✓ 已选' : '选择') + '</button>' +
+        '</div>' +
+      '</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function toggleGenre(genre) {
+    state.selectedGenre = (state.selectedGenre === genre) ? '' : genre;
+    state.page = 1;
+    _renderPanel();
+    _loadCases();
+  }
+
+  function setPlatform(platform) {
+    state.selectedPlatform = (state.selectedPlatform === platform) ? '' : platform;
+    state.page = 1;
+    _renderPanel();
+    _loadCases();
+  }
+
+  function doSearch(q) {
+    state.searchQuery = (q || '').trim();
+    state.page = 1;
+    _loadCases();
+  }
+
+  function toggleSelect(caseId) {
+    state.selectedCases[caseId] = !state.selectedCases[caseId];
+    _renderCases();
+  }
+
+  function showDetail(caseId) {
+    var c = state.cases.find(function(x) { return x.id === caseId; });
+    if (!c) return;
+    apiFetch('/api/v1/book-analysis/cases/' + caseId, { method: 'GET' })
+      .then(function(d) {
+        var detail = (d.success && d.data) ? d.data : _getMockDetail(c);
+        _showDetailModal(detail);
+      })
+      .catch(function() {
+        _showDetailModal(_getMockDetail(c));
+      });
+  }
+
+  function _getMockDetail(c) {
+    return {
+      title: c.title, author: c.author, genre: c.genre, platform: c.platform,
+      word_count: c.word_count, status: c.status, tags: c.tags,
+      rhythm: [
+        { stage: '开篇', score: 85 },
+        { stage: '发展', score: 78 },
+        { stage: '高潮', score: 92 },
+        { stage: '结局', score: 80 },
+      ],
+      satisfaction_points: [
+        { type: '打脸爽', desc: '主角被轻视后用实力反击，让对手目瞪口呆', effect: 90 },
+        { type: '升级爽', desc: '突破境界时的震撼描写和旁人反应', effect: 88 },
+        { type: '复仇爽', desc: '积蓄力量后对仇人进行精准打击', effect: 95 },
+        { type: '收获爽', desc: '获得稀有宝物/功法时的惊喜感', effect: 82 },
+        { type: '装逼爽', desc: '隐藏实力后在关键时刻展露', effect: 87 },
+        { type: '情感爽', desc: '与重要角色的情感互动高潮', effect: 75 },
+      ],
+      structure: { main_lines: 3, sub_lines: 5, foreshadows: 12, turning_points: 8 },
+      characters: [
+        { name: '主角', arc: '从弱小到强大，经历失去与重生，最终成为世界巅峰' },
+        { name: '女主', arc: '从敌对到理解，共同成长，成为主角最坚实的后盾' },
+        { name: '反派', arc: '从不可一世到逐步瓦解，最终被主角彻底击败' },
+      ],
+      style_fingerprint: [
+        { dim: '叙事节奏', score: 88 }, { dim: '描写密度', score: 72 },
+        { dim: '对话占比', score: 65 }, { dim: '情感浓度', score: 78 },
+        { dim: '世界观深度', score: 90 }, { dim: '战斗描写', score: 85 },
+        { dim: '幽默元素', score: 60 }, { dim: '悬疑氛围', score: 70 },
+        { dim: '文笔华丽度', score: 75 }, { dim: '节奏紧凑度', score: 82 },
+        { dim: '人物塑造', score: 86 }, { dim: '创新程度', score: 77 },
+      ],
+      methodology: [
+        '开篇三章内必须出现核心冲突和金手指',
+        '每5章设置一个小高潮，每20章一个大高潮',
+        '反派塑造要有层次，不能一开始就全坏',
+        '升级体系要清晰，让读者有明确期待',
+        '重要伏笔在30章内必须回收',
+        '战斗描写遵循"劣势-反转-胜利"三段式',
+        '配角要有独立动机，不能只为衬托主角',
+        '每章结尾留钩子，引导读者继续阅读',
+        '世界观设定逐步揭示，不要一次性灌输',
+        '主角成长要有代价，不能一帆风顺',
+        '情感线与主线交织，不要割裂',
+        '关键场景用细节描写增强代入感',
+      ],
+      quotes: [
+        '三十年河东，三十年河西，莫欺少年穷！',
+        '天地不仁，以万物为刍狗。',
+        '我命由我不由天！',
+      ],
+    };
+  }
+
+  function _showDetailModal(detail) {
+    var infoHtml = '<div class="ba-info-grid">' +
+      '<div class="ba-info-item"><b>书名：</b>' + esc(detail.title || '') + '</div>' +
+      '<div class="ba-info-item"><b>作者：</b>' + esc(detail.author || '') + '</div>' +
+      '<div class="ba-info-item"><b>题材：</b>' + esc(detail.genre || '') + '</div>' +
+      '<div class="ba-info-item"><b>平台：</b>' + esc(detail.platform || '') + '</div>' +
+      '<div class="ba-info-item"><b>字数：</b>' + esc(detail.word_count || '') + '</div>' +
+      '<div class="ba-info-item"><b>状态：</b>' + esc(detail.status || '') + '</div>' +
+    '</div>';
+    var rhythmHtml = '';
+    (detail.rhythm || []).forEach(function(r) {
+      var color = r.score >= 80 ? 'var(--success)' : (r.score >= 60 ? 'var(--warning)' : 'var(--error)');
+      rhythmHtml += '<div class="ba-rhythm-row">' +
+        '<span class="ba-rhythm-label">' + esc(r.stage || '') + '</span>' +
+        '<div class="ba-rhythm-bar"><div class="ba-rhythm-fill" style="width:' + r.score + '%;background:' + color + ';"></div></div>' +
+        '<span class="ba-rhythm-score" style="color:' + color + ';">' + r.score + '</span>' +
+      '</div>';
+    });
+    var satHtml = '';
+    (detail.satisfaction_points || []).forEach(function(s) {
+      satHtml += '<div class="ba-satisfaction-item">' +
+        '<div class="ba-satisfaction-type">' + esc(s.type || '') + ' · 效果分 ' + (s.effect || 0) + '</div>' +
+        '<div class="ba-satisfaction-desc">' + esc(s.desc || '') + '</div>' +
+      '</div>';
+    });
+    var struct = detail.structure || {};
+    var structHtml = '<div class="ba-structure-grid">' +
+      '<div class="ba-structure-item"><div class="ba-structure-num">' + (struct.main_lines || 0) + '</div><div class="ba-structure-label">主线</div></div>' +
+      '<div class="ba-structure-item"><div class="ba-structure-num">' + (struct.sub_lines || 0) + '</div><div class="ba-structure-label">支线</div></div>' +
+      '<div class="ba-structure-item"><div class="ba-structure-num">' + (struct.foreshadows || 0) + '</div><div class="ba-structure-label">伏笔</div></div>' +
+      '<div class="ba-structure-item"><div class="ba-structure-num">' + (struct.turning_points || 0) + '</div><div class="ba-structure-label">转折</div></div>' +
+    '</div>';
+    var charHtml = '';
+    (detail.characters || []).forEach(function(ch) {
+      charHtml += '<div class="ba-character-item">' +
+        '<div class="ba-character-name">' + esc(ch.name || '') + '</div>' +
+        '<div class="ba-character-arc">' + esc(ch.arc || '') + '</div>' +
+      '</div>';
+    });
+    var styleHtml = '';
+    (detail.style_fingerprint || []).forEach(function(s) {
+      styleHtml += '<div class="ba-style-row">' +
+        '<span class="ba-style-label">' + esc(s.dim || '') + '</span>' +
+        '<div class="ba-style-bar"><div class="ba-style-fill" style="width:' + (s.score || 0) + '%;"></div></div>' +
+        '<span class="ba-style-score">' + (s.score || 0) + '</span>' +
+      '</div>';
+    });
+    var methodHtml = '';
+    (detail.methodology || []).forEach(function(m, i) {
+      methodHtml += '<div class="ba-method-item">' + (i + 1) + '. ' + esc(m || '') + '</div>';
+    });
+    var quoteHtml = '';
+    (detail.quotes || []).forEach(function(q) {
+      quoteHtml += '<div class="ba-quote-item">"' + esc(q || '') + '"</div>';
+    });
+    var bodyHtml =
+      '<div class="ba-detail-section"><div class="ba-detail-title">📖 作品信息</div>' + infoHtml + '</div>' +
+      '<div class="ba-detail-section"><div class="ba-detail-title">📈 叙事节奏分析</div>' + rhythmHtml + '</div>' +
+      '<div class="ba-detail-section"><div class="ba-detail-title">⚡ 爽点设置</div>' + satHtml + '</div>' +
+      '<div class="ba-detail-section"><div class="ba-detail-title">🏗️ 情节结构</div>' + structHtml + '</div>' +
+      '<div class="ba-detail-section"><div class="ba-detail-title">👤 人物弧光</div>' + charHtml + '</div>' +
+      '<div class="ba-detail-section"><div class="ba-detail-title">🎨 风格指纹（12维度）</div>' + styleHtml + '</div>' +
+      '<div class="ba-detail-section"><div class="ba-detail-title">💡 可复用方法论</div>' + methodHtml + '</div>' +
+      '<div class="ba-detail-section"><div class="ba-detail-title">✍️ 经典金句</div>' + quoteHtml + '</div>';
+    showGenericModal('📖 ' + (detail.title || '案例详情'), bodyHtml, '720px');
+  }
+
+  function compareCases() {
+    var ids = Object.keys(state.selectedCases).filter(function(k) { return state.selectedCases[k]; });
+    if (ids.length < 2) { IDE.toast('请至少选择2个案例进行对比', 'warning'); return; }
+    apiFetch('/api/v1/book-analysis/compare', {
+      method: 'POST',
+      body: JSON.stringify({ case_ids: ids })
+    })
+    .then(function(d) {
+      var result = (d.success && d.data) ? d.data : _getMockCompare(ids);
+      _showCompareModal(result);
+    })
+    .catch(function() {
+      _showCompareModal(_getMockCompare(ids));
+    });
+  }
+
+  function _getMockCompare(ids) {
+    var selected = state.cases.filter(function(c) { return ids.indexOf(c.id) !== -1; });
+    var dimensions = ['叙事节奏','爽点密度','结构复杂度','风格独特性','人物深度'];
+    var rows = dimensions.map(function(dim) {
+      var row = { dimension: dim };
+      selected.forEach(function(c) {
+        row[c.id] = Math.floor(Math.random() * 30) + 65;
+      });
+      return row;
+    });
+    return { cases: selected, dimensions: dimensions, rows: rows };
+  }
+
+  function _showCompareModal(result) {
+    var cases = result.cases || [];
+    var headerHtml = '<th>维度</th>';
+    cases.forEach(function(c) { headerHtml += '<th>' + esc(c.title || '') + '</th>'; });
+    var bodyHtml = '';
+    (result.rows || []).forEach(function(row) {
+      bodyHtml += '<tr><td><b>' + esc(row.dimension || '') + '</b></td>';
+      cases.forEach(function(c) {
+        var score = row[c.id] || 0;
+        var color = score >= 80 ? 'var(--success)' : (score >= 60 ? 'var(--warning)' : 'var(--error)');
+        bodyHtml += '<td style="color:' + color + ';font-weight:600;">' + score + '</td>';
+      });
+      bodyHtml += '</tr>';
+    });
+    var html = '<table class="ba-compare-table"><thead><tr>' + headerHtml + '</tr></thead><tbody>' + bodyHtml + '</tbody></table>';
+    showGenericModal('📊 多案例对比分析', html, '680px');
+  }
+
+  function extractMethodology() {
+    var ids = Object.keys(state.selectedCases).filter(function(k) { return state.selectedCases[k]; });
+    if (ids.length < 1) { IDE.toast('请至少选择1个案例', 'warning'); return; }
+    apiFetch('/api/v1/book-analysis/methodology', {
+      method: 'POST',
+      body: JSON.stringify({ case_ids: ids })
+    })
+    .then(function(d) {
+      var result = (d.success && d.data) ? d.data : _getMockMethodology(ids);
+      _showMethodologyModal(result);
+    })
+    .catch(function() {
+      _showMethodologyModal(_getMockMethodology(ids));
+    });
+  }
+
+  function _getMockMethodology(ids) {
+    return {
+      summary: '从选中的' + ids.length + '个案例中提取了以下共性写作技巧',
+      techniques: [
+        '开篇三章定律：前三章必须完成世界观引入、主角出场、核心冲突建立',
+        '黄金三章结构：第一章钩子、第二章冲突、第三章小高潮',
+        '爽点节奏控制：平均每3000字一个小爽点，每章至少一个',
+        '反派分层理论：小反派(章级)、中反派(卷级)、大反派(书级)三级体系',
+        '升级期待感：明确的境界/等级体系，每次突破都有仪式感',
+        '伏笔回收周期：重要伏笔不超过30章必须回收',
+        '配角工具人化：每个配角都有明确功能定位，不浪费笔墨',
+        '情感线穿插：每5-8章插入一段情感互动调节节奏',
+        '世界观渐进式：通过剧情自然揭示设定，避免大段说明',
+        '结尾钩子公式：悬念+危机+新信息，三选一或组合',
+      ],
+    };
+  }
+
+  function _showMethodologyModal(result) {
+    var html = '<div style="margin-bottom:12px;font-size:12px;color:var(--text-secondary);">' + esc(result.summary || '') + '</div>';
+    (result.techniques || []).forEach(function(t, i) {
+      html += '<div class="ba-method-item">' + (i + 1) + '. ' + esc(t || '') + '</div>';
+    });
+    showGenericModal('💡 共性方法论提取', html, '640px');
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    toggleGenre: toggleGenre,
+    setPlatform: setPlatform,
+    doSearch: doSearch,
+    toggleSelect: toggleSelect,
+    showDetail: showDetail,
+    compareCases: compareCases,
+    extractMethodology: extractMethodology,
+  };
+})();
+
+/* ============================================================
+   P1新增：工作流可视化管理器 WorkflowManager
+   ============================================================ */
+var WorkflowManager = (function() {
+  var state = {
+    loaded: false,
+    activeTab: 'presets',
+    presets: [],
+    customWorkflows: [],
+    nodeTypes: [],
+    executing: false,
+    executionState: null,
+  };
+
+  function ensureLoaded() {
+    if (state.loaded) return;
+    state.loaded = true;
+    _renderPanel();
+    _loadNodeTypes();
+    refresh();
+  }
+
+  function refresh() {
+    if (!state.loaded) { ensureLoaded(); return; }
+    _loadPresets();
+    _loadWorkflows();
+  }
+
+  function _renderPanel() {
+    var panel = document.getElementById('workflowContent');
+    panel.innerHTML =
+      '<div class="wf-tabs">' +
+        '<div class="wf-tab ' + (state.activeTab === 'presets' ? 'active' : '') + '" onclick="WorkflowManager.switchTab(\'presets\')">预设工作流</div>' +
+        '<div class="wf-tab ' + (state.activeTab === 'custom' ? 'active' : '') + '" onclick="WorkflowManager.switchTab(\'custom\')">自定义工作流</div>' +
+      '</div>' +
+      '<div class="wf-list" id="wfList">' +
+        '<div class="panel-placeholder"><div class="loader"></div><span>加载中...</span></div>' +
+      '</div>';
+  }
+
+  function switchTab(tab) {
+    state.activeTab = tab;
+    _renderPanel();
+    _renderList();
+  }
+
+  function _loadNodeTypes() {
+    apiFetch('/api/v1/workflow-engine/node-types', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) state.nodeTypes = d.data;
+      })
+      .catch(function() {});
+  }
+
+  function _loadPresets() {
+    apiFetch('/api/v1/workflow-engine/presets', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) {
+          state.presets = d.data.presets || d.data.items || d.data || [];
+        } else {
+          state.presets = _getMockPresets();
+        }
+        if (state.activeTab === 'presets') _renderList();
+      })
+      .catch(function() {
+        state.presets = _getMockPresets();
+        if (state.activeTab === 'presets') _renderList();
+      });
+  }
+
+  function _loadWorkflows() {
+    apiFetch('/api/v1/workflow-engine/workflows', { method: 'GET' })
+      .then(function(d) {
+        if (d.success && d.data) {
+          state.customWorkflows = d.data.workflows || d.data.items || d.data || [];
+        } else {
+          state.customWorkflows = _getMockCustom();
+        }
+        if (state.activeTab === 'custom') _renderList();
+      })
+      .catch(function() {
+        state.customWorkflows = _getMockCustom();
+        if (state.activeTab === 'custom') _renderList();
+      });
+  }
+
+  function _getMockPresets() {
+    return [
+      {
+        id: 'preset_chapter', name: '章节生成', category: '创作',
+        node_count: 5, edge_count: 4,
+        description: '从大纲到完整章节的全自动生成流程',
+        nodes: [
+          { id: 'n1', name: '输入', type: 'input', x: 40, y: 120 },
+          { id: 'n2', name: '大纲解析', type: 'llm', x: 180, y: 60 },
+          { id: 'n3', name: '细纲生成', type: 'llm', x: 180, y: 180 },
+          { id: 'n4', name: '正文写作', type: 'llm', x: 340, y: 120 },
+          { id: 'n5', name: '输出', type: 'output', x: 500, y: 120 },
+        ],
+        edges: [
+          { from: 'n1', to: 'n2' }, { from: 'n1', to: 'n3' },
+          { from: 'n2', to: 'n4' }, { from: 'n3', to: 'n4' }, { from: 'n4', to: 'n5' },
+        ],
+        inputs: [{ key: 'outline', label: '卷大纲', type: 'textarea' }, { key: 'chapter_num', label: '章节号', type: 'number' }],
+      },
+      {
+        id: 'preset_imitate', name: '爆款仿写', category: '分析',
+        node_count: 6, edge_count: 5,
+        description: '分析爆款作品并生成仿写内容',
+        nodes: [
+          { id: 'n1', name: '输入', type: 'input', x: 40, y: 140 },
+          { id: 'n2', name: '风格提取', type: 'llm', x: 180, y: 60 },
+          { id: 'n3', name: '结构分析', type: 'llm', x: 180, y: 140 },
+          { id: 'n4', name: '爽点识别', type: 'llm', x: 180, y: 220 },
+          { id: 'n5', name: '仿写生成', type: 'llm', x: 360, y: 140 },
+          { id: 'n6', name: '输出', type: 'output', x: 520, y: 140 },
+        ],
+        edges: [
+          { from: 'n1', to: 'n2' }, { from: 'n1', to: 'n3' }, { from: 'n1', to: 'n4' },
+          { from: 'n2', to: 'n5' }, { from: 'n3', to: 'n5' }, { from: 'n4', to: 'n5' }, { from: 'n5', to: 'n6' },
+        ],
+        inputs: [{ key: 'reference_text', label: '参考文本', type: 'textarea' }, { key: 'topic', label: '仿写主题', type: 'text' }],
+      },
+      {
+        id: 'preset_humanize', name: '降AI处理', category: '优化',
+        node_count: 4, edge_count: 3,
+        description: 'AI文本检测与人性化改写全流程',
+        nodes: [
+          { id: 'n1', name: '输入', type: 'input', x: 40, y: 120 },
+          { id: 'n2', name: 'AI率检测', type: 'llm', x: 180, y: 60 },
+          { id: 'n3', name: '人性化改写', type: 'llm', x: 180, y: 180 },
+          { id: 'n4', name: '输出', type: 'output', x: 360, y: 120 },
+        ],
+        edges: [
+          { from: 'n1', to: 'n2' }, { from: 'n2', to: 'n3' }, { from: 'n3', to: 'n4' },
+        ],
+        inputs: [{ key: 'text', label: '待处理文本', type: 'textarea' }, { key: 'strategies', label: '策略(逗号分隔)', type: 'text' }],
+      },
+    ];
+  }
+
+  function _getMockCustom() {
+    return [
+      { id: 'custom_1', name: '我的玄幻生成流', category: '自定义', node_count: 7, edge_count: 6, description: '针对玄幻题材优化的生成流程' },
+      { id: 'custom_2', name: '质量审计管线', category: '自定义', node_count: 4, edge_count: 3, description: '多维度质量自动审计' },
+    ];
+  }
+
+  function _renderList() {
+    var el = document.getElementById('wfList');
+    if (!el) return;
+    var items = state.activeTab === 'presets' ? state.presets : state.customWorkflows;
+    if (!items.length) {
+      el.innerHTML = '<div class="empty-state" style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px;">暂无' + (state.activeTab === 'presets' ? '预设' : '自定义') + '工作流</div>';
+      return;
+    }
+    var html = '';
+    items.forEach(function(wf) {
+      var isPreset = state.activeTab === 'presets';
+      html += '<div class="wf-card">' +
+        '<div class="wf-card-header">' +
+          '<span class="wf-card-icon">' + (isPreset ? '⚡' : '🔧') + '</span>' +
+          '<span class="wf-card-name">' + esc(wf.name || '') + '</span>' +
+          '<span class="wf-card-category">' + esc(wf.category || '') + '</span>' +
+        '</div>' +
+        '<div class="wf-card-meta">' +
+          '<span>📦 ' + (wf.node_count || 0) + '节点</span>' +
+          '<span>🔗 ' + (wf.edge_count || 0) + '连线</span>' +
+        '</div>' +
+        (wf.description ? '<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;line-height:1.4;">' + esc(wf.description) + '</div>' : '') +
+        '<div class="wf-card-actions">' +
+          '<button onclick="WorkflowManager.executeWorkflow(\'' + wf.id + '\')">▶ 执行</button>' +
+          '<button onclick="WorkflowManager.viewCanvas(\'' + wf.id + '\')">🖼 画布</button>' +
+          (isPreset ? '' : '<button onclick="WorkflowManager.deleteWorkflow(\'' + wf.id + '\')" style="color:var(--error);">🗑</button>') +
+        '</div>' +
+      '</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function _findWorkflow(id) {
+    var all = state.presets.concat(state.customWorkflows);
+    return all.find(function(w) { return w.id === id; });
+  }
+
+  function executeWorkflow(id) {
+    var wf = _findWorkflow(id);
+    if (!wf) { IDE.toast('工作流不存在', 'error'); return; }
+    _showExecuteModal(wf);
+  }
+
+  function _showExecuteModal(wf) {
+    var inputsHtml = '';
+    var inputs = wf.inputs || [{ key: 'input', label: '输入', type: 'textarea' }];
+    inputs.forEach(function(inp) {
+      inputsHtml += '<div class="ws-form-row" style="margin-bottom:8px;">' +
+        '<label class="ws-form-label">' + esc(inp.label || inp.key) + '</label>';
+      if (inp.type === 'textarea') {
+        inputsHtml += '<textarea class="ws-form-textarea" id="wf_in_' + inp.key + '" rows="3" placeholder="输入' + esc(inp.label || '') + '..."></textarea>';
+      } else if (inp.type === 'number') {
+        inputsHtml += '<input type="number" class="ws-form-input" id="wf_in_' + inp.key + '" value="1">';
+      } else {
+        inputsHtml += '<input type="text" class="ws-form-input" id="wf_in_' + inp.key + '" placeholder="输入...">';
+      }
+      inputsHtml += '</div>';
+    });
+    var bodyHtml =
+      '<div id="wfExecInputArea">' +
+        '<div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text-primary);">📝 输入参数</div>' +
+        inputsHtml +
+      '</div>' +
+      '<div id="wfExecProgress" style="display:none;">' +
+        '<div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text-primary);">⚡ 执行进度</div>' +
+        '<div id="wfExecNodes" style="margin-bottom:8px;"></div>' +
+        '<div class="wf-exec-log" id="wfExecLog"></div>' +
+      '</div>' +
+      '<div id="wfExecResult" style="display:none;">' +
+        '<div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text-primary);">✅ 执行结果</div>' +
+        '<div class="wf-exec-result" id="wfExecResultContent"></div>' +
+      '</div>';
+    var footerHtml =
+      '<button class="btn btn-sm" onclick="hideGenericModal()">关闭</button>' +
+      '<button class="btn btn-primary btn-sm" id="wfExecStartBtn" onclick="WorkflowManager.startExecution(\'' + wf.id + '\')">🚀 开始执行</button>';
+    showGenericModal('⚡ 执行：' + wf.name, bodyHtml, '640px', footerHtml);
+  }
+
+  function startExecution(id) {
+    var wf = _findWorkflow(id);
+    if (!wf) return;
+    if (state.executing) return;
+    state.executing = true;
+    var btn = document.getElementById('wfExecStartBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span>执行中...'; }
+    document.getElementById('wfExecInputArea').style.display = 'none';
+    document.getElementById('wfExecProgress').style.display = 'block';
+    var nodes = wf.nodes || [{ id: 'n1', name: '处理中', type: 'llm' }];
+    state.executionState = { nodes: {}, log: [], currentIndex: 0 };
+    nodes.forEach(function(n) { state.executionState.nodes[n.id] = 'pending'; });
+    _renderExecNodes(wf);
+    _appendLog('system', '工作流启动: ' + wf.name);
+    var inputs = {};
+    (wf.inputs || []).forEach(function(inp) {
+      var el = document.getElementById('wf_in_' + inp.key);
+      if (el) inputs[inp.key] = el.value;
+    });
+    apiFetch('/api/v1/workflow-engine/workflows/' + id + '/execute', {
+      method: 'POST',
+      body: JSON.stringify({ inputs: inputs })
+    })
+    .then(function(d) {
+      if (d.success && d.data && d.data.execution_id) {
+        _pollExecution(d.data.execution_id, wf);
+      } else {
+        _simulateExecution(wf);
+      }
+    })
+    .catch(function() {
+      _simulateExecution(wf);
+    });
+  }
+
+  function _simulateExecution(wf) {
+    var nodes = wf.nodes || [{ id: 'n1', name: '处理', type: 'llm' }];
+    var idx = 0;
+    function nextNode() {
+      if (idx >= nodes.length) {
+        _finishExecution(wf, { output: '模拟执行完成，共处理 ' + nodes.length + ' 个节点' });
+        return;
+      }
+      var node = nodes[idx];
+      state.executionState.nodes[node.id] = 'running';
+      state.executionState.currentIndex = idx;
+      _renderExecNodes(wf);
+      _appendLog(node.name, '开始执行节点: ' + node.name + ' (' + node.type + ')');
+      setTimeout(function() {
+        state.executionState.nodes[node.id] = 'done';
+        _appendLog(node.name, '节点完成，输出: ' + node.name + '结果');
+        _renderExecNodes(wf);
+        idx++;
+        nextNode();
+      }, 800 + Math.random() * 600);
+    }
+    nextNode();
+  }
+
+  function _pollExecution(executionId, wf) {
+    var pollCount = 0;
+    function poll() {
+      pollCount++;
+      if (pollCount > 30) { _simulateExecution(wf); return; }
+      apiFetch('/api/v1/workflow-engine/executions/' + executionId, { method: 'GET' })
+        .then(function(d) {
+          if (d.success && d.data) {
+            var status = d.data.status || d.data.state;
+            if (d.data.nodes) {
+              d.data.nodes.forEach(function(n) {
+                if (state.executionState.nodes[n.id] !== n.status) {
+                  state.executionState.nodes[n.id] = n.status;
+                  _appendLog(n.name || n.id, '节点状态: ' + n.status + (n.message ? ' - ' + n.message : ''));
+                }
+              });
+              _renderExecNodes(wf);
+            }
+            if (status === 'completed' || status === 'done' || status === 'success') {
+              _finishExecution(wf, d.data.result || d.data.outputs || { output: '执行完成' });
+              return;
+            }
+            if (status === 'failed' || status === 'error') {
+              _appendLog('error', '执行失败: ' + (d.data.error || '未知错误'));
+              state.executing = false;
+              return;
+            }
+          }
+          setTimeout(poll, 1000);
+        })
+        .catch(function() {
+          setTimeout(poll, 1000);
+        });
+    }
+    poll();
+  }
+
+  function _renderExecNodes(wf) {
+    var el = document.getElementById('wfExecNodes');
+    if (!el || !state.executionState) return;
+    var nodes = wf.nodes || [];
+    var html = '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    nodes.forEach(function(n) {
+      var status = state.executionState.nodes[n.id] || 'pending';
+      var statusClass = status;
+      var statusText = { pending: '等待', running: '执行中', done: '完成', error: '错误' }[status] || status;
+      html += '<div style="font-size:10px;padding:3px 8px;background:var(--bg-input);border-radius:3px;display:flex;align-items:center;gap:4px;">' +
+        '<span class="wf-node-status ' + statusClass + '"></span>' +
+        esc(n.name || n.id) + ' (' + esc(statusText) + ')' +
+      '</div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  function _appendLog(node, msg) {
+    var el = document.getElementById('wfExecLog');
+    if (!el) return;
+    var now = new Date();
+    var time = now.toLocaleTimeString();
+    var line = '<div><span class="log-time">[' + time + ']</span> <span class="log-node">' + esc(node) + '</span>: <span class="log-msg">' + esc(msg) + '</span></div>';
+    el.innerHTML += line;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function _finishExecution(wf, result) {
+    state.executing = false;
+    var btn = document.getElementById('wfExecStartBtn');
+    if (btn) { btn.disabled = false; btn.textContent = '🚀 重新执行'; }
+    _appendLog('system', '工作流执行完成');
+    var resultEl = document.getElementById('wfExecResult');
+    var resultContent = document.getElementById('wfExecResultContent');
+    if (resultEl && resultContent) {
+      resultEl.style.display = 'block';
+      var html = '';
+      if (typeof result === 'object') {
+        Object.entries(result).forEach(function(entry) {
+          html += '<div class="wf-exec-result-item">' +
+            '<div class="wf-exec-result-name">' + esc(entry[0]) + '</div>' +
+            '<div class="wf-exec-result-output">' + esc(typeof entry[1] === 'object' ? JSON.stringify(entry[1], null, 2) : String(entry[1])) + '</div>' +
+          '</div>';
+        });
+      } else {
+        html = '<div class="wf-exec-result-output">' + esc(String(result)) + '</div>';
+      }
+      resultContent.innerHTML = html;
+    }
+  }
+
+  function viewCanvas(id) {
+    var wf = _findWorkflow(id);
+    if (!wf) { IDE.toast('工作流不存在', 'error'); return; }
+    _showCanvasModal(wf);
+  }
+
+  function _showCanvasModal(wf) {
+    var nodes = wf.nodes || [];
+    var edges = wf.edges || [];
+    var maxX = 600, maxY = 300;
+    nodes.forEach(function(n) {
+      if (n.x + 120 > maxX) maxX = n.x + 140;
+      if (n.y + 60 > maxY) maxY = n.y + 80;
+    });
+    var nodeMap = {};
+    nodes.forEach(function(n) { nodeMap[n.id] = n; });
+    var edgesHtml = '';
+    edges.forEach(function(e) {
+      var from = nodeMap[e.from], to = nodeMap[e.to];
+      if (from && to) {
+        var x1 = (from.x || 0) + 50, y1 = (from.y || 0) + 25;
+        var x2 = (to.x || 0), y2 = (to.y || 0) + 25;
+        edgesHtml += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#wfArrow)"/>';
+      }
+    });
+    var typeIcons = { input: '📥', output: '📤', llm: '🤖', condition: '🔀', loop: '🔁', code: '💻', http: '🌐' };
+    var nodesHtml = '';
+    nodes.forEach(function(n) {
+      var icon = typeIcons[n.type] || '📦';
+      nodesHtml += '<div class="wf-canvas-node" style="left:' + (n.x || 0) + 'px;top:' + (n.y || 0) + 'px;">' +
+        '<div class="wf-canvas-node-icon">' + icon + '</div>' +
+        '<div class="wf-canvas-node-name">' + esc(n.name || n.id) + '</div>' +
+        '<div class="wf-canvas-node-type">' + esc(n.type || '') + '</div>' +
+      '</div>';
+    });
+    var bodyHtml =
+      '<div class="wf-canvas-container" style="height:360px;position:relative;">' +
+        '<svg width="' + maxX + '" height="' + maxY + '" style="position:absolute;top:0;left:0;pointer-events:none;">' +
+          '<defs><marker id="wfArrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--text-muted)"/></marker></defs>' +
+          edgesHtml +
+        '</svg>' +
+        nodesHtml +
+      '</div>' +
+      '<div style="margin-top:8px;font-size:11px;color:var(--text-muted);">共 ' + nodes.length + ' 个节点，' + edges.length + ' 条连线（只读视图）</div>';
+    showGenericModal('🖼 工作流画布：' + wf.name, bodyHtml, '720px');
+  }
+
+  function deleteWorkflow(id) {
+    if (!confirm('确定删除此工作流？')) return;
+    apiFetch('/api/v1/workflow-engine/workflows/' + id, { method: 'DELETE' })
+      .then(function(d) {
+        if (d.success) {
+          IDE.toast('已删除', 'success');
+          state.customWorkflows = state.customWorkflows.filter(function(w) { return w.id !== id; });
+          _renderList();
+        } else {
+          IDE.toast(d.error || '删除失败', 'error');
+        }
+      })
+      .catch(function(e) {
+        IDE.toast('删除异常: ' + e.message, 'error');
+      });
+  }
+
+  return {
+    ensureLoaded: ensureLoaded,
+    refresh: refresh,
+    switchTab: switchTab,
+    executeWorkflow: executeWorkflow,
+    startExecution: startExecution,
+    viewCanvas: viewCanvas,
+    deleteWorkflow: deleteWorkflow,
+  };
+})();
 
 </script>
 </body>

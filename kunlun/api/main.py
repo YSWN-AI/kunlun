@@ -48,7 +48,7 @@ if _rate_limit_enabled:
                         file_values[key] = value
             return file_values
 
-        _StarletteConfig._read_file = staticmethod(_utf8_read_file)  # type: ignore
+        _StarletteConfig._read_file = staticmethod(_utf8_read_file)
     except (ImportError, AttributeError) as e:
         logger.debug(f"[Startup] starlette Config monkey-patch 跳过: {e}")
 
@@ -457,6 +457,59 @@ try:
     logger.debug("工作台路由 /api/v1/workstation")
 except Exception as e:
     logger.debug(f"工作台路由跳过: {e}")
+
+try:
+    from kunlun.api.routers.ai_rate_workbench import router as ai_workbench_router
+
+    app.include_router(ai_workbench_router, prefix="/api/v1")
+    logger.debug("降AI工作台路由 /api/v1/ai-workbench")
+except Exception as e:
+    logger.debug(f"降AI工作台路由跳过: {e}")
+
+# 专业生成器工具箱
+try:
+    from kunlun.api.routers.toolbox import router as toolbox_router
+
+    app.include_router(toolbox_router, prefix="/api/v1")
+    logger.debug("生成器工具箱路由 /api/v1/toolbox")
+except Exception as e:
+    logger.warning(f"生成器工具箱路由注册失败: {e}")
+
+# 提示词模板库
+try:
+    from kunlun.api.routers.prompt_library import router as prompt_library_router
+
+    app.include_router(prompt_library_router, prefix="/api/v1")
+    logger.debug("提示词模板库路由 /api/v1/prompt-library")
+except Exception as e:
+    logger.warning(f"提示词模板库路由注册失败: {e}")
+
+# AI拆书案例库
+try:
+    from kunlun.api.routers.book_analysis import router as book_analysis_router
+
+    app.include_router(book_analysis_router, prefix="/api/v1")
+    logger.debug("AI拆书案例库路由 /api/v1/book-analysis")
+except Exception as e:
+    logger.warning(f"AI拆书案例库路由注册失败: {e}")
+
+# 书架作品管理
+try:
+    from kunlun.api.routers.bookshelf import router as bookshelf_router
+
+    app.include_router(bookshelf_router, prefix="/api/v1")
+    logger.debug("书架作品管理路由 /api/v1/bookshelf")
+except Exception as e:
+    logger.warning(f"书架作品管理路由注册失败: {e}")
+
+# 工作流可视化编辑器
+try:
+    from kunlun.api.routers.workflow_engine import router as workflow_engine_router
+
+    app.include_router(workflow_engine_router, prefix="/api/v1")
+    logger.debug("工作流引擎路由 /api/v1/workflow-engine")
+except Exception as e:
+    logger.warning(f"工作流引擎路由注册失败: {e}")
 
 _web_dir = settings.PROJECT_ROOT / "web"
 if _web_dir.is_dir() and (_web_dir / "index.html").exists():
